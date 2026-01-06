@@ -1,0 +1,63 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(uuid())
+  email         String    @unique
+  password      String
+  name          String?
+  phone         String?
+  accessCode    String    @unique
+  isVerified    Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  orders        Order[]
+}
+
+model Order {
+  id              String    @id @default(uuid())
+  userId          String
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  designTheme     String    // Prestij, Aksiyon, Vizyon
+  industry        String
+  price           Int       // 7000 (TL cinsinden)
+  status          OrderStatus @default(PENDING)
+
+  stripePaymentId String?   @unique
+  stripeSessionId String?   @unique
+
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([status])
+}
+
+model AIAnalysis {
+  id          String    @id @default(uuid())
+  industry    String
+  analysis    String    @db.Text
+  createdAt   DateTime  @default(now())
+  ipAddress   String?
+
+  @@index([industry])
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
