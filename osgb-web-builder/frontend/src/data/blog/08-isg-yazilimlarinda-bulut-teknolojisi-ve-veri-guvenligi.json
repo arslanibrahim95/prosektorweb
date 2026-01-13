@@ -1,0 +1,32 @@
+{
+  "id": "8",
+  "slug": "isg-yazilimlarinda-bulut-teknolojisi-ve-veri-guvenligi",
+  "title": "İSG Yazılımlarında Bulut Teknolojisi ve Veri Güvenliği",
+  "excerpt": "Bulut tabanlı İSG yazılımları, veri erişilebilirliğini artırırken güvenlik endişelerini de beraberinde getiriyor. Bu yazıda, bulut teknolojisinin avantajlarını ve veri güvenliği için alınması gereken önlemleri inceliyoruz.",
+  "content": "<h2>Dijital Dönüşümün Kalbi: Bulut Tabanlı İSG Yönetimi</h2><p>Geleneksel sunucu tabanlı yazılımların yerini hızla alan bulut teknolojisi, İSG süreçlerinin yönetiminde de devrim yarattı. Artık veriler, fiziksel bir ofise bağlı kalmadan, internetin olduğu her yerden erişilebilir durumda. Bu esneklik, saha denetimlerinden eğitim takibine kadar birçok süreci hızlandırsa da, 'Verilerimiz güvende mi?' sorusunu da gündeme getiriyor.</p><h2>Bulut Teknolojisinin İSG'ye Sağladığı Avantajlar</h2><ul><li><strong>Erişilebilirlik:</strong> İş güvenliği uzmanları ve hekimler, tablet veya telefon üzerinden anlık veri girişi yapabilir.</li><li><strong>Maliyet Tasarrufu:</strong> Pahalı sunucu donanımları ve bakım maliyetleri ortadan kalkar.</li><li><strong>Otomatik Güncellemeler:</strong> Mevzuat değişiklikleri veya yeni özellikler sisteme anında yansıtılır.</li><li><strong>Veri Yedekleme:</strong> Olası bir donanım arızasında veri kaybı riski minimize edilir.</li></ul><h2>Veri Güvenliği: KVKK ve Siber Tehditler</h2><p>Sağlık verileri gibi hassas bilgilerin bulutta saklanması, KVKK uyumluluğu açısından ekstra özen gerektirir. Güvenilir bir İSG yazılımı şu özelliklere sahip olmalıdır:</p><h3>1. Şifreleme (Encryption)</h3><p>Veriler, hem transfer edilirken hem de saklanırken endüstri standardı protokollerle (örneğin 256-bit SSL) şifrelenmelidir.</p><h3>2. Yetkilendirme ve Erişim Kontrolü</h3><p>Her kullanıcının sadece kendi yetki alanındaki verilere erişebilmesi sağlanmalıdır. Rol tabanlı erişim kontrolü (RBAC) bu konuda en etkili yöntemdir.</p><h3>3. Düzenli Sızma Testleri</h3><p>Yazılım sağlayıcısı, sistemin güvenlik açıklarını tespit etmek için düzenli olarak sızma testleri (penetration tests) yaptırmalıdır.</p><h3>4. Veri Merkezi Lokasyonu</h3><p>KVKK gereği, kişisel verilerin yurt içinde saklanması tercih edilmelidir. Sunucuların Türkiye sınırları içinde olması yasal uyum açısından avantaj sağlar.</p><h2>Sonuç: Korku Değil, Tedbir</h2><p>Bulut teknolojisi, doğru güvenlik önlemleri alındığında, kağıt tabanlı sistemlerden veya yerel sunuculardan çok daha güvenlidir. İSG profesyonelleri, yazılım seçimi yaparken sadece özelliklere değil, aynı zamanda veri güvenliği standartlarına da dikkat etmelidir.</p>",
+  "coverImage": "https://images.unsplash.com/photo-1551434678-e076c223a692?w=800&h=400&fit=crop",
+  "category": {
+    "name": "Dijital Dönüşüm",
+    "slug": "dijital-donusum"
+  },
+  "tags": [
+    {
+      "name": "Bulut Bilişim",
+      "slug": "bulut-bilisim"
+    },
+    {
+      "name": "Veri Güvenliği",
+      "slug": "veri-guvenligi"
+    },
+    {
+      "name": "İSG Yazılımı",
+      "slug": "isg-yazilimi"
+    }
+  ],
+  "author": {
+    "name": "ProSektorWeb Editör"
+  },
+  "publishedAt": "2026-01-13",
+  "readingTime": 6,
+  "featured": false
+}

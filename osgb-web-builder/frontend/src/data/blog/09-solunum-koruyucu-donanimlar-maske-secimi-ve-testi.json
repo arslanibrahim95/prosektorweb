@@ -1,0 +1,32 @@
+{
+  "id": "9",
+  "slug": "solunum-koruyucu-donanimlar-maske-secimi-ve-testi",
+  "title": "Solunum Koruyucu Donanımlar: Maske Seçimi ve Testi",
+  "excerpt": "Toz, gaz ve buharlara karşı doğru maske seçimi hayati önem taşır. FFP1, FFP2, FFP3 sınıfları, filtre türleri ve yüz uyum testleri hakkında bilmeniz gereken her şey.",
+  "content": "<h2>Görünmez Tehlikelere Karşı Kalkan: Solunum Koruyucular</h2><p>İşyerlerinde solunan hava; toz, duman, gaz veya buhar şeklinde birçok kirletici barındırabilir. Bu kirleticiler, kısa vadede zehirlenmelere, uzun vadede ise silikozis, astım veya kanser gibi meslek hastalıklarına yol açabilir. Solunum koruyucu donanımlar (SKD), mühendislik önlemlerinin yetersiz kaldığı durumlarda çalışanın sağlığını koruyan son bariyerdir.</p><h2>Maske Türleri ve Koruma Sınıfları</h2><p>Solunum koruyucular temel olarak toz maskeleri ve gaz/buhar maskeleri olarak ikiye ayrılır.</p><h3>Toz Maskeleri (Partikül Filtreli):</h3><ul><li><strong>FFP1:</strong> Toksik olmayan tozlara karşı düşük koruma sağlar. (Maruziyet sınırı: 4xMAK)</li><li><strong>FFP2:</strong> Orta düzeyde toksik tozlar, dumanlar ve aerosollere karşı korur. (Maruziyet sınırı: 10xMAK)</li><li><strong>FFP3:</strong> Yüksek toksisiteye sahip tozlar, radyoaktif maddeler, virüs ve bakterilere karşı en yüksek korumayı sağlar. (Maruziyet sınırı: 20xMAK)</li></ul><h3>Gaz ve Buhar Maskeleri:</h3><p>Bu maskeler, aktif karbonlu filtreler kullanır. Filtreler, kirleticinin türüne göre renk kodları ile sınıflandırılır (Örn: A tipi kahverengi - Organik gazlar, B tipi gri - İnorganik gazlar).</p><h2>Doğru Seçim İçin Adımlar</h2><ol><li><strong>Tehlikeyi Tanımlayın:</strong> Ortamda toz mu, gaz mı yoksa her ikisi birden mi var?</li><li><strong>Konsantrasyonu Ölçün:</strong> Kirletici miktarı yasal sınırların ne kadar üzerinde?</li><li><strong>Kullanıcıyı Değerlendirin:</strong> Çalışanın sakalı var mı? Gözlük kullanıyor mu? Bu faktörler maske sızdırmazlığını etkiler.</li></ol><h2>Yüz Uyum Testi (Fit Test)</h2><p>En kaliteli maske bile, yüze tam oturmazsa koruma sağlamaz. 'Yüz Uyum Testi', maskenin kullanıcının yüzüne doğru şekilde oturup oturmadığını ve sızdırmazlık sağlayıp sağlamadığını belirlemek için yapılan bir testtir. Özellikle negatif basınçlı maskelerde bu testin yapılması hayati önem taşır.</p><h2>Sonuç: Nefes Almak Haktır</h2><p>Solunum koruyucu seçimi rastgele yapılamaz. Ortam ölçümleri, risk analizi ve bireysel faktörler göz önünde bulundurularak yapılan doğru seçim, çalışanın sağlıklı bir şekilde nefes almasını ve geleceğini güvence altına almasını sağlar.</p>",
+  "coverImage": "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=800&h=400&fit=crop",
+  "category": {
+    "name": "İş Güvenliği",
+    "slug": "is-guvenligi"
+  },
+  "tags": [
+    {
+      "name": "KKD",
+      "slug": "kkd"
+    },
+    {
+      "name": "Solunum Koruyucu",
+      "slug": "solunum-koruyucu"
+    },
+    {
+      "name": "Maske Seçimi",
+      "slug": "maske-secimi"
+    }
+  ],
+  "author": {
+    "name": "ProSektorWeb Editör"
+  },
+  "publishedAt": "2026-01-13",
+  "readingTime": 7,
+  "featured": false
+}

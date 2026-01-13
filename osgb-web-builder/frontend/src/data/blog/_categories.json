@@ -1,0 +1,27 @@
+[
+  {
+    "name": "Mevzuat",
+    "slug": "mevzuat",
+    "count": 2
+  },
+  {
+    "name": "İş Güvenliği",
+    "slug": "is-guvenligi",
+    "count": 15
+  },
+  {
+    "name": "Dijital Dönüşüm",
+    "slug": "dijital-donusum",
+    "count": 3
+  },
+  {
+    "name": "Risk Yönetimi",
+    "slug": "risk-yonetimi",
+    "count": 3
+  },
+  {
+    "name": "Sağlık",
+    "slug": "saglik",
+    "count": 5
+  }
+]

@@ -1,0 +1,32 @@
+{
+  "id": "7",
+  "slug": "is-makinesi-operatoru-saglik-ve-guvenlik-gereksinimleri",
+  "title": "İş Makinesi Operatörü: Sağlık ve Güvenlik Gereksinimleri",
+  "excerpt": "İş makineleri, şantiyelerin gücüdür ancak operatörlerin sağlığı ve güvenliği göz ardı edilmemelidir. Operatörler için gerekli sağlık raporları, eğitimler ve güvenli çalışma prosedürleri bu yazıda.",
+  "content": "<h2>Direksiyon Başındaki Sorumluluk: İş Makinesi Operatörlüğü</h2><p>Ekskavatörlerden forkliftlere, kule vinçlerden bekoloderlere kadar iş makineleri, inşaat ve endüstri sektörünün vazgeçilmez güç unsurlarıdır. Ancak bu devasa makineleri kullanmak, sadece teknik beceri değil, aynı zamanda yüksek düzeyde fiziksel ve zihinsel sağlık gerektirir. Bir operatörün anlık dikkatsizliği veya sağlık sorunu, sadece kendisi için değil, çevresindeki herkes için ölümcül bir risk oluşturabilir.</p><h2>Operatör Olmanın İlk Şartı: Sağlık Raporu</h2><p>İş makinesi operatörü olabilmek ve bu işi sürdürebilmek için belirli sağlık kriterlerini karşılamak zorunludur. 'Ağır ve Tehlikeli İşler Yönetmeliği' (mülga olsa da prensipleri geçerlidir) ve ilgili İSG mevzuatı gereği, operatörlerin;</p><ul><li><strong>Göz Sağlığı:</strong> Görme keskinliği, derinlik algısı ve renk körlüğü testlerinden geçmeleri gerekir.</li><li><strong>İşitme Sağlığı:</strong> Uyarı seslerini ve telsiz komutlarını duyabilmek için yeterli işitme duyusuna sahip olmaları şarttır.</li><li><strong>Nörolojik ve Psikolojik Durum:</strong> Epilepsi, denge kaybı veya ani bayılmaya neden olabilecek rahatsızlıklarının bulunmaması gerekir. Ayrıca, stres altında karar verme yetisi değerlendirilmelidir.</li><li><strong>Kas ve İskelet Sistemi:</strong> Uzun süre oturarak ve titreşim altında çalışmaya uygun fiziksel dayanıklılığa sahip olmalıdırlar.</li></ul><blockquote><strong>Önemli:</strong> Operatörlerin sağlık raporları, işin tehlike sınıfına göre (genellikle yılda bir veya üç yılda bir) periyodik olarak yenilenmelidir. Psikoteknik değerlendirme raporu da (özellikle karayoluna çıkan araçlar için) yasal bir zorunluluktur.</blockquote><h2>Güvenli Operasyon İçin Altın Kurallar</h2><p>Sağlıklı bir operatör, güvenli bir makine ile birleştiğinde riskler minimize edilir.</p><h3>1. Eğitim ve Belgelendirme</h3><p>Hiçbir çalışan, 'G sınıfı ehliyet' veya Milli Eğitim Bakanlığı onaylı 'Operatörlük Belgesi' olmadan iş makinesi koltuğuna oturmamalıdır. Ayrıca, işe girişte makineye özel 'Güvenli Kullanım Eğitimi' verilmelidir.</p><h3>2. Günlük Kontroller</h3><p>Operatör, her vardiya başında makinesini kontrol etmelidir. Frenler, ışıklar, hidrolik sistemler, lastikler ve geri vites alarmı çalışır durumda olmalıdır.</p><h3>3. Emniyet Kemeri Hayat Kurtarır</h3><p>İş makinelerinde devrilme riski her zaman vardır. ROPS (Devrilmeye Karşı Koruyucu Yapı) kabinli bir makinede emniyet kemeri takmak, operatörün kabin içinde kalarak hayatta kalmasını sağlayan tek önlemdir.</p><h3>4. İletişim ve İşaretçi Kullanımı</h3><p>Kör noktaların olduğu çalışmalarda veya yük kaldırma operasyonlarında mutlaka yetkili bir işaretçi (sapancı) ile çalışılmalı ve standart el işaretleri kullanılmalıdır.</p><h2>Ergonomi ve Çalışma Ortamı</h2><p>Operatör sağlığını korumak sadece kazaları önlemek değildir. Uzun vadeli meslek hastalıklarını (bel fıtığı, titreşim hastalığı vb.) engellemek için;</p><ul><li>Kabin içi koltuk süspansiyonlu ve ayarlanabilir olmalıdır.</li><li>Klima ve havalandırma sistemleri çalışır durumda olmalıdır.</li><li>Düzenli molalar verilmeli ve operatörün araçtan inerek hareket etmesi sağlanmalıdır.</li></ul><h2>Sonuç: Profesyonellik Güvenliktir</h2><p>İş makinesi operatörlüğü, saygı duyulması gereken, yüksek riskli ve uzmanlık isteyen bir meslektir. İşverenlerin düzenli sağlık gözetimi ve eğitim sağlaması, operatörlerin ise güvenlik kurallarına tavizsiz uyması, bu gücü kontrol altında tutmanın ve kazasız bir çalışma ortamı yaratmanın anahtarıdır.</p>",
+  "coverImage": "https://images.unsplash.com/photo-1581094288338-2314dddb7ece?w=800&h=450&fit=crop",
+  "category": {
+    "name": "İş Güvenliği",
+    "slug": "is-guvenligi"
+  },
+  "tags": [
+    {
+      "name": "İş Makinesi",
+      "slug": "is-makinesi"
+    },
+    {
+      "name": "Operatör Belgesi",
+      "slug": "operator-belgesi"
+    },
+    {
+      "name": "Psikoteknik",
+      "slug": "psikoteknik"
+    }
+  ],
+  "author": {
+    "name": "ProSektorWeb Editör"
+  },
+  "publishedAt": "2026-01-13",
+  "readingTime": 7,
+  "featured": false
+}

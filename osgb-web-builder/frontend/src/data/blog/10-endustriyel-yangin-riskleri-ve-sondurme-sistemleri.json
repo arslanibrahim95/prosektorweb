@@ -1,0 +1,32 @@
+{
+  "id": "10",
+  "slug": "endustriyel-yangin-riskleri-ve-sondurme-sistemleri",
+  "title": "Endüstriyel Yangın Riskleri ve Söndürme Sistemleri",
+  "excerpt": "Endüstriyel tesislerdeki yangın riskleri, ev tipi yangınlardan çok daha karmaşıktır. Tesisinize uygun söndürme sistemlerini (Sprinkler, Gazlı, Köpüklü) ve risk yönetimini keşfedin.",
+  "content": "<h2>Sanayinin Kabusu: Endüstriyel Yangınlar</h2><p>Fabrikalar, depolar ve üretim tesisleri, yüksek miktarda yanıcı madde, karmaşık elektrik sistemleri ve yüksek sıcaklıklı işlemler barındırması nedeniyle yangın riski açısından en kritik alanlardır. Bir endüstriyel yangın, sadece maddi hasara değil, aynı zamanda üretim kaybına, çevre kirliliğine ve can kayıplarına yol açabilir.</p><h2>Yangın Sınıfları ve Söndürme Yöntemleri</h2><p>Doğru müdahale için yangının sınıfını bilmek şarttır.</p><ul><li><strong>A Sınıfı (Katı):</strong> Odun, kağıt, tekstil. Su ve köpük ile söndürülür.</li><li><strong>B Sınıfı (Sıvı):</strong> Benzin, tiner, yağ. Köpük, Kuru Kimyevi Toz (KKT) veya CO2 ile söndürülür. Su kesinlikle kullanılmamalıdır.</li><li><strong>C Sınıfı (Gaz):</strong> Doğalgaz, LPG. Önce gaz akışı kesilmeli, KKT kullanılmalıdır.</li><li><strong>D Sınıfı (Metal):</strong> Magnezyum, alüminyum tozu. Özel metal yangın söndürücüleri gerekir. Su patlamaya neden olur.</li><li><strong>F Sınıfı (Yağ):</strong> Kızartma yağları. Sulu kimyasal söndürücüler kullanılır.</li></ul><h2>Otomatik Söndürme Sistemleri</h2><p>Büyük tesislerde manuel müdahale yetersiz kalabilir. Otomatik sistemler, yangını algılayıp saniyeler içinde müdahale eder.</p><h3>1. Sprinkler (Yağmurlama) Sistemleri</h3><p>Genellikle suyun yangına zarar vermeyeceği (A sınıfı riskli) alanlarda kullanılır. Isı artışıyla devreye girer.</p><h3>2. Gazlı Söndürme Sistemleri (FM200, Novec 1230)</h3><p>Veri merkezleri, elektrik odaları ve müzeler gibi suyun zarar vereceği hassas alanlarda kullanılır. Oksijeni azaltarak veya zincirleme yanma reaksiyonunu kırarak söndürür.</p><h3>3. Köpüklü Söndürme Sistemleri</h3><p>Özellikle yanıcı sıvı depoları ve uçak hangarları gibi B sınıfı yangın riskinin yüksek olduğu yerlerde, yanan yüzeyi kaplayarak havayla temasını keser.</p><h2>Bakım ve Test</h2><p>En iyi sistem bile çalışmazsa işe yaramaz. Yangın pompalarının, dedektörlerin ve söndürme hatlarının periyodik bakımları ve testleri, yasal bir zorunluluktur ve asla aksatılmamalıdır.</p><h2>Sonuç: Yangın Çıkmadan Söndürülür</h2><p>Etkili bir yangın güvenliği yönetimi, sadece söndürme sistemlerine güvenmek değil, yangın çıkma ihtimalini en aza indirmektir. Düzenli risk analizi, çalışan eğitimi, temizlik ve düzen (5S) uygulamaları, yangınla mücadelenin ilk ve en önemli adımlarıdır.</p>",
+  "coverImage": "https://images.unsplash.com/photo-1599422428664-83a37a915174?w=800&h=450&fit=crop",
+  "category": {
+    "name": "İş Güvenliği",
+    "slug": "is-guvenligi"
+  },
+  "tags": [
+    {
+      "name": "Yangın Güvenliği",
+      "slug": "yangin-guvenligi"
+    },
+    {
+      "name": "Söndürme Sistemleri",
+      "slug": "sondurme-sistemleri"
+    },
+    {
+      "name": "Endüstriyel Risk",
+      "slug": "endustriyel-risk"
+    }
+  ],
+  "author": {
+    "name": "ProSektorWeb Editör"
+  },
+  "publishedAt": "2026-01-13",
+  "readingTime": 7,
+  "featured": false
+}
