@@ -1,6 +1,134 @@
 {
   "posts": [
     {
+      "id": "1",
+      "slug": "2026-isg-mevzuat-degisiklikleri",
+      "title": "2026 Yılında İSG Mevzuatındaki Önemli Değişiklikler",
+      "excerpt": "Bu yıl yürürlüğe giren yeni İSG düzenlemeleri ve OSGB'lerin uyum süreci hakkında bilmeniz gereken her şey.",
+      "content": "<h2>Giriş</h2><p>2026 yılı, iş sağlığı ve güvenliği mevzuatında önemli değişikliklerin yaşandığı bir yıl oldu. Bu yazımızda, OSGB'leri ve işyerlerini doğrudan etkileyen düzenlemeleri detaylı bir şekilde inceleyeceğiz.</p><h2>Yeni Düzenlemeler</h2><p>Çalışma ve Sosyal Güvenlik Bakanlığı tarafından yayımlanan yeni yönetmelikler, işyerlerinde güvenlik standartlarını yükseltmeyi amaçlamaktadır. Bu düzenlemeler arasında en dikkat çekici olanları şunlardır:</p><ul><li><strong>Risk Değerlendirme Güncellemesi:</strong> Artık tüm işyerleri, risk değerlendirmelerini yılda en az bir kez güncellemek zorundadır.</li><li><strong>Dijital Raporlama:</strong> İş kazası bildirimleri artık tamamen dijital ortamda yapılacaktır.</li><li><strong>Eğitim Zorunlulukları:</strong> Tehlikeli sınıftaki işyerlerinde çalışanlara verilecek eğitim süreleri artırılmıştır.</li></ul><h2>OSGB'ler İçin Uyum Süreci</h2><p>OSGB'lerin bu yeni düzenlemelere uyum sağlaması için belirli adımlar atması gerekmektedir. Öncelikle, mevcut süreçlerin gözden geçirilmesi ve eksikliklerin belirlenmesi önemlidir.</p><blockquote><strong>Önemli:</strong> Dijitalleşme, iş güvenliği süreçlerini daha etkin ve takip edilebilir hale getirmektedir. OSGB'lerin bu dönüşüme hazırlıklı olması kritik öneme sahiptir.</blockquote><h2>Önemli Tarihler</h2><ul><li>1 Ocak 2026: Dijital raporlama sistemi zorunlu hale geldi</li><li>1 Mart 2026: Güncellenmiş eğitim programları başlayacak</li><li>1 Haziran 2026: Yeni risk değerlendirme formatı zorunlu olacak</li></ul><h2>Sonuç</h2><p>2026 yılındaki bu değişiklikler, iş güvenliği standartlarını yükseltme yolunda atılmış önemli adımlardır. OSGB'lerin ve işyerlerinin bu değişikliklere zamanında uyum sağlaması, hem yasal yükümlülüklerin yerine getirilmesi hem de çalışan güvenliğinin artırılması açısından büyük önem taşımaktadır.</p>",
+      "coverImage": "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=800&h=400&fit=crop",
+      "category": {
+        "name": "Mevzuat",
+        "slug": "mevzuat"
+      },
+      "tags": [
+        {
+          "name": "İSG Mevzuatı",
+          "slug": "isg-mevzuati"
+        },
+        {
+          "name": "2026",
+          "slug": "2026"
+        },
+        {
+          "name": "Yasal Düzenleme",
+          "slug": "yasal-duzenleme"
+        }
+      ],
+      "author": {
+        "name": "ProSektorWeb Editör"
+      },
+      "publishedAt": "2026-01-10",
+      "readingTime": 8,
+      "featured": true
+    },
+    {
+      "id": "4",
+      "slug": "risk-degerlendirmesi-nasil-yapilir",
+      "title": "Risk Değerlendirmesi Rehberi: A'dan Z'ye",
+      "excerpt": "İşyerinizde risk değerlendirmesi yaparken dikkat etmeniz gereken kritik noktalar ve adım adım uygulama.",
+      "content": "<h2>Risk Değerlendirmesi Nedir?</h2><p>Risk değerlendirmesi, işyerindeki tehlikelerin belirlenmesi, bu tehlikelerden kaynaklanabilecek risklerin analiz edilmesi ve kontrol tedbirlerinin planlanması sürecidir. 6331 sayılı İş Sağlığı ve Güvenliği Kanunu gereği tüm işyerleri için zorunludur.</p><h2>5 Adımda Risk Değerlendirmesi</h2><h3>Adım 1: Tehlikeleri Belirleme</h3><p>İşyerini gözlemleyin, çalışanlarla görüşün, mevcut kayıtları inceleyin. Fiziksel, kimyasal, biyolojik, ergonomik ve psikososyal tehlikeleri listeleyin.</p><h3>Adım 2: Riskleri Analiz Etme</h3><p>Her tehlike için olasılık ve şiddet değerlendirmesi yapın. Risk = Olasılık x Şiddet formülünü kullanın.</p><h3>Adım 3: Kontrol Tedbirlerini Belirleme</h3><p>Risk kontrol hiyerarşisine göre tedbirler planlayın: Eliminasyon > Substitüsyon > Mühendislik Kontrolleri > İdari Kontroller > KKD</p><h3>Adım 4: Uygulama</h3><p>Belirlenen tedbirleri öncelik sırasına göre uygulayın. Sorumlulukları ve zamanlamaları netleştirin.</p><h3>Adım 5: İzleme ve Gözden Geçirme</h3><p>Alınan tedbirlerin etkinliğini düzenli olarak kontrol edin. Değişiklik durumunda risk değerlendirmesini güncelleyin.</p><h2>Sık Yapılan Hatalar</h2><ul><li>Risk değerlendirmesini sadece kağıt üzerinde yapmak</li><li>Çalışanları sürece dahil etmemek</li><li>Düzenli güncelleme yapmamak</li><li>Kontrol tedbirlerini takip etmemek</li></ul><h2>Sonuç</h2><p>Etkili bir risk değerlendirmesi, iş kazalarının önlenmesinde en temel araçtır. Bu rehberi takip ederek işyerinizde güvenli bir çalışma ortamı oluşturabilirsiniz.</p>",
+      "coverImage": "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=800&h=400&fit=crop",
+      "category": {
+        "name": "Risk Yönetimi",
+        "slug": "risk-yonetimi"
+      },
+      "tags": [
+        {
+          "name": "Risk Değerlendirmesi",
+          "slug": "risk-degerlendirmesi"
+        },
+        {
+          "name": "Tehlike Analizi",
+          "slug": "tehlike-analizi"
+        },
+        {
+          "name": "6331",
+          "slug": "6331"
+        }
+      ],
+      "author": {
+        "name": "ProSektorWeb Editör"
+      },
+      "publishedAt": "2026-01-03",
+      "readingTime": 10,
+      "featured": false
+    },
+    {
+      "id": "7",
+      "slug": "isg-egitim-sertifikalarinin-gecerlilik-suresi-ve-yenileme",
+      "title": "İSG Eğitim Sertifikalarının Geçerlilik Süresi ve Yenileme Rehberi",
+      "excerpt": "İSG eğitim sertifikalarının geçerlilik süresi, yenileme zorunlulukları ve kayıt düzeni hakkında 6331 sayılı Kanun çerçevesinde pratik bir yol haritası.",
+      "content": "<h2>İSG Eğitim Sertifikalarının Geçerlilik Süresi Neden Kritiktir?</h2><p><strong>İSG eğitim sertifikalarının geçerlilik süresi</strong>, çalışanların güncel bilgiye sahip olduğunu ve yasal yükümlülüklerin yerine getirildiğini gösteren temel bir göstergedir. 6331 sayılı Kanun ve ilgili yönetmelikler, çalışanların iş sağlığı ve güvenliği eğitimlerinin belirli aralıklarla yenilenmesini öngörür.</p><h2>Eğitim Süreleri ve Geçerlilik Periyotları</h2><p>İSG eğitim süreleri, işyerinin tehlike sınıfına göre değişir:</p><h3>Tehlike Sınıfına Göre Asgari Eğitim Süreleri</h3><ul><li><strong>Az tehlikeli işyerleri:</strong> Çalışan başına en az 8 saat</li><li><strong>Tehlikeli işyerleri:</strong> Çalışan başına en az 12 saat</li><li><strong>Çok tehlikeli işyerleri:</strong> Çalışan başına en az 16 saat</li></ul><h3>Yenileme Periyotları</h3><ul><li><strong>Az tehlikeli:</strong> 3 yılda bir</li><li><strong>Tehlikeli:</strong> 2 yılda bir</li><li><strong>Çok tehlikeli:</strong> Yılda bir</li></ul><blockquote><strong>Önemli:</strong> İş değişikliği, yeni ekipman veya iş kazası durumlarında ek eğitim zorunludur.</blockquote><h2>Kayıt ve Belgeleme</h2><p>Eğitim kayıtları, işten ayrılma tarihinden itibaren en az 15 yıl saklanmalıdır. Dijital arşivleme sistemleri bu süreci kolaylaştırır.</p><h2>Sonuç</h2><p>Eğitim sertifikalarının takibi, hem yasal uyum hem de çalışan güvenliği için kritiktir. OSGB yazılımları ile bu takip otomatikleştirilebilir.</p>",
+      "coverImage": "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=800&h=400&fit=crop",
+      "category": {
+        "name": "Mevzuat",
+        "slug": "mevzuat"
+      },
+      "tags": [
+        {
+          "name": "İSG Eğitimleri",
+          "slug": "isg-egitimleri"
+        },
+        {
+          "name": "Eğitim Sertifikası",
+          "slug": "egitim-sertifikasi"
+        },
+        {
+          "name": "6331 Sayılı Kanun",
+          "slug": "6331-sayili-kanun"
+        }
+      ],
+      "author": {
+        "name": "ProSektorWeb Editör"
+      },
+      "publishedAt": "2026-01-13",
+      "readingTime": 7,
+      "featured": true
+    },
+    {
+      "id": "10",
+      "slug": "isyeri-hekimligi-dijital-arsivin-onemi-ve-kvkk-uyumu",
+      "title": "İşyeri Hekimliği: Dijital Arşivin Önemi ve KVKK Uyumu",
+      "excerpt": "Çalışan sağlık kayıtlarını 15+ yıl güvenle saklamak, hem yasal bir zorunluluk hem de operasyonel bir güçlüktür. Dijital arşivlemenin bu sorunu nasıl çözdüğünü ve KVKK uyumunu nasıl kolaylaştırdığını keşfedin.",
+      "content": "<h2>Klasörler Arasında Kaybolmayın: İşyeri Hekimliğinde Dijital Arşiv Devrimi</h2><p>İşyeri hekimleri ve OSGB'ler için en büyük operasyonel yüklerden biri, şüphesiz ki çalışan sağlık kayıtlarının yönetimi ve arşivlenmesidir. 6331 sayılı Kanun gereği bu kayıtların işten ayrılma tarihinden itibaren <strong>en az 15 yıl</strong> süreyle saklanması zorunluluğu, fiziksel arşivleri devasa, yönetilmesi güç ve maliyetli depolara dönüştürmektedir.</p><h2>Yasal Zemin: Saklama Süreleri ve Gizlilik Yükümlülüğü</h2><p>Sağlık kayıtları, KVKK kapsamında <strong>Özel Nitelikli Kişisel Veri</strong> statüsündedir. Bu da demek oluyor ki, bu verilerin işlenmesi ve saklanması çok daha sıkı güvenlik ve gizlilik tedbirleri gerektirir.</p><h2>Fiziksel Arşiv mi, Dijital Arşiv mi?</h2><h3>Fiziksel Arşivin Dezavantajları:</h3><ul><li><strong>Yüksek Maliyet:</strong> Arşiv odaları, dolaplar, klasörler ve kira</li><li><strong>Güvenlik Riskleri:</strong> Yangın, su baskını, nem, hırsızlık</li><li><strong>Yavaş Erişim:</strong> Belirli bir kayda ulaşmak dakikalar alabilir</li></ul><h3>Dijital Arşivin Avantajları:</h3><ul><li><strong>Anında Erişim:</strong> Saniyeler içinde istediğiniz kayda ulaşın</li><li><strong>Otomatik Yedekleme:</strong> Veri kaybı riski minimize edilir</li><li><strong>KVKK Uyumu:</strong> Şifreleme, erişim logları, anonimleştirme</li><li><strong>Maliyet Tasarrufu:</strong> Fiziksel depolama ihtiyacı ortadan kalkar</li></ul><blockquote><strong>Önemli:</strong> Dijital arşivlerde şifreleme (AES-256), erişim kontrolü ve düzenli yedekleme zorunludur.</blockquote><h2>Sonuç</h2><p>Dijital arşiv, hem yasal uyum hem de operasyonel verimlilik için artık bir lüks değil zorunluluktur.</p>",
+      "coverImage": "https://images.unsplash.com/photo-1584433144853-c3ae6a3a4445?w=800&h=450&fit=crop",
+      "category": {
+        "name": "Dijital Dönüşüm",
+        "slug": "dijital-donusum"
+      },
+      "tags": [
+        {
+          "name": "Dijital Arşiv",
+          "slug": "dijital-arsiv"
+        },
+        {
+          "name": "KVKK",
+          "slug": "kvkk"
+        },
+        {
+          "name": "İşyeri Hekimliği",
+          "slug": "isyeri-hekimligi"
+        }
+      ],
+      "author": {
+        "name": "ProSektorWeb Editör"
+      },
+      "publishedAt": "2026-01-13",
+      "readingTime": 7,
+      "featured": true
+    },
+    {
       "id": "13",
       "slug": "isyerlerinde-tehlikeli-atik-yonetimi-rehberi",
       "title": "İşyerlerinde Tehlikeli Atık Yönetimi: Çevre ve İSG İçin Kritik Adımlar",
