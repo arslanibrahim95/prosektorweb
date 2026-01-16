@@ -1,0 +1,95 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+// ===============================
+// BLOG SYSTEM
+// ===============================
+
+model BlogCategory {
+  id        String     @id @default(uuid())
+  name      String
+  slug      String     @unique
+  posts     BlogPost[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  @@index([slug])
+}
+
+model BlogPost {
+  id              String        @id @default(uuid())
+  title           String        @db.VarChar(500)
+  slug            String        @unique
+  excerpt         String?       @db.Text
+  content         String        @db.MediumText
+  coverImage      String?       @db.VarChar(1000)
+  
+  // Category
+  categoryId      String?
+  category        BlogCategory? @relation(fields: [categoryId], references: [id])
+  
+  // Tags (stored as JSON array)
+  tags            Json?         @default("[]")
+  
+  // Meta
+  authorName      String?       @default("ProSektorWeb")
+  readingTime     Int?          @default(5)
+  viewCount       Int           @default(0)
+  
+  // SEO
+  metaTitle       String?       @db.VarChar(500)
+  metaDescription String?       @db.VarChar(500)
+  
+  // Status
+  published       Boolean       @default(true)
+  featured        Boolean       @default(false)
+  
+  // Timestamps
+  publishedAt     DateTime      @default(now())
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@index([slug])
+  @@index([categoryId])
+  @@index([published])
+  @@index([featured])
+  @@index([publishedAt])
+}
+
+// ===============================
+// CONTACT / LEADS
+// ===============================
+
+model ContactMessage {
+  id        String   @id @default(uuid())
+  name      String
+  email     String
+  phone     String?
+  company   String?
+  message   String   @db.Text
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([read])
+  @@index([createdAt])
+}
+
+// ===============================
+// SITE SETTINGS
+// ===============================
+
+model SiteSetting {
+  id        String   @id @default(uuid())
+  key       String   @unique
+  value     String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
