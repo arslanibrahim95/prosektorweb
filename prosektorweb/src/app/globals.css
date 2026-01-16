@@ -2,14 +2,27 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #111827;
+  --foreground: #242424;
+  /* Fluent neutralPrimary */
+
+  /* Fluent UI Tokens */
+  --font-fluent: 'Segoe UI', 'Segoe UI Web (West European)', -apple-system, BlinkMacSystemFont, Roboto, 'Helvetica Neue', sans-serif;
+  --radius: 4px;
+  /* Fluent roundedCorner4 */
+
+  /* Elevation Tokens */
+  --shadow-4: 0px 2px 4px rgba(0, 0, 0, 0.14), 0px 0px 2px rgba(0, 0, 0, 0.12);
+  --shadow-8: 0px 4px 8px rgba(0, 0, 0, 0.14), 0px 0px 2px rgba(0, 0, 0, 0.12);
+  --shadow-16: 0px 8px 16px rgba(0, 0, 0, 0.14), 0px 0px 2px rgba(0, 0, 0, 0.12);
+  --shadow-64: 0px 32px 64px rgba(0, 0, 0, 0.24), 0px 0px 8px rgba(0, 0, 0, 0.2);
 
   /* ProSektorWeb Brand Colors */
   --primary: #8B1E1E;
   --primary-hover: #6F1717;
   --primary-active: #5A1313;
   --bg-alt: #F7F7F9;
-  --text-secondary: #4B5563;
+  --text-secondary: #5c5c5c;
+  /* Fluent neutralSecondary */
   --selection: #e74c3c;
 }
 
@@ -19,21 +32,22 @@
   --color-primary: var(--primary);
   --color-primary-hover: var(--primary-hover);
   --color-alt: var(--bg-alt);
-  --font-sans: var(--font-inter);
+  --font-sans: var(--font-fluent);
+  --radius-md: var(--radius);
 }
 
 /* Remove dark preference override */
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #ffffff;
-    --foreground: #111827;
+    --foreground: #242424;
   }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-sans), sans-serif;
+  font-family: var(--font-fluent);
 }
 
 /* Custom Scrollbar to match landing */
