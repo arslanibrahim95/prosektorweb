@@ -1043,6 +1043,7 @@
                 <a href="#iletisim">İletişim</a>
                 <a href="#sss">SSS</a>
                 <a href="#fiyatlandirma">Fiyatlandırma</a>
+                <a href="/cerez-politikasi">Çerez Politikası</a>
             </div>
             <div class="footer-brand">
                 <p style="font-weight: 700; color: var(--text-main);">Güvenli ödeme altyapısı</p>
@@ -1274,9 +1275,38 @@
             onclick="document.getElementById('revizeModal').style.display='none'">Anladım</button>
     </div>
 
+    <!-- COOKIE BANNER -->
+    <div id="cookieBanner"
+        style="display:none; position:fixed; bottom:0; left:0; width:100%; bg:rgba(255,255,255,0.98); backdrop-filter:blur(10px); background: #ffffff; border-top:1px solid var(--border-color); padding:1.5rem 5%; z-index:9000; box-shadow:0 -5px 20px rgba(0,0,0,0.05);">
+        <div
+            style="max-width:1200px; margin:0 auto; display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:1rem;">
+            <p style="margin:0; font-size:0.95rem; color:var(--text-secondary); flex:1; min-width:300px;">
+                Platformun çalışması için zorunlu çerezler kullanılmaktadır.
+                Detaylar için <a href="/cerez-politikasi"
+                    style="color:var(--primary-red); font-weight:700; text-decoration:none;">Çerez Politikası</a>’nı
+                inceleyebilirsiniz.
+            </p>
+            <button class="btn-main" style="padding:0.8rem 2rem; font-size:0.9rem;" onclick="acceptCookies()">Kabul
+                Et</button>
+        </div>
+    </div>
+
     <script>
-        // --- SCROLL LOGIC ---
-        function scrollToFaq(id) {
+        // Check Cookies
+        window.addEventListener('load', () => {
+            if (!localStorage.getItem('cookiesAccepted')) {
+                document.getElementById('cookieBanner').style.display = 'block';
+            }
+        });
+
+        function acceptCookies() {
+            localStorage.setItem('cookiesAccepted', 'true');
+            document.getElementById('cookieBanner').style.display = 'none';
+        }
+
+        // ... existing scripts (scroll logic etc) ...
+        const scrollToFaq = (id) => { // Wrapper or fix if needed, but existing script implies standard blocks
+            // ... existing script continues ...
             const el = document.getElementById(id);
             if (el) {
                 el.scrollIntoView();
