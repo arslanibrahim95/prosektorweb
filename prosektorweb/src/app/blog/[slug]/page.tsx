@@ -1,8 +1,8 @@
 import Link from 'next/link'
-import { Shield, ChevronLeft, Calendar, Clock, User, Tag, ArrowLeft, ArrowRight } from 'lucide-react'
+import { Shield, ChevronLeft, Calendar, Clock, User, Tag, ArrowLeft, ArrowRight, Share2 } from 'lucide-react'
 import { notFound } from 'next/navigation'
 
-// Demo post data - will be replaced with DB query
+// Demo post data - replacement
 const getPost = (slug: string) => {
     const posts: Record<string, {
         title: string
@@ -34,8 +34,12 @@ const getPost = (slug: string) => {
 <h2>Kusur Paylaşımı Nasıl Yapılır?</h2>
 <p>Yargıtay kararlarına göre, İSG uzmanının kusuru ancak görevini yerine getirmemesi halinde söz konusu olmaktadır. Yazılı uyarı ve önerilerini işverene iletmiş, ancak işveren bunları uygulamamışsa, uzmanın kusuru olmayabilir.</p>
 
+<blockquote class="bg-[#8B1E1E]/5 border-l-4 border-[#8B1E1E] pl-4 italic py-2 my-6 text-gray-700">
+  "İSG uzmanının kendini korumasının en önemli yolu, tüm tespit ve önerilerini onaylı deftere yazmasıdır."
+</blockquote>
+
 <h2>Onaylı Defter Neden Bu Kadar Önemli?</h2>
-<p>İSG uzmanının kendini korumasının en önemli yolu, tüm tespit ve önerilerini <strong>onaylı deftere</strong> yazmasıdır. Bu defter, mahkemede ispat aracı olarak kullanılabilmektedir.</p>
+<p>Bu defter, mahkemede ispat aracı olarak kullanılabilmektedir. Uzman, sorumluluğunu yerine getirdiğini bu defter ile kanıtlar.</p>
 
 <h2>Sonuç</h2>
 <p>İSG uzmanları "günah keçisi" değildir. Ancak görevlerini eksiksiz yapmaları ve bunu belgeleyerek kanıtlamaları gerekmektedir. Yazılı iletişim ve kayıt tutma, hem yasal koruma hem de profesyonellik açısından kritik önem taşımaktadır.</p>
@@ -43,7 +47,7 @@ const getPost = (slug: string) => {
             coverImage: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd',
             category: { name: 'Mevzuat', slug: 'mevzuat' },
             tags: ['İSG Uzmanı', 'Sorumluluk', 'İş Kazası', 'Yargıtay'],
-            author: 'ProSektorWeb',
+            author: 'Dr. Ahmet Yılmaz',
             publishedAt: '2026-01-14',
             readingTime: 7,
         },
@@ -64,144 +68,134 @@ export default async function BlogDetailPage({
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white">
-            {/* Navigation */}
-            <nav className="fixed top-0 left-0 right-0 z-50 backdrop-blur-xl bg-slate-950/80 border-b border-white/5">
-                <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-                    <Link href="/" className="flex items-center gap-2">
-                        <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center">
-                            <Shield className="w-6 h-6" />
-                        </div>
-                        <span className="text-xl font-bold">ProSektorWeb</span>
+        <div className="min-h-screen bg-white text-gray-900">
+            {/* Navigation - Same as List Page */}
+            <nav className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-100">
+                <div className="max-w-[1200px] mx-auto px-[5%] py-4 flex items-center justify-between">
+                    <Link href="/" className="text-2xl font-black tracking-tighter text-gray-900 no-underline">
+                        psw
                     </Link>
+
+                    <div className="hidden md:flex items-center gap-8 text-[0.95rem] font-medium text-gray-600">
+                        <Link href="/" className="hover:text-[#8B1E1E] transition-colors">Ana Sayfa</Link>
+                        <Link href="/blog" className="text-[#8B1E1E] font-semibold">Blog</Link>
+                        <Link href="/#iletisim" className="hover:text-[#8B1E1E] transition-colors">İletişim</Link>
+                    </div>
 
                     <Link
                         href="/blog"
-                        className="flex items-center gap-2 px-4 py-2 text-sm text-white/60 hover:text-white transition"
+                        className="flex items-center gap-2 px-5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full text-sm font-semibold transition"
                     >
                         <ChevronLeft className="w-4 h-4" />
-                        Blog&apos;a Dön
+                        Tüm Yazılar
                     </Link>
                 </div>
             </nav>
 
             {/* Hero */}
-            <section className="pt-24 pb-0">
-                <div className="relative h-96 overflow-hidden">
-                    <img
-                        src={post.coverImage}
-                        alt={post.title}
-                        className="w-full h-full object-cover"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/50 to-transparent" />
+            <section className="pt-24 pb-0 relative">
+                <div className="absolute inset-0 bg-[#F7F7F9] h-2/3 -z-10" />
+                <div className="max-w-4xl mx-auto px-[5%] pt-12">
+
+                    {/* Breadcrumb / Category */}
+                    <div className="flex items-center justify-between mb-8">
+                        <Link
+                            href="/blog"
+                            className="inline-flex items-center gap-2 px-4 py-1.5 bg-white border border-gray-200 shadow-sm text-[#8B1E1E] rounded-full text-sm font-bold hover:shadow-md transition"
+                        >
+                            {post.category.name}
+                        </Link>
+                        <div className="text-sm text-gray-400 font-medium">
+                            {post.publishedAt}
+                        </div>
+                    </div>
+
+                    <h1 className="text-4xl md:text-5xl lg:text-6xl font-black leading-[1.1] mb-8 text-gray-900 tracking-tight">
+                        {post.title}
+                    </h1>
+
+                    <div className="flex items-center justify-between border-y border-gray-200 py-6 mb-12">
+                        <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 rounded-full bg-[#8B1E1E]/10 flex items-center justify-center text-[#8B1E1E]">
+                                <User className="w-6 h-6" />
+                            </div>
+                            <div>
+                                <div className="font-bold text-gray-900">{post.author}</div>
+                                <div className="text-xs text-gray-500 font-medium">{post.readingTime} dakika okuma süresi</div>
+                            </div>
+                        </div>
+                        <button className="p-3 rounded-full hover:bg-gray-100 text-gray-500 transition">
+                            <Share2 className="w-5 h-5" />
+                        </button>
+                    </div>
+
+                    <div className="relative aspect-[2/1] rounded-3xl overflow-hidden shadow-2xl shadow-gray-200 mb-16">
+                        <img
+                            src={post.coverImage}
+                            alt={post.title}
+                            className="w-full h-full object-cover"
+                        />
+                    </div>
                 </div>
             </section>
 
             {/* Content */}
-            <article className="relative -mt-32 z-10 px-6 pb-24">
-                <div className="max-w-4xl mx-auto">
-                    {/* Header */}
-                    <div className="bg-slate-900/80 backdrop-blur-xl rounded-3xl p-8 md:p-12 border border-white/10 mb-8">
-                        <Link
-                            href="/blog"
-                            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600/20 text-blue-400 rounded-full text-sm font-medium mb-6 hover:bg-blue-600/30 transition"
-                        >
-                            {post.category.name}
-                        </Link>
-
-                        <h1 className="text-3xl md:text-4xl font-bold leading-tight mb-6">
-                            {post.title}
-                        </h1>
-
-                        <p className="text-xl text-white/60 mb-8">
-                            {post.excerpt}
-                        </p>
-
-                        <div className="flex flex-wrap items-center gap-6 text-sm text-white/50">
-                            <span className="flex items-center gap-2">
-                                <User className="w-4 h-4" />
-                                {post.author}
-                            </span>
-                            <span className="flex items-center gap-2">
-                                <Calendar className="w-4 h-4" />
-                                {post.publishedAt}
-                            </span>
-                            <span className="flex items-center gap-2">
-                                <Clock className="w-4 h-4" />
-                                {post.readingTime} dakika
-                            </span>
-                        </div>
-                    </div>
-
-                    {/* Article Content */}
-                    <div
-                        className="prose prose-invert prose-lg max-w-none
-              prose-headings:font-bold prose-headings:text-white
-              prose-h2:text-2xl prose-h2:mt-12 prose-h2:mb-4
-              prose-p:text-white/70 prose-p:leading-relaxed
-              prose-li:text-white/70
-              prose-strong:text-white prose-strong:font-semibold
-              prose-a:text-blue-400 prose-a:no-underline hover:prose-a:underline
+            <article className="max-w-3xl mx-auto px-[5%] pb-24">
+                {/* Article Content */}
+                <div
+                    className="prose prose-lg max-w-none prose-gray
+              prose-headings:font-black prose-headings:text-gray-900 prose-headings:tracking-tight
+              prose-h2:text-3xl prose-h2:mt-12 prose-h2:mb-6
+              prose-p:text-gray-600 prose-p:leading-8
+              prose-strong:text-gray-900 prose-strong:font-bold
+              prose-a:text-[#8B1E1E] prose-a:font-semibold prose-a:no-underline hover:prose-a:underline
+              prose-li:text-gray-600
             "
-                        dangerouslySetInnerHTML={{ __html: post.content }}
-                    />
+                    dangerouslySetInnerHTML={{ __html: post.content }}
+                />
 
-                    {/* Tags */}
-                    <div className="mt-12 pt-8 border-t border-white/10">
-                        <div className="flex items-center gap-2 mb-4">
-                            <Tag className="w-4 h-4 text-white/50" />
-                            <span className="text-sm text-white/50">Etiketler</span>
-                        </div>
-                        <div className="flex flex-wrap gap-2">
-                            {post.tags.map((tag) => (
-                                <span
-                                    key={tag}
-                                    className="px-4 py-2 bg-white/5 rounded-full text-sm text-white/70"
-                                >
-                                    {tag}
-                                </span>
-                            ))}
-                        </div>
+                {/* Tags */}
+                <div className="mt-16 pt-8 border-t border-gray-100">
+                    <div className="flex flex-wrap gap-2">
+                        {post.tags.map((tag) => (
+                            <span
+                                key={tag}
+                                className="px-4 py-2 bg-gray-50 text-gray-600 rounded-lg text-sm font-medium hover:bg-[#8B1E1E]/5 hover:text-[#8B1E1E] transition cursor-pointer"
+                            >
+                                #{tag}
+                            </span>
+                        ))}
                     </div>
+                </div>
 
-                    {/* Navigation */}
-                    <div className="mt-12 grid md:grid-cols-2 gap-4">
-                        <Link
-                            href="/blog"
-                            className="flex items-center gap-4 p-6 bg-white/5 rounded-2xl border border-white/10 hover:border-white/20 transition group"
-                        >
-                            <ArrowLeft className="w-5 h-5 text-white/50 group-hover:text-white transition" />
-                            <div>
-                                <div className="text-xs text-white/40 mb-1">Önceki Makale</div>
-                                <div className="font-medium line-clamp-1">Risk Değerlendirmesi Yöntemleri</div>
-                            </div>
-                        </Link>
-                        <Link
-                            href="/blog"
-                            className="flex items-center justify-end gap-4 p-6 bg-white/5 rounded-2xl border border-white/10 hover:border-white/20 transition group text-right"
-                        >
-                            <div>
-                                <div className="text-xs text-white/40 mb-1">Sonraki Makale</div>
-                                <div className="font-medium line-clamp-1">İşyeri Hekimi Görevleri</div>
-                            </div>
-                            <ArrowRight className="w-5 h-5 text-white/50 group-hover:text-white transition" />
-                        </Link>
-                    </div>
+                {/* Navigation */}
+                <div className="mt-16 grid md:grid-cols-2 gap-6">
+                    <Link
+                        href="/blog"
+                        className="group p-6 bg-[#F7F7F9] rounded-2xl border border-transparent hover:border-gray-200 hover:bg-white hover:shadow-lg transition-all"
+                    >
+                        <div className="flex items-center gap-2 text-sm text-gray-400 font-bold mb-2 group-hover:text-[#8B1E1E] transition-colors">
+                            <ArrowLeft className="w-4 h-4" /> Önceki
+                        </div>
+                        <div className="font-bold text-gray-900 line-clamp-1">Risk Değerlendirmesi Yöntemleri</div>
+                    </Link>
+                    <Link
+                        href="/blog"
+                        className="group p-6 bg-[#F7F7F9] rounded-2xl border border-transparent hover:border-gray-200 hover:bg-white hover:shadow-lg transition-all text-right"
+                    >
+                        <div className="flex items-center justify-end gap-2 text-sm text-gray-400 font-bold mb-2 group-hover:text-[#8B1E1E] transition-colors">
+                            Sonraki <ArrowRight className="w-4 h-4" />
+                        </div>
+                        <div className="font-bold text-gray-900 line-clamp-1">İşyeri Hekimi Görevleri</div>
+                    </Link>
                 </div>
             </article>
 
-            {/* Footer */}
-            <footer className="py-12 px-6 border-t border-white/5">
-                <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
-                    <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                            <Shield className="w-4 h-4" />
-                        </div>
-                        <span className="font-bold">ProSektorWeb</span>
-                    </div>
-
-                    <div className="text-white/40 text-sm">
-                        © 2026 ProSektorWeb. Tüm hakları saklıdır.
+            {/* Footer - Same as List Page */}
+            <footer className="bg-[#F7F7F9] pt-20 pb-12 border-t border-gray-200">
+                <div className="max-w-[1200px] mx-auto px-[5%]">
+                    <div className="pt-8 border-t border-gray-200 text-center text-sm text-gray-400">
+                        © 2026 Prosektorweb. Tüm hakları saklıdır.
                     </div>
                 </div>
             </footer>
