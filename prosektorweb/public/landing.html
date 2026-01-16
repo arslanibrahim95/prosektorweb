@@ -1210,16 +1210,44 @@
                     <p style="margin:0; font-weight: 800; color:var(--text-main); font-size: 1.2rem;">Toplam: 7.000 TL +
                         KDV</p>
                 </div>
-                <div class="checkbox-group"><input type="checkbox" id="pay1"><label for="pay1">Mesafeli Satış
-                        Sözleşmesini okudum</label></div>
-                <div class="checkbox-group"><input type="checkbox" id="pay2"><label for="pay2">Gizlilik ve KVKK
-                        metinlerini okudum</label></div>
-                <div class="checkbox-group"><input type="checkbox" id="pay3"><label for="pay3">İptal ve iade koşullarını
-                        okudum</label></div>
-                <button class="btn-modal btn-modal-primary" onclick="handlePayment()">Ödemeyi Tamamla</button>
+
+                <!-- 1. Zorunlu Onay -->
+                <div class="checkbox-group">
+                    <input type="checkbox" id="pay1">
+                    <label for="pay1">
+                        <a href="/mesafeli-satis-sozlesmesi" target="_blank"
+                            style="color:var(--text-main); text-decoration:underline;">Kullanım Koşulları ve Mesafeli
+                            Satış Sözleşmesi</a>’ni okudum, kabul ediyorum.
+                    </label>
+                </div>
+
+                <!-- 2. Bilgilendirme Onayı -->
+                <div class="checkbox-group">
+                    <input type="checkbox" id="pay2">
+                    <label for="pay2">Satın alma sonrası web sitesinin yayına alınacağını ve <strong>cayma hakkı
+                            bulunmadığını</strong> biliyorum.</label>
+                </div>
+
+                <!-- 3. KVKK Bilgilendirmesi -->
+                <div class="checkbox-group">
+                    <input type="checkbox" id="pay3">
+                    <label for="pay3">
+                        <a href="/gizlilik-ve-kvkk" target="_blank"
+                            style="color:var(--text-main); text-decoration:underline;">Gizlilik Politikası ve KVKK
+                            Aydınlatma Metni</a>’ni okudum.
+                    </label>
+                </div>
+
+                <div style="margin-top:2rem; margin-bottom:1rem;">
+                    <button class="btn-modal btn-modal-primary" onclick="handlePayment()">Ödemeyi Tamamla</button>
+                    <p style="text-align:center; font-size:0.8rem; color:var(--text-muted); margin-top:0.5rem;">
+                        Ödeme tamamlandığında seçilen web sitesi yayına alma sürecine alınır.
+                    </p>
+                </div>
+
                 <div id="payError"
                     style="color:#DC2626; font-size: 0.85rem; margin-bottom: 1rem; display:none; font-weight: 600;">
-                    Lütfen tüm sözleşmeleri onaylayın.</div>
+                    Lütfen tüm onay kutularını işaretleyin.</div>
             </div>
 
             <!-- E3: Final Success -->
