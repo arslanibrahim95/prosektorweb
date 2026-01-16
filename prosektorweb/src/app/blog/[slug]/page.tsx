@@ -77,7 +77,9 @@ export default async function BlogDetailPage({
                     </Link>
 
                     <div className="hidden md:flex items-center gap-8 text-[0.95rem] font-medium text-gray-600">
-                        <Link href="/" className="hover:text-[#8B1E1E] transition-colors">Ana Sayfa</Link>
+                        <Link href="/#neden-biz" className="hover:text-[#8B1E1E] transition-colors">Neden Biz?</Link>
+                        <Link href="/#fiyatlandirma" className="hover:text-[#8B1E1E] transition-colors">Fiyatlandırma</Link>
+                        <Link href="/#sss" className="hover:text-[#8B1E1E] transition-colors">SSS</Link>
                         <Link href="/blog" className="text-[#8B1E1E] font-semibold">Blog</Link>
                         <Link href="/#iletisim" className="hover:text-[#8B1E1E] transition-colors">İletişim</Link>
                     </div>

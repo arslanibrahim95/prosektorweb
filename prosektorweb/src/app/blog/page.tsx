@@ -111,7 +111,9 @@ export default function BlogPage() {
                     </Link>
 
                     <div className="hidden md:flex items-center gap-8 text-[0.95rem] font-medium text-gray-600">
-                        <Link href="/" className="hover:text-[#8B1E1E] transition-colors">Ana Sayfa</Link>
+                        <Link href="/#neden-biz" className="hover:text-[#8B1E1E] transition-colors">Neden Biz?</Link>
+                        <Link href="/#fiyatlandirma" className="hover:text-[#8B1E1E] transition-colors">Fiyatlandırma</Link>
+                        <Link href="/#sss" className="hover:text-[#8B1E1E] transition-colors">SSS</Link>
                         <span className="text-[#8B1E1E] font-semibold">Blog</span>
                         <Link href="/#iletisim" className="hover:text-[#8B1E1E] transition-colors">İletişim</Link>
                     </div>
@@ -268,7 +270,9 @@ export default function BlogPage() {
                             <h3 className="font-bold text-gray-900 mb-4">Hızlı Erişim</h3>
                             <div className="flex flex-col gap-2">
                                 <Link href="/" className="text-gray-500 hover:text-[#8B1E1E] text-sm transition-colors">Ana Sayfa</Link>
-                                <Link href="#" className="text-gray-500 hover:text-[#8B1E1E] text-sm transition-colors">Blog</Link>
+                                <Link href="/#neden-biz" className="text-gray-500 hover:text-[#8B1E1E] text-sm transition-colors">Neden Biz?</Link>
+                                <Link href="/#fiyatlandirma" className="text-gray-500 hover:text-[#8B1E1E] text-sm transition-colors">Fiyatlandırma</Link>
+                                <Link href="/#sss" className="text-gray-500 hover:text-[#8B1E1E] text-sm transition-colors">SSS</Link>
                                 <Link href="/#iletisim" className="text-gray-500 hover:text-[#8B1E1E] text-sm transition-colors">İletişim</Link>
                             </div>
                         </div>
