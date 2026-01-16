@@ -28,15 +28,23 @@
             --primary-hover: #6F1717;
             --primary-active: #5A1313;
             --primary-gradient: linear-gradient(135deg, #8B1E1E 0%, #B91C1C 100%);
-            --text-main: #111827;
-            --text-secondary: #4B5563;
+            /* Fluent UI Neutrals */
+            --text-main: #242424;
+            --text-secondary: #5c5c5c;
             --text-muted: #6B7280;
             --border-color: #E6E6EA;
             --transition-speed: 0.3s;
-            --shadow-soft: 0 10px 30px rgba(17, 24, 39, 0.08);
-            --shadow-strong: 0 20px 40px rgba(17, 24, 39, 0.12);
-            --font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            --overlay-color: rgba(17, 24, 39, 0.45);
+            /* Fluent Shadow Elevations */
+            --shadow-soft: 0px 4px 8px rgba(0, 0, 0, 0.14), 0px 0px 2px rgba(0, 0, 0, 0.12);
+            /* Elevation 8 */
+            --shadow-strong: 0px 8px 16px rgba(0, 0, 0, 0.14), 0px 0px 2px rgba(0, 0, 0, 0.12);
+            /* Elevation 16 */
+            --font-family: 'Segoe UI', 'Segoe UI Web (West European)', -apple-system, BlinkMacSystemFont, Roboto, 'Helvetica Neue', sans-serif;
+            --overlay-color: rgba(0, 0, 0, 0.4);
+            /* Fluent standard overlay */
+            --radius-btn: 4px;
+            --radius-card: 8px;
+            --radius-input: 4px;
         }
 
         * {
@@ -164,8 +172,8 @@
         .btn-main {
             background: var(--primary-gradient);
             color: white;
-            padding: 1rem 2.8rem;
-            border-radius: 50px;
+            padding: 0.8rem 2rem;
+            border-radius: var(--radius-btn);
             font-size: 1.1rem;
             font-weight: 700;
             text-decoration: none;
@@ -223,7 +231,7 @@
         .step-card {
             background: var(--bg-surface);
             padding: 2.5rem;
-            border-radius: 20px;
+            border-radius: var(--radius-card);
             border: 1px solid var(--border-color);
             transition: transform var(--transition-speed), box-shadow var(--transition-speed);
             box-shadow: var(--shadow-soft);
@@ -270,7 +278,7 @@
         .price-card {
             background: var(--bg-surface);
             padding: 3rem;
-            border-radius: 30px;
+            border-radius: var(--radius-card);
             border: 1px solid var(--border-color);
             position: relative;
             display: flex;
@@ -416,7 +424,7 @@
             background: var(--bg-surface);
             border: 1px solid var(--border-color);
             color: var(--text-main);
-            border-radius: 12px;
+            border-radius: var(--radius-input);
             outline: none;
             font-size: 1rem;
             transition: border-color 0.2s, box-shadow 0.2s;
@@ -447,8 +455,8 @@
             width: 100%;
             background: var(--primary-gradient);
             color: white;
-            padding: 1.25rem;
-            border-radius: 12px;
+            padding: 1rem;
+            border-radius: var(--radius-btn);
             border: none;
             font-weight: 700;
             font-size: 1.1rem;
@@ -588,7 +596,7 @@
             background: var(--bg-surface);
             width: 100%;
             max-width: 720px;
-            border-radius: 24px;
+            border-radius: var(--radius-card);
             position: relative;
             border: 1px solid var(--border-color);
             overflow: hidden;
@@ -658,9 +666,9 @@
         .btn-modal {
             display: block;
             width: 100%;
-            padding: 1.25rem;
+            padding: 1rem;
             margin-bottom: 1rem;
-            border-radius: 12px;
+            border-radius: var(--radius-btn);
             border: none;
             font-weight: 700;
             font-size: 1rem;
