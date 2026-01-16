@@ -1,0 +1,31 @@
+{
+  "slug": "is-kazasinda-isverenin-hukuki-ve-cezai-sorumlulugu-rehberi",
+  "title": "İş Kazası Olduğunda Patronu Ne Bekler? Hapis ve Tazminat Riski",
+  "excerpt": "Bir kaza anında 'kader' diyemezsiniz. TCK'ya göre Taksirle Yaralama/Öldürme suçu, işverenin gözetme borcu ve ödenecek tazminatların ağır faturası.",
+  "content": "<h2>Kaza Geliyorum Demez, Kanun Hesap Sorar</h2><p>İşyerinizde bir kaza yaşandığında, ambulans sirenlerinin sesi kesildikten sonra, çok daha soğuk ve korkutucu bir ses başlar: Adliye koridorlarının sesi. Bir işveren olarak, çalışanın güvenliğini sağlamak sadece vicdani bir görev değil, Borçlar Kanunu'nun size yüklediği en temel borçtur (Gözetme Borcu).</p><p>Kaza olduğunda devlet kapınızı iki farklı şapkayla çalar: <strong>Ceza Hukuku (Savcı)</strong> ve <strong>Özel Hukuk (Tazminat)</strong>. Gelin, bu kabus senaryosuna yakından bakalım.</p><h2>Ceza Davası: Özgürlüğünüz Tehlikede mi?</h2><p>Evet. Türk Ceza Kanunu'na (TCK) göre iş kazası, basit bir hata değil, bir suçtur.</p><ul><li><strong>Taksirle Yaralama (TCK 89):</strong> Eğer işçi yaralandıysa, 3 aydan 1 yıla kadar hapis cezası gündeme gelir. Eğer uzuv kaybı veya kalıcı hasar varsa ceza katlanır.</li><li><strong>Taksirle Öldürme (TCK 85):</strong> Eğer işçi hayatını kaybettiyse, 2 yıldan 6 yıla kadar hapis cezası istenir. Eğer birden fazla kişi öldüyse, bu süre 15 yıla kadar çıkar.</li><li><strong>Bilinçli Taksir:</strong> Burası çok kritiktir. Eğer işveren riski biliyor ama 'bir şey olmaz, biz hep böyle yapıyoruz' diyerek önlem almıyorsa (Örn: İskelede korkuluk yok, pres makinesinde sensör sökülmüş), ceza 3'te 1 oranında artırılır ve hapis cezası paraya çevrilmez.</li></ul><h3>Kim Yargılanır?</h3><p>Şirket tüzel kişiliği (A.Ş. veya Ltd. Şti.) hapis yatmaz. Hapis cezasını, şirketin o konudaki yetkili 'gerçek kişi' yöneticileri çeker. Bu kişi Patron, Genel Müdür, Fabrika Müdürü, Şantiye Şefi veya o işi denetlemekle görevli Formen olabilir. Savcı, 'Emir ve talimat verme yetkisi kimdeydi?' diye sorar.</p><h2>Hukuki Sorumluluk: Tazminatlar</h2><p>Ceza davası sürerken veya bittikten sonra, kazalı işçi veya (ölüm halinde) geride kalan ailesi, işverene karşı tazminat davası açar.</p><ul><li><strong>Maddi Tazminat:</strong> İşçinin çalışamadığı günler, tedavi masrafları, bakıcı giderleri ve en önemlisi 'İş Göremezlik Tazminatı'. İşçi %40 sakat kaldıysa, ömrü boyunca kazanacağı paranın %40'ını peşin olarak sizden ister. Genç bir işçi için bu rakam milyonları bulur.</li><li><strong>Manevi Tazminat:</strong> Çekilen acı, üzüntü ve psikolojik yıkım için ödenen paradır. Hakimin takdirindedir ve zenginleşme aracı olmasa da ciddi rakamlara ulaşabilir.</li><li><strong>Destekten Yoksun Kalma Tazminatı:</strong> Ölüm halinde, işçinin eşine, çocuklarına, hatta destek olduğu anne-babasına ödenen paradır.</li></ul><h2>Kusur Oranı Her Şeyi Değiştirir</h2><p>Mahkeme bir bilirkişi heyeti atar (Genelde bir İSG uzmanı, bir hukukçu). Bilirkişi olay yerine gider ve bakar: 'Kaza neden oldu? İşveren önlem aldı mı? İşçi kurala uydu mu?'</p><p>Eğer işveren %100 kusurluysa (Örn: Hiçbir önlem yok), bedel çok ağır olur. Ama işçinin de hatası varsa (Örn: Verilen bareti takmamış, talimata uymamış), tazminattan işçinin kusuru oranında (Müterafik Kusur) indirim yapılır. İşte bu yüzden, sadece önlem almak yetmez, o önlemi aldığınızı ve denetlediğinizi <strong>ispatlamak</strong> (Zimmet tutanağı, eğitim belgesi, ihtar formu) zorundasınız.</p>",
+  "coverImage": "https://images.unsplash.com/photo-1589829085413-56de8ae18c73?auto=format&fit=crop&q=80&w=2070",
+  "category": {
+    "name": "Hukuk",
+    "slug": "hukuk"
+  },
+  "tags": [
+    {
+      "name": "İş Kazası",
+      "slug": "is-kazasi"
+    },
+    {
+      "name": "Tazminat",
+      "slug": "tazminat"
+    },
+    {
+      "name": "Ceza Hukuku",
+      "slug": "ceza-hukuku"
+    }
+  ],
+  "author": {
+    "name": "ProSektorWeb Editör"
+  },
+  "publishedAt": "2026-01-14",
+  "readingTime": 9,
+  "featured": true
+}

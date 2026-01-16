@@ -1,0 +1,31 @@
+{
+  "slug": "kkd-kullanmayan-iscinin-isten-cikarilmasi-ve-tazminatsiz-fesih",
+  "title": "Baret Takmayan İşçi Tazminatsız Kovulabilir mi? Yargıtay Kararları",
+  "excerpt": "İş güvenliği kurallarına uymayan, KKD kullanmamakta direnen personelin iş akdinin feshi (Madde 25/II-ı), tutanak süreci ve haklı fesih şartları.",
+  "content": "<h2>Kural Tanımayan İşçi, Bombadan Tehlikelidir</h2><p>İşveren her türlü önlemi aldı, eğitimi verdi, en kaliteli malzemeyi (KKD) teslim etti. Ama işçi inatla baretini takmıyor, emniyet kemerini bağlamıyor, makinenin koruyucusunu söküyor. İşveren ne yapmalı? 'İşçi işte, ne yapsak olmuyor' deyip göz mü yummalı? Hayır. Bu durum sadece o işçiyi değil, tüm işyerini tehlikeye atar.</p><h2>Haklı Fesih Sebebi (Madde 25/II-ı)</h2><p>İş Kanunu'nun 25. maddesinin II-ı bendi, işçinin 'isteği ile işin güvenliğini tehlikeye düşürmesini' haklı fesih (Tazminatsız çıkış) sebebi sayar. Ancak bunun için 'Takmadın, kovuldun' denilemez. Bir hukuki süreç işletilmelidir.</p><h2>Adım Adım Fesih Süreci</h2><ol><li><strong>Tespit ve Tutanak:</strong> İşçinin kural ihlali (Örn: Gözlüksüz taşlama yapması) anında fotoğraf veya şahitlerle tutanak altına alınır.</li><li><strong>Yazılı Uyarı ve Savunma:</strong> İşçiden yazılı savunma istenir. 'Neden takmadın?' İşçi geçerli bir mazeret sunamazsa (Örn: 'Gözlük kırıktı' demezse), yazılı ihtar verilir.</li><li><strong>Tekrar:</strong> İşçi aynı hatayı tekrarlarsa, tekrar tutanak tutulur.</li><li><strong>Fesih:</strong> Israrlı davranış devam ederse, işçinin 'İş güvenliğini tehlikeye attığı' gerekçesiyle iş akdi, ihbar ve kıdem tazminatı ödenmeden feshedilebilir.</li></ol><h2>Yargıtay'ın Aradığı Şartlar</h2><p>Mahkemede haklı çıkmak için işverenin şunları ispatlaması gerekir:</p><ul><li>Malzeme işçiye zimmet tutanağı ile verilmiş mi?</li><li>Nasıl kullanılacağı konusunda eğitim verilmiş mi?</li><li>İşveren 'takmıyorlar ama ne yapayım' demeyip, gerçekten denetim yapmış ve uyarmış mı?</li></ul><p>Eğer işveren göz yumduysa, 'zımni kabul' sayılır ve fesih haksız bulunur.</p>",
+  "coverImage": "https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?auto=format&fit=crop&q=80&w=2070",
+  "category": {
+    "name": "Hukuk",
+    "slug": "hukuk"
+  },
+  "tags": [
+    {
+      "name": "İşten Çıkarma",
+      "slug": "isten-cikarma"
+    },
+    {
+      "name": "Tazminatsız Fesih",
+      "slug": "tazminatsiz-fesih"
+    },
+    {
+      "name": "KKD",
+      "slug": "kkd"
+    }
+  ],
+  "author": {
+    "name": "ProSektorWeb Editör"
+  },
+  "publishedAt": "2026-01-14",
+  "readingTime": 7,
+  "featured": false
+}

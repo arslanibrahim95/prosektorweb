@@ -1,0 +1,31 @@
+{
+  "slug": "sgk-rucu-davalari-isveren-ne-zaman-oder",
+  "title": "SGK'nın İşverene Faturası: Rücu Davaları ve Kusur Oranı",
+  "excerpt": "İş kazası geçiren işçinin tedavi masraflarını ve emekli maaşını SGK öder, sonra dönüp işverenden 'faiziyle' geri ister. Rücu şartları ve korunma yolları.",
+  "content": "<h2>Devlet 'Ben Öderim Ama Senden Alırım' Der</h2><p>Bir işçiniz kaza geçirdiğinde veya meslek hastalığına yakalandığında, Sosyal Güvenlik Kurumu (SGK) devreye girer. İşçiyi en iyi hastanelerde tedavi ettirir, çalışamadığı günler için rapor parası verir, eğer sakat kalırsa ömür boyu 'Sürekli İş Göremezlik Geliri' (emekli maaşı gibi) bağlar. İşveren genelde 'Oh, devletimiz var olsun, masrafları karşıladı' diye düşünür.</p><p>Ancak aylar veya yıllar sonra işverene SGK'dan bir tebligat gelir: <strong>'Bu kaza senin ihmalin yüzünden oldu. İşçiye yaptığım 2 milyon TL masrafı, yasal faiziyle birlikte bana geri öde.'</strong> İşte buna <strong>Rücu Davası</strong> (Geriye Dönük Talep) denir ve birçok şirketi iflasa sürükleyen asıl maliyet budur.</p><h2>SGK Hangi Durumda Rücu Eder?</h2><p>5510 sayılı Kanun'un 21. maddesi çok açıktır. Rücu için şu şartlardan biri gerekir:</p><ul><li><strong>Kastı Varsa:</strong> İşveren bile bile kazaya neden olduysa (Çok nadir bir durumdur).</li><li><strong>İşçilerin Sağlığını Koruma Mevzuatına Aykırı Hareket:</strong> En sık karşılaşılan budur. Yani İSG kurallarına uymamak. Makinede koruyucu yoksa, havalandırma çalışmıyorsa, işçiye eğitim verilmediyse, baret zorunlu tutulmadıysa... Kısacası, mevzuattaki 'yap' denilen bir şeyi yapmadıysanız, SGK rücu eder.</li><li><strong>Suç Sayılır Eylem:</strong> Mahkemede taksirle yaralama veya öldürme suçu sabit görülürse.</li></ul><h2>Kusur Oranı Hesabı</h2><p>SGK, işçiye yaptığı masrafın tamamını istemez. İşverenin <strong>kusur oranı</strong> kadarını ister. İş Mahkemesi bilirkişisi, kazadaki kusurları dağıtır.</p><p><strong>Örnek:</strong> Kaza maliyeti 1 Milyon TL. Bilirkişi dedi ki: 'İşveren %80 kusurlu (önlem almamış), işçi %20 kusurlu (dikkatsiz davranmış).' SGK işverenden 1 Milyonun %80'ini, yani 800.000 TL'yi ister.</p><h2>Rücu'dan Nasıl Kurtulursunuz?</h2><p>Tek yolu vardır: <strong>Kaçınılmazlık İlkesi</strong>. Eğer işveren olarak her türlü önlemi aldığınızı, en son teknolojiyi kullandığınızı, denetim yaptığınızı, eğitimi verdiğinizi ispatlarsanız ve kaza buna rağmen (bilimsel ve teknik olarak önlenemez bir sebeple) olduysa, SGK size rücu edemez. Ama 'baret verdim takmadı' demek yetmez, 'takmadığı için tutanak tuttum, uyardım' demeniz gerekir.</p>",
+  "coverImage": "https://images.unsplash.com/photo-1589829085413-56de8ae18c73?auto=format&fit=crop&q=80&w=2070",
+  "category": {
+    "name": "Hukuk",
+    "slug": "hukuk"
+  },
+  "tags": [
+    {
+      "name": "Rücu Davası",
+      "slug": "rucu-davasi"
+    },
+    {
+      "name": "SGK",
+      "slug": "sgk"
+    },
+    {
+      "name": "İş Kazası",
+      "slug": "is-kazasi"
+    }
+  ],
+  "author": {
+    "name": "ProSektorWeb Editör"
+  },
+  "publishedAt": "2026-01-14",
+  "readingTime": 8,
+  "featured": false
+}

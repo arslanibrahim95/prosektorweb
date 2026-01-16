@@ -1,0 +1,31 @@
+{
+  "slug": "asil-isveren-alt-isveren-taseron-iliskisinde-isg-sorumlulugu",
+  "title": "Taşeronun Kazası Ana Firmayı Yakar Mı? Asıl-Alt İşveren Sorumluluğu",
+  "excerpt": "İşi taşerona verdim, kurtuldum mu? Yargıtay'ın 'Müteselsil (Zincirleme) Sorumluluk' ilkesi, sözleşmelere yazılan 'sorumlu taşerondur' maddesinin geçersizliği.",
+  "content": "<h2>Sözleşme ile Sorumluluk Devredilemez</h2><p>Büyük inşaat firmaları veya fabrikalar, tehlikeli veya uzmanlık gerektiren işleri taşeronlara (Alt İşveren) verir. Genellikle sözleşmeye şöyle bir madde eklerler: <strong>'İş sağlığı ve güvenliği ile ilgili tüm sorumluluk taşerona aittir. Kaza olursa asıl işveren sorumlu değildir.'</strong></p><p>Hukukta bu maddenin hiçbir geçerliliği yoktur. Yargıtay der ki: 'İşçinin güvenliği, kağıt üzerindeki imzalarla başkasına atılamaz. Asıl işveren, kendi sahasında çalışan herkesi gözetmek zorundadır.'</p><h2>Müteselsil (Zincirleme) Sorumluluk Nedir?</h2><p>İş Kanunu'na göre Asıl İşveren, Alt İşverenin işçilerine karşı, o işçi kendi işçisiymiş gibi sorumludur. Buna <strong>Müteselsil Sorumluluk</strong> denir. Yani taşeronun işçisi kaza geçirirse, tazminat davasını hem kendi patronuna (Taşeron) hem de ana firmaya (Asıl İşveren) açar.</p><p>Mahkeme tazminatı belirler ve der ki: 'Bu parayı ikinizden biri ödesin, hanginizin parası varsa ondan alırım.' Genelde ana firmanın ödeme gücü daha yüksek olduğu için, parayı ana firma öder. Sonra ana firma, bu parayı taşerondan almaya çalışır (Rücu eder). Ama taşeron batmışsa veya kaçmışsa, ihale ana firmaya kalır.</p><h2>Asıl İşveren Ne Yapmalı?</h2><p>Sadece işi verip kenara çekilmek yetmez. Asıl işveren 'Denetim ve Gözetim' görevini yapmalıdır:</p><ul><li>Taşeronun İSG uzmanı ve hekimi var mı? (İSG-KATİP'ten kontrol).</li><li>İşçilerin sigortası ve eğitimleri tam mı?</li><li>Sahada baret takıyorlar mı? İskeleleri güvenli mi?</li><li>Asıl işverenin İSG uzmanı, taşeronun sahasını da gezmeli ve uygunsuzlukları asıl işverene raporlamalıdır. Asıl işveren, güvenli çalışmayan taşeronun işini durdurmalıdır.</li></ul><h2>Sıkça Sorulan Sorular</h2><h3>Her işi taşerona verebilir miyim?</h3><p>Hayır. Asıl işin bir bölümünü veya yardımcı işleri (yemek, güvenlik, nakliye) verebilirsiniz. Ama asıl işin tamamını veya uzmanlık gerektirmeyen bir kısmını taşerona verirseniz (Muvazaa), o işçiler yasal olarak baştan beri sizin işçiniz sayılır ve tüm haklarını sizden isterler.</p>",
+  "coverImage": "https://images.unsplash.com/photo-1531973576160-7125cd663d86?auto=format&fit=crop&q=80&w=2070",
+  "category": {
+    "name": "Hukuk",
+    "slug": "hukuk"
+  },
+  "tags": [
+    {
+      "name": "Taşeron",
+      "slug": "taseron"
+    },
+    {
+      "name": "Sorumluluk",
+      "slug": "sorumluluk"
+    },
+    {
+      "name": "İş Hukuku",
+      "slug": "is-hukuku"
+    }
+  ],
+  "author": {
+    "name": "ProSektorWeb Editör"
+  },
+  "publishedAt": "2026-01-14",
+  "readingTime": 8,
+  "featured": false
+}

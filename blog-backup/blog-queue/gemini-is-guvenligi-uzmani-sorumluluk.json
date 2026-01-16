@@ -1,0 +1,31 @@
+{
+  "slug": "is-guvenligi-uzmaninin-hukuki-sorumlulugu-ve-isg-katip",
+  "title": "İSG Uzmanı Günah Keçisi midir? İş Kazasında Uzmanın Sorumluluğu",
+  "excerpt": "Kaza olunca patron 'uzman suçlu', uzman 'ben uyardım' der. Mahkemede İSG uzmanını kurtaran veya yakan detaylar: Onaylı Defter, İSG-KATİP ve yazılı bildirim.",
+  "content": "<h2>Danışman mı, İcracı mı?</h2><p>İş güvenliği uzmanlarının (İGU) en büyük mesleki korkusu, bir ölümlü kazada sanık sandalyesine oturmaktır. Kanun aslında çok nettir: <strong>'İSG uzmanı rehberdir, danışmandır. Önlemi aldırmak, parayı harcamak işverenin görevidir.'</strong> Teoride uzman, sadece 'şunu yap' der, yapmak patronun işidir.</p><p>Ancak pratikte işler karışır. Savcılar ve bilirkişiler, kazada 'kusur paylaştırma' yöntemine giderler ve genellikle uzmana da 'Görevi ihmal' veya 'Taksirle ölüme sebebiyet verme' suçlamasıyla dava açarlar.</p><h2>Sorumluluğun Sınırı: Tespit ve Bildirim</h2><p>Uzmanın yasal sorumluluğu, işyerindeki riski <strong>görmek, tespit etmek ve işverene yazılı olarak bildirmektir</strong>. Uzman, 'Burada pres makinesinin sensörü yok, işçi elini kaptırabilir, acil takılmalı' diye yazıp imzalattıysa (Onaylı Deftere veya İSG-KATİP sistemine), hukuki sorumluluğunu yerine getirmiş sayılır. O sensörü takmayan işveren %100 sorumludur.</p><h2>Uzman Ne Zaman Suçlu Olur?</h2><ul><li><strong>Körlük (Tespiti Yapmamışsa):</strong> Bariz bir tehlikeyi (Örn: 3 metrelik açık bir kuyu, korkuluksuz merdiven) görmemiş, raporlamamış ve deftere yazmamışsa. Hakim 'Sen uzmansın, bunu nasıl görmezsin?' der.</li><li><strong>Yanlış Bilgi (Hatalı Yönlendirme):</strong> 'Bu iskele sağlam, çalışılabilir' dediyse ama iskele standart dışıysa.</li><li><strong>Takip Etmeme:</strong> Bir kere yazıp kenara çekilmek yetmez. Risk devam ediyorsa, uzman tekrar tekrar yazmalı, işvereni zorlamalıdır.</li></ul><h2>Bakanlığa Bildirim (İhbar) Yükümlülüğü</h2><p>Kanun, uzmana çok kritik bir görev daha verir: Eğer işveren, hayati tehlike arz eden bir durumu (Örn: Çökme riski, patlama riski, zehirli gaz) uzmanın uyarısına rağmen makul sürede düzeltmiyorsa, uzman bu durumu <strong>Çalışma ve Sosyal Güvenlik Bakanlığı'na bildirmek zorundadır</strong>.</p><p>Bu 'ispiyonculuk' değil, 'hayat kurtarma' görevidir. Eğer uzman, düzeltilmeyen hayati bir riski Bakanlığa bildirmezse ve kaza olursa; uzman belgesini kaybedebilir ve ceza alabilir.</p>",
+  "coverImage": "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&q=80&w=2070",
+  "category": {
+    "name": "Hukuk",
+    "slug": "hukuk"
+  },
+  "tags": [
+    {
+      "name": "İSG Uzmanı",
+      "slug": "isg-uzmani"
+    },
+    {
+      "name": "Sorumluluk",
+      "slug": "sorumluluk"
+    },
+    {
+      "name": "Yargıtay",
+      "slug": "yargitay"
+    }
+  ],
+  "author": {
+    "name": "ProSektorWeb Editör"
+  },
+  "publishedAt": "2026-01-14",
+  "readingTime": 8,
+  "featured": false
+}

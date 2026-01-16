@@ -1,0 +1,31 @@
+{
+  "slug": "isyeri-hekiminin-yetkileri-sorumluluklari-is-durdurma",
+  "title": "İşyeri Hekimi Sadece İlaç mı Yazar? Hayati Yetkiler ve Sorumluluklar",
+  "excerpt": "İşyeri hekiminin 'İşe Uygunluk Raporu'nun bağlayıcılığı, meslek hastalığı tespitindeki kritik rolü ve hayati tehlikede işi durdurma yetkisi.",
+  "content": "<h2>Koruyucu Hekimliğin Kalesi</h2><p>Birçok işveren ve çalışan, işyeri hekimini 'işyerindeki sağlık ocağı doktoru' gibi görür. 'Başım ağrıdı ilaç yazsın', 'Grip oldum rapor versin'. Oysa işyeri hekiminin asıl görevi tedavi etmek (poliklinik) değil, <strong>korumaktır</strong>. Çalışanın yaptığı işten dolayı hasta olmasını engellemektir.</p><h2>En Büyük Güç: İşe Uygunluk Raporu (Kanaat Raporu)</h2><p>Hekim, işe girişlerde ve periyodik muayenelerde çalışanı değerlendirir ve bir karar verir: 'Bu işi yapmaya elverişlidir' veya 'Elverişli değildir'.</p><p>Hekim, 'Bu kişi epilepsi hastası, yüksekte çalışamaz' veya 'Akciğer kapasitesi düşük, tozlu ortamda çalışamaz' derse, bu karar kesindir. İşveren, hekimin 'çalışamaz' dediği bir kişiyi o işte <strong>çalıştıramaz</strong>. Çalıştırırsa ve kaza olursa (Örn: Epilepsi nöbeti geçirip düşerse), işveren 'Ben bilmiyordum' diyemez, %100 kusurlu sayılır.</p><h2>Hayati Tehlikede İş Durdurma</h2><p>Tıpkı İSG uzmanı gibi, işyeri hekimi de hayati bir sağlık riski gördüğünde (Örn: Yoğun kimyasal sızıntısı, radyasyon kaçağı, salgın hastalık riski) işverene işin durdurulmasını önerebilir. İşveren dinlemezse, hekimin de Bakanlığa bildirim yükümlülüğü vardır.</p><h2>Gizlilik İlkesi ve KVKK</h2><p>Hekim, çalışanların sağlık verilerini (Hastalık teşhisleri, tahlil sonuçları) işverenle veya İK departmanıyla paylaşamaz. Bu, Kişisel Verilerin Korunması Kanunu'na (KVKK) aykırıdır ve suçtur. Hekim işverene sadece sonucu bildirir: 'Uygun' veya 'Uygun Değil'. Detay (Örn: 'Ahmet'in şekeri var') verilmez.</p><h2>Meslek Hastalığı Tanısı</h2><p>Meslek hastalığını ilk fark edecek kişi işyeri hekimidir. Çalışanlarda benzer şikayetler (Örn: Herkesin cildinde döküntü veya öksürük) başladığında, hekim ortamdaki kimyasalları veya tozları sorgular. İşçiyi Meslek Hastalıkları Hastanesi'ne sevk ederek süreci başlatır. Bu erken teşhis, hem işçinin hayatını kurtarır hem de işvereni ileride açılacak milyonluk davalardan korur.</p>",
+  "coverImage": "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&q=80&w=2070",
+  "category": {
+    "name": "Mevzuat",
+    "slug": "mevzuat"
+  },
+  "tags": [
+    {
+      "name": "İşyeri Hekimi",
+      "slug": "isyeri-hekimi"
+    },
+    {
+      "name": "Sağlık",
+      "slug": "saglik"
+    },
+    {
+      "name": "Yetki",
+      "slug": "yetki"
+    }
+  ],
+  "author": {
+    "name": "ProSektorWeb Editör"
+  },
+  "publishedAt": "2026-01-14",
+  "readingTime": 7,
+  "featured": false
+}

@@ -1,0 +1,31 @@
+{
+  "slug": "sigortasiz-isci-kaza-gecirirse-isvereni-bekleyen-son",
+  "title": "Kumar Masasında Bile Bu Kadar Risk Yok: Sigortasız İşçi Kazası",
+  "excerpt": "Kayıt dışı işçi çalıştırmanın bedeli sandığınızdan çok daha ağır. Kaza anında SGK'nın uyguladığı yaptırımlar, sermaye değeri peşin ödemesi ve iflas riski.",
+  "content": "<h2>En Pahalı 'Tasarruf' Yöntemi</h2><p>'Birkaç gün deneme süresi' diyerek, 'bugün geldi yarın gider' diyerek veya 'sigorta istemiyor, elden para alıyor' bahanesiyle işçiyi sigortasız çalıştırmak, bir işverenin alabileceği en büyük, en mantıksız risktir. O işçi kaza geçirirse, işveren için 'kıyamet senaryosu' başlar.</p><h2>SGK Her Şeyi Rücu Eder</h2><p>Sigortasız işçi kaza geçirdiğinde, SGK onu sahipsiz bırakmaz, en iyi hastanelerde tedavi ettirir. AMA, sonra döner ve işverene faturayı çıkarır:</p><ul><li><strong>Tedavi Masrafları:</strong> Ameliyat, ilaç, protez, yoğun bakım... Hepsi faiziyle istenir.</li><li><strong>Gelir Bağlama (Peşin Sermaye Değeri):</strong> Eğer işçi sakat kalırsa veya ölürse, SGK ona veya ailesine maaş bağlar. SGK, bu maaşın ömür boyu tutacak toplamını hesaplar (buna Peşin Sermaye Değeri denir) ve işverenden <strong>tek seferde, peşin olarak</strong> ister. Bu rakam genç bir işçi için milyonlarca lirayı bulabilir.</li></ul><h2>Ekstra Cezalar ve Yaptırımlar</h2><ul><li><strong>İdari Para Cezası:</strong> Sigortasız çalıştırılan her işçi ve her ay için on binlerce lira ceza kesilir.</li><li><strong>Teşvik İptali:</strong> İşyerinin faydalandığı tüm SGK teşvikleri (5 puanlık indirim vb.) iptal edilir. Geçmişe dönük yararlandığı teşvikler faiziyle geri alınır ve 3 yıl boyunca teşvikten yasaklanır.</li><li><strong>İş Kazası Bildirmeme Cezası:</strong> Kaza bildirilmediği için ayrıca ceza uygulanır.</li></ul><h2>'Deneme Süresi' Mazeret Değildir</h2><p>Hukukta 'sigortasız deneme süresi' diye bir kavram yoktur. İşçi işe başladığı (hatta işyerinin servisine bindiği) andan itibaren sigortalı olmak zorundadır. İşe giriş bildirgesi, işçi işbaşı yapmadan <strong>en geç 1 gün önce</strong> verilmelidir. Kaza olduktan sonra yapılan girişin hükmü yoktur.</p>",
+  "coverImage": "https://images.unsplash.com/photo-1626265774643-f1943311a86b?auto=format&fit=crop&q=80&w=2070",
+  "category": {
+    "name": "Hukuk",
+    "slug": "hukuk"
+  },
+  "tags": [
+    {
+      "name": "Sigortasız İşçi",
+      "slug": "sigortasiz-isci"
+    },
+    {
+      "name": "İş Kazası",
+      "slug": "is-kazasi"
+    },
+    {
+      "name": "SGK",
+      "slug": "sgk"
+    }
+  ],
+  "author": {
+    "name": "ProSektorWeb Editör"
+  },
+  "publishedAt": "2026-01-14",
+  "readingTime": 7,
+  "featured": false
+}

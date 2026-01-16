@@ -1,0 +1,31 @@
+{
+  "slug": "50-calisan-siniri-ve-isg-uzmani-gorevlendirme-sartlari",
+  "title": "50 Çalışan Sınırı Nedir? İSG Uzmanı ve Hekim Zorunluluğu",
+  "excerpt": "Hangi işyerleri uzman çalıştırmak zorunda? 50 kişi hesabı nasıl yapılır? Çıraklar, stajyerler ve alt işverenler sayıya dahil mi? Az tehlikeli işyerleri için kritik eşik.",
+  "content": "<h2>İSG'de Sihirli Rakam: 50</h2><p>6331 sayılı Kanun'da bazı önemli yükümlülükler (İSG Kurulu kurma, az tehlikeli sınıfta uzman çalıştırma) '50 ve daha fazla çalışan' şartına bağlanmıştır. Bu yüzden 49 ile 50 arasındaki fark, işveren için maliyet ve sorumluluk açısından uçurumdur. Peki bu 50 kişi nasıl sayılır?</p><h2>Kimler Sayıya Dahil?</h2><p>Sayı hesabında, o işyerinde (aynı SGK sicil numarasında) çalışan tüm SGK'lılar dikkate alınır. Kısmi süreli çalışanlar, belirli süreli sözleşmeliler tam çalışan gibi sayılır.</p><h3>Dahil Olmayanlar:</h3><ul><li><strong>Çıraklar ve Stajyerler:</strong> 3308 sayılı Mesleki Eğitim Kanunu'na tabi olanlar sayıya dahil edilmez.</li><li><strong>Alt İşveren (Taşeron) İşçileri:</strong> Sizin bordronuzda değilse, sizin sayınıza dahil edilmez. Onlar taşeronun kendi sorumluluğundadır.</li></ul><h2>Aynı İşverenin Farklı Şubeleri</h2><p>Bu nokta çok önemlidir ve sıkça karıştırılır: 50 sayısı, Türkiye genelindeki toplam çalışan sayısı değil, <strong>aynı SGK sicil numarasına sahip işyerindeki</strong> çalışan sayısıdır. Yani bir market zincirinin 100 şubesi ve her şubede 5 çalışanı varsa, toplam 500 çalışanı olsa bile, her şube ayrı bir birim olarak değerlendirilir (50'nin altındadır). Ancak hepsi tek bir bina ve tek bir sicildeyse 500 sayılır.</p><h2>Sayı 50'yi Geçerse Ne Olur?</h2><p>Özellikle 'Az Tehlikeli' (Ofis, mağaza) işyerleri için, çalışan sayısı 49 iken uzman zorunlu değildir. Ancak 50 olduğu gün zorunluluk başlar. İSG Kurulu kurulmalı, işyeri hekimi ve uzmanı ile sözleşme yapılmalıdır. Bu yüzden İK departmanları bu sayıyı yakından takip etmelidir.</p>",
+  "coverImage": "https://images.unsplash.com/photo-1556761175-4b46a572b786?auto=format&fit=crop&q=80&w=2072",
+  "category": {
+    "name": "Mevzuat",
+    "slug": "mevzuat"
+  },
+  "tags": [
+    {
+      "name": "50 Çalışan",
+      "slug": "50-calisan"
+    },
+    {
+      "name": "Yasal Zorunluluk",
+      "slug": "yasal-zorunluluk"
+    },
+    {
+      "name": "İSG",
+      "slug": "isg"
+    }
+  ],
+  "author": {
+    "name": "ProSektorWeb Editör"
+  },
+  "publishedAt": "2026-01-14",
+  "readingTime": 7,
+  "featured": false
+}
