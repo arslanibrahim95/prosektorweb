@@ -13,6 +13,7 @@ import {
     Plus
 } from 'lucide-react'
 import { DnsRecordsSection } from '@/components/admin/domain/DnsRecordsSection'
+import { CloudflareActions } from '@/components/admin/domain/CloudflareActions'
 
 interface DomainDetailPageProps {
     params: Promise<{ id: string }>
@@ -120,7 +121,7 @@ export default async function DomainDetailPage({ params }: DomainDetailPageProps
                             {domain.notes && (
                                 <div>
                                     <div className="text-sm text-neutral-500 mb-1">Notlar</div>
-                                    <div className="text-neutral-700">{domain.notes}</div>
+                                    <div className="text-neutral-700 whitespace-pre-wrap text-sm">{domain.notes}</div>
                                 </div>
                             )}
                         </div>
@@ -145,10 +146,18 @@ export default async function DomainDetailPage({ params }: DomainDetailPageProps
                             </button>
                         </div>
                     </div>
+
+                    {/* Cloudflare Actions */}
+                    <CloudflareActions
+                        domainId={domain.id}
+                        domainName={domain.name}
+                        serverIp={domain.serverIp}
+                        hasZone={domain.registrar === 'Cloudflare'}
+                    />
                 </div>
 
                 {/* Right - DNS Records */}
-                <div className="lg:col-span-2">
+                <div className="lg:col-span-2 space-y-6">
                     <DnsRecordsSection records={domain.dnsRecords} domainId={domain.id} serverIp={domain.serverIp || ''} />
                 </div>
             </div>
