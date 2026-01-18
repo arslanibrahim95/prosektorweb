@@ -1,36 +1,80 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ProSektorWeb - İş Sağlığı ve Güvenliği Yönetim Sistemi
 
-## Getting Started
+OSGB'lere özel profesyonel web çözümleri ve yönetim paneli.
 
-First, run the development server:
+## 🚀 Hızlı Kurulum
+
+### Gereksinimler
+- Node.js 18+
+- MySQL/MariaDB
+- npm veya yarn
+
+### Kurulum Adımları
 
 ```bash
+# 1. Projeyi klonla
+git clone https://github.com/arslanibrahim95/prosektorweb.git
+cd prosektorweb
+
+# 2. Bağımlılıkları yükle
+npm install
+
+# 3. Environment değişkenlerini ayarla
+cp .env.example .env
+# .env dosyasını düzenle (veritabanı şifresi, admin şifresi vs.)
+
+# 4. Veritabanı şemasını oluştur
+npx prisma db push
+
+# 5. Geliştirme sunucusunu başlat
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 📦 Production Deployment
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+# Sunucuda deploy için
+./deploy.sh
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+# Veya manuel:
+npm ci --only=production
+npx prisma generate
+npx prisma db push
+npm run build
+npm start
+```
 
-## Learn More
+## 🔐 Admin Paneli
 
-To learn more about Next.js, take a look at the following resources:
+- URL: `/admin`
+- Varsayılan: `.env` dosyasındaki `ADMIN_EMAIL` ve `ADMIN_PASSWORD`
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 📁 Proje Yapısı
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```
+prosektorweb/
+├── src/
+│   ├── app/           # Next.js App Router
+│   │   ├── admin/     # Admin Panel
+│   │   ├── blog/      # Public Blog
+│   │   └── api/       # API Routes
+│   ├── components/    # React Components
+│   ├── actions/       # Server Actions
+│   └── lib/           # Utilities
+├── prisma/
+│   └── schema.prisma  # Database Schema
+├── public/            # Static Files
+└── .env.example       # Environment Template
+```
 
-## Deploy on Vercel
+## 🛠️ Teknolojiler
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- **Framework:** Next.js 14 (App Router)
+- **Database:** MySQL/MariaDB + Prisma ORM
+- **Auth:** NextAuth.js v5
+- **Styling:** Tailwind CSS
+- **Icons:** Lucide React
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 📞 Destek
+
+hello@prosektorweb.com
