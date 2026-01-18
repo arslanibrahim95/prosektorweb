@@ -60,7 +60,7 @@ export async function createEmployee(formData: FormData): Promise<EmployeeAction
     } catch (error: any) {
         console.error('createEmployee error:', error)
         if (error instanceof z.ZodError) {
-            return { success: false, error: error.errors[0].message }
+            return { success: false, error: (error as any).errors[0].message }
         }
         // Handle unique constraint violation (TC No)
         if (error.code === 'P2002') {

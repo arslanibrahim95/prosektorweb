@@ -62,7 +62,7 @@ export async function createCompany(formData: FormData): Promise<CompanyActionRe
         console.error('createCompany error:', error)
 
         if (error instanceof z.ZodError) {
-            return { success: false, error: error.errors[0].message }
+            return { success: false, error: (error as any).errors[0].message }
         }
 
         return { success: false, error: 'Firma oluşturulurken bir hata oluştu.' }
@@ -193,7 +193,7 @@ export async function updateCompany(id: string, formData: FormData): Promise<Com
         console.error('updateCompany error:', error)
 
         if (error instanceof z.ZodError) {
-            return { success: false, error: error.errors[0].message }
+            return { success: false, error: (error as any).errors[0].message }
         }
 
         return { success: false, error: 'Firma güncellenirken bir hata oluştu.' }

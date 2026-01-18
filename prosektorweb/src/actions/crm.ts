@@ -41,7 +41,7 @@ export async function createNote(formData: FormData): Promise<CrmActionResult> {
     } catch (error: any) {
         console.error('createNote error:', error)
         if (error instanceof z.ZodError) {
-            return { success: false, error: error.errors[0].message }
+            return { success: false, error: (error as any).errors[0].message }
         }
         return { success: false, error: 'Not eklenirken hata oluştu.' }
     }
@@ -126,7 +126,7 @@ export async function createContact(formData: FormData): Promise<CrmActionResult
     } catch (error: any) {
         console.error('createContact error:', error)
         if (error instanceof z.ZodError) {
-            return { success: false, error: error.errors[0].message }
+            return { success: false, error: (error as any).errors[0].message }
         }
         return { success: false, error: 'Kişi eklenirken hata oluştu.' }
     }
@@ -182,7 +182,7 @@ export async function createActivity(formData: FormData): Promise<CrmActionResul
     } catch (error: any) {
         console.error('createActivity error:', error)
         if (error instanceof z.ZodError) {
-            return { success: false, error: error.errors[0].message }
+            return { success: false, error: (error as any).errors[0].message }
         }
         return { success: false, error: 'Aktivite eklenirken hata oluştu.' }
     }

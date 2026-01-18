@@ -92,7 +92,7 @@ export async function createPayment(formData: FormData): Promise<PaymentActionRe
         console.error('createPayment error:', error)
 
         if (error instanceof z.ZodError) {
-            return { success: false, error: error.errors[0].message }
+            return { success: false, error: (error as any).errors[0].message }
         }
 
         return { success: false, error: 'Ödeme kaydedilirken bir hata oluştu.' }

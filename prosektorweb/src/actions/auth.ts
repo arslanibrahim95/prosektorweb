@@ -1,20 +1,24 @@
 'use server'
 
+import { prisma } from '@/lib/prisma'
+import { revalidatePath } from 'next/cache'
+import { z } from 'zod'
+import { Role } from '@prisma/client'
 import { signIn } from '@/auth'
 import { AuthError } from 'next-auth'
 
-export async function authenticate(
-    prevState: string | undefined,
-    formData: FormData,
-) {
+// ==========================================
+// ACTIONS
+// ==========================================
+
+export async function authenticate(prevState: string | undefined, formData: FormData) {
     try {
         await signIn('credentials', formData)
     } catch (error) {
         if (error instanceof AuthError) {
             switch (error.type) {
-                case 'CallbackRouteError':
                 case 'CredentialsSignin':
-                    return 'E-posta veya şifre hatalı.'
+                    return 'Hatalı e-posta veya şifre.'
                 default:
                     return 'Giriş yapılırken bir hata oluştu.'
             }

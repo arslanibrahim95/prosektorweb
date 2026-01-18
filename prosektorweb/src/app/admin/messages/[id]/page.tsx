@@ -92,7 +92,7 @@ export default async function MessageDetailPage({ params }: MessageDetailPagePro
                 </div>
 
                 <div className="p-8">
-                    <h3 className="text-lg font-bold text-neutral-900 mb-4">{message.subject}</h3>
+                    <h3 className="text-lg font-bold text-neutral-900 mb-4">İletişim Mesajı</h3>
                     <div className="prose prose-neutral max-w-none text-neutral-600 whitespace-pre-wrap">
                         {message.message}
                     </div>
@@ -101,7 +101,7 @@ export default async function MessageDetailPage({ params }: MessageDetailPagePro
 
             <div className="flex justify-end">
                 <Link
-                    href={`mailto:${message.email}?subject=RE: ${message.subject}`}
+                    href={`mailto:${message.email}?subject=RE: İletişim Formu Mesajınız`}
                     className="px-6 py-3 bg-brand-600 text-white rounded-xl font-medium hover:bg-brand-700 transition-colors flex items-center gap-2"
                 >
                     <Mail className="w-5 h-5" />

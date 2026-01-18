@@ -76,7 +76,7 @@ export async function setupDomainEmail(projectId: string, forwardTo: string): Pr
         // 1. Enable Email Routing (adds MX records)
         const enableRes = await cf.enableEmailRouting(zone.id)
         if (!enableRes.success) {
-            return { success: false, error: enableRes.error }
+            return { success: false, error: enableRes.error || "Hata" }
         }
 
         // 2. Create Rule: contact@domain -> forwardTo

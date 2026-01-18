@@ -67,7 +67,7 @@ export async function createDomain(formData: FormData): Promise<DomainActionResu
             return { success: false, error: 'Bu domain zaten kayıtlı.' }
         }
         if (error instanceof z.ZodError) {
-            return { success: false, error: error.errors[0].message }
+            return { success: false, error: (error as any).errors[0].message }
         }
         return { success: false, error: 'Domain eklenirken hata oluştu.' }
     }
@@ -194,7 +194,7 @@ export async function createDnsRecord(formData: FormData): Promise<DomainActionR
     } catch (error: any) {
         console.error('createDnsRecord error:', error)
         if (error instanceof z.ZodError) {
-            return { success: false, error: error.errors[0].message }
+            return { success: false, error: (error as any).errors[0].message }
         }
         return { success: false, error: 'DNS kaydı eklenirken hata oluştu.' }
     }

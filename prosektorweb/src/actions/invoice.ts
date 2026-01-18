@@ -98,7 +98,7 @@ export async function createInvoice(formData: FormData): Promise<InvoiceActionRe
         console.error('createInvoice error:', error)
 
         if (error instanceof z.ZodError) {
-            return { success: false, error: error.errors[0].message }
+            return { success: false, error: (error as any).errors[0].message }
         }
 
         if (error.code === 'P2002') {

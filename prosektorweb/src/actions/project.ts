@@ -54,7 +54,7 @@ export async function createProject(formData: FormData): Promise<ProjectActionRe
     } catch (error: any) {
         console.error('createProject error:', error)
         if (error instanceof z.ZodError) {
-            return { success: false, error: error.errors[0].message }
+            return { success: false, error: (error as any).errors[0].message }
         }
         return { success: false, error: 'Proje oluşturulurken hata oluştu.' }
     }

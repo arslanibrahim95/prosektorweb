@@ -215,8 +215,95 @@ export class CloudflareService {
     }
 
     // ==========================================
-    // HELPER: Create Standard Website DNS
+    // PREVIEW & EMAIL ROUTING
     // ==========================================
+
+    async createPreviewSubdomain(
+        rootDomain: string,
+        subdomain: string,
+        serverIp: string
+    ): Promise<{ success: boolean; url?: string; error?: string }> {
+        try {
+            const zone = await this.getZoneByName(rootDomain)
+            if (!zone) {
+                return { success: false, error: 'Root domain zone bulunamadı' }
+            }
+
+            // Create A record for subdomain
+            const result = await this.createDnsRecord(
+                zone.id,
+                'A',
+                `${subdomain}.${rootDomain}`,
+                serverIp,
+                3600,
+                undefined,
+                true // Proxied
+            )
+
+            if (result.success) {
+                return { success: true, url: `https://${subdomain}.${rootDomain}` }
+            }
+            return { success: false, error: result.error }
+        } catch (error) {
+            console.error('createPreviewSubdomain error:', error)
+            return { success: false, error: 'API hatası' }
+        }
+    }
+
+    async enableEmailRouting(zoneId: string): Promise<{ success: boolean; error?: string }> {
+        try {
+            // Check if enabled first (GET /zones/:id/email/routing/enabled)
+            // If not, enable it (POST /zones/:id/email/routing/enabled)
+            // Simplified: Just try to enable or assume enabled if we can add rules. 
+            // Correct API: POST /zones/{zone_identifier}/email/routing/enabled
+
+            const response = await this.request<any>(
+                `/zones/${zoneId}/email/routing/enabled`,
+                'POST',
+                { enabled: true }
+            )
+
+            if (response.success || (response.errors[0]?.message || '').includes('already enabled')) {
+                return { success: true }
+            }
+            return { success: false, error: response.errors[0]?.message }
+        } catch (error) {
+            // If already enabled it might error contextually, but usually returns success: false
+            console.error('enableEmailRouting error:', error)
+            return { success: false, error: 'Email routing aktif edilemedi' }
+        }
+    }
+
+    async createEmailRule(
+        zoneId: string,
+        email: string, // e.g. info@domain.com
+        forwardTo: string // e.g. target@gmail.com
+    ): Promise<{ success: boolean; error?: string }> {
+        try {
+            // POST /zones/{zone_identifier}/email/routing/rules
+            const [localPart, ...rest] = email.split('@')
+            const domain = rest.join('@')
+
+            const response = await this.request<any>(
+                `/zones/${zoneId}/email/routing/rules`,
+                'POST',
+                {
+                    matchers: [{ type: 'literal', field: 'to', value: email }],
+                    actions: [{ type: 'forward', value: [forwardTo] }],
+                    name: `Forward ${localPart} to ${forwardTo}`,
+                    enabled: true
+                }
+            )
+
+            if (response.success) {
+                return { success: true }
+            }
+            return { success: false, error: response.errors[0]?.message }
+        } catch (error) {
+            console.error('createEmailRule error:', error)
+            return { success: false, error: 'Email kuralı oluşturulamadı' }
+        }
+    }
 
     async createStandardWebsiteDns(
         zoneId: string,

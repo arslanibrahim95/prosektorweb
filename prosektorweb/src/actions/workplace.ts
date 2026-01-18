@@ -54,7 +54,7 @@ export async function createWorkplace(formData: FormData): Promise<WorkplaceActi
     } catch (error: any) {
         console.error('createWorkplace error:', error)
         if (error instanceof z.ZodError) {
-            return { success: false, error: error.errors[0].message }
+            return { success: false, error: (error as any).errors[0].message }
         }
         return { success: false, error: 'İşyeri oluşturulurken hata oluştu.' }
     }

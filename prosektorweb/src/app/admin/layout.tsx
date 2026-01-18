@@ -16,8 +16,12 @@ import {
     ChevronDown,
     Receipt,
     Globe,
-    ShoppingCart
+    ShoppingCart,
+    Ticket,
+    RefreshCw
 } from 'lucide-react'
+
+import { redirect } from 'next/navigation'
 
 export default async function AdminLayout({
     children,
@@ -25,6 +29,10 @@ export default async function AdminLayout({
     children: React.ReactNode
 }) {
     const session = await auth()
+
+    if (!session?.user) {
+        redirect('/login')
+    }
 
     return (
         <div className="flex min-h-screen bg-neutral-100 font-sans">
@@ -75,6 +83,10 @@ export default async function AdminLayout({
                         Müşteriler
                         <span className="ml-auto text-xs bg-brand-500/20 text-brand-400 px-2 py-0.5 rounded-full">CRM</span>
                     </Link>
+                    <Link href="/admin/proposals" className="flex items-center gap-3 px-4 py-3 rounded-xl text-neutral-300 hover:bg-white/5 hover:text-white font-medium transition-all">
+                        <FileText className="w-5 h-5" />
+                        Teklifler
+                    </Link>
                     <Link href="/admin/projects" className="flex items-center gap-3 px-4 py-3 rounded-xl text-neutral-300 hover:bg-white/5 hover:text-white font-medium transition-all">
                         <LayoutDashboard className="w-5 h-5" />
                         Web Projeleri
@@ -96,7 +108,6 @@ export default async function AdminLayout({
                         <Receipt className="w-5 h-5" />
                         Faturalar
                     </Link>
-
                     {/* İçerik */}
                     <div className="px-3 py-2 mt-6 text-xs font-bold text-neutral-500 uppercase tracking-wider">
                         İçerik & İletişim
@@ -109,6 +120,14 @@ export default async function AdminLayout({
                         <MessageSquare className="w-5 h-5" />
                         Gelen Mesajlar
                         <span className="ml-auto text-xs bg-orange-500/20 text-orange-400 px-2 py-0.5 rounded-full">0</span>
+                    </Link>
+                    <Link href="/admin/tickets" className="flex items-center gap-3 px-4 py-3 rounded-xl text-neutral-300 hover:bg-white/5 hover:text-white font-medium transition-all">
+                        <Ticket className="w-5 h-5" />
+                        Destek Talepleri
+                    </Link>
+                    <Link href="/admin/services" className="flex items-center gap-3 px-4 py-3 rounded-xl text-neutral-300 hover:bg-white/5 hover:text-white font-medium transition-all">
+                        <RefreshCw className="w-5 h-5" />
+                        Abonelikler
                     </Link>
 
                     {/* Sistem */}
