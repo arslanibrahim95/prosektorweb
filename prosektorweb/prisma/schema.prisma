@@ -36,14 +36,95 @@ model Company {
   address     String?  @db.Text
   isActive    Boolean  @default(true)
   
+  // CRM Fields
+  status      CompanyStatus @default(LEAD)
+  source      String?       // Nereden geldi (Web, Referans, vb.)
+  
   // Relations
   workplaces  Workplace[]
   invoices    Invoice[]
+  notes       CompanyNote[]
+  contacts    CompanyContact[]
+  activities  CompanyActivity[]
 
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
   @@index([name])
+  @@index([status])
+}
+
+// ===============================
+// CRM SİSTEMİ
+// ===============================
+
+enum CompanyStatus {
+  LEAD        // Potansiyel Müşteri
+  PROSPECT    // İlgilenen
+  NEGOTIATION // Görüşme Aşamasında
+  CUSTOMER    // Müşteri
+  CHURNED     // Kaybedilen
+}
+
+// Firma Notları
+model CompanyNote {
+  id          String   @id @default(uuid())
+  companyId   String
+  company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  
+  content     String   @db.Text
+  isPinned    Boolean  @default(false)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([companyId])
+  @@index([createdAt])
+}
+
+// Firma İletişim Kişileri
+model CompanyContact {
+  id          String   @id @default(uuid())
+  companyId   String
+  company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  
+  name        String
+  title       String?  // Ünvan (Müdür, Muhasebe, vb.)
+  phone       String?
+  email       String?
+  isPrimary   Boolean  @default(false)
+  
+  createdAt   DateTime @default(now())
+
+  @@index([companyId])
+}
+
+enum ActivityType {
+  CALL        // Telefon Görüşmesi
+  EMAIL       // E-posta
+  MEETING     // Toplantı
+  NOTE        // Not
+  TASK        // Görev
+  REMINDER    // Hatırlatma
+}
+
+// Firma Aktiviteleri
+model CompanyActivity {
+  id          String       @id @default(uuid())
+  companyId   String
+  company     Company      @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  
+  type        ActivityType
+  title       String
+  description String?      @db.Text
+  dueDate     DateTime?    // Hatırlatma/Görev için
+  isCompleted Boolean      @default(false)
+  
+  createdAt   DateTime     @default(now())
+
+  @@index([companyId])
+  @@index([type])
+  @@index([dueDate])
 }
 
 // ===============================

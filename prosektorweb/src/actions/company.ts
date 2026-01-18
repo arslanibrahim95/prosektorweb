@@ -135,6 +135,19 @@ export async function getCompanyById(id: string) {
                         },
                     },
                 },
+                notes: {
+                    orderBy: [{ isPinned: 'desc' }, { createdAt: 'desc' }],
+                },
+                contacts: {
+                    orderBy: [{ isPrimary: 'desc' }, { name: 'asc' }],
+                },
+                activities: {
+                    orderBy: { createdAt: 'desc' },
+                    take: 20,
+                },
+                _count: {
+                    select: { invoices: true },
+                },
             },
         })
         return company
