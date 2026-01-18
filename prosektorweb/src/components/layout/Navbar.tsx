@@ -28,7 +28,7 @@ export function Navbar({ variant = 'landing', onOpenLogin }: NavbarProps) {
     return (
         <nav className="fixed top-0 left-0 right-0 z-50 bg-white/70 backdrop-blur-xl border-b border-white/20 shadow-sm supports-[backdrop-filter]:bg-white/60">
             <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-                <Link href="/" className="flex items-center gap-2 group">
+                <Link href="/" className="flex items-center gap-2 group" aria-label="ProSektorWeb Ana Sayfa">
                     <span className="text-2xl font-bold tracking-tighter text-neutral-900 group-hover:text-brand-600 transition-colors">
                         psw
                     </span>
@@ -57,6 +57,9 @@ export function Navbar({ variant = 'landing', onOpenLogin }: NavbarProps) {
                 <button
                     className="md:hidden p-2 text-neutral-600"
                     onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                    aria-label={mobileMenuOpen ? "Menüyü kapat" : "Menüyü aç"}
+                    aria-expanded={mobileMenuOpen}
+                    aria-controls="mobile-menu"
                 >
                     {mobileMenuOpen ? <X /> : <Menu />}
                 </button>
@@ -64,7 +67,12 @@ export function Navbar({ variant = 'landing', onOpenLogin }: NavbarProps) {
 
             {/* Mobile Menu Dropdown */}
             {mobileMenuOpen && (
-                <div className="md:hidden bg-white border-b border-neutral-200 px-6 py-4 space-y-4">
+                <div
+                    id="mobile-menu"
+                    className="md:hidden bg-white border-b border-neutral-200 px-6 py-4 space-y-4"
+                    role="region"
+                    aria-label="Mobil Menü"
+                >
                     <Link href={getLink('#neden-biz')} className="block text-neutral-600 font-medium" onClick={() => setMobileMenuOpen(false)}>Neden Biz?</Link>
                     <Link href={getLink('#nasil-calisiriz')} className="block text-neutral-600 font-medium" onClick={() => setMobileMenuOpen(false)}>Nasıl Çalışırız?</Link>
                     <Link href={getLink('#fiyatlandirma')} className="block text-neutral-600 font-medium" onClick={() => setMobileMenuOpen(false)}>Fiyatlandırma</Link>
