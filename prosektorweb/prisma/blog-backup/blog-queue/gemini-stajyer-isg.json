@@ -1,0 +1,31 @@
+{
+  "slug": "stajyer-ve-ciraklarin-is-guvenligi-haklari",
+  "title": "Stajyerler Ucuz İşgücü Değildir: Öğrenci ve Çırakların İSG Hakları",
+  "excerpt": "Meslek lisesi ve üniversite stajyerlerinin iş kazası sigortası, İSG eğitim zorunluluğu ve tehlikeli işlerde çalıştırılma yasakları.",
+  "content": "<h2>Öğrenci mi, İşçi mi?</h2><p>Stajyerler ve çıraklar, meslek öğrenmek için işletmelerdedir. Ancak fabrika kapısından girdikleri anda, diğer işçilerle aynı risklere (gürültü, toz, kaza) maruz kalırlar. 6331 sayılı İSG Kanunu, stajyerleri ve çırakları da <strong>'Çalışan'</strong> statüsünde sayar ve tam koruma altına alır.</p><h2>Sigorta Kimin Sorumluluğunda?</h2><p>Stajyerlerin 'İş Kazası ve Meslek Hastalığı Sigortası', okulları tarafından yapılır. Ancak kaza olduğunda sorumlu okul değil, stajın yapıldığı <strong>işyeridir (İşveren)</strong>. Yani bir stajyer işyerinde parmağını koparırsa, 'Sigortasını okul yapıyor, bana ne' diyemezsiniz. İşveren olarak güvenli ortamı sağlamak sizin borcunuzdur.</p><h2>Eğitim ve KKD Zorunluluğu</h2><p>Stajyer, işe başlamadan önce mutlaka temel İSG eğitimini almalı ve işin özel risklerine karşı bilgilendirilmelidir. Diğer işçilere verilen baret, ayakkabı, gözlük gibi Kişisel Koruyucu Donanımlar (KKD), stajyere de eksiksiz ve ücretsiz verilmelidir.</p><h2>Yasaklı İşler</h2><p>18 yaşından küçük stajyer ve çıraklar, 'Genç ve Çocuk İşçi' statüsündedir. Onları korumak için bazı işler yasaktır:</p><ul><li>Ağır ve tehlikeli işler.</li><li>Gece vardiyası (saat 20:00'den sonra).</li><li>Gürültülü, titreşimli ve yoğun kimyasallı işler.</li><li>Yüksekte çalışma.</li></ul><p>Stajyer, fotokopi çekmek için gelmemiştir, meslek öğrenmelidir; ama henüz ehil olmadığı için tehlikeli bir makinenin başına tek başına da bırakılamaz. Mutlaka bir usta gözetiminde olmalıdır.</p>",
+  "coverImage": "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&q=80&w=2070",
+  "category": {
+    "name": "Mevzuat",
+    "slug": "mevzuat"
+  },
+  "tags": [
+    {
+      "name": "Stajyer",
+      "slug": "stajyer"
+    },
+    {
+      "name": "Genç İşçi",
+      "slug": "genc-isci"
+    },
+    {
+      "name": "Eğitim",
+      "slug": "egitim"
+    }
+  ],
+  "author": {
+    "name": "ProSektorWeb Editör"
+  },
+  "publishedAt": "2026-01-14",
+  "readingTime": 6,
+  "featured": false
+}

@@ -1,0 +1,31 @@
+{
+  "slug": "yabanci-uyruklu-calisanlar-icin-isg-egitimi-ve-prosedurler",
+  "title": "Yabancı Çalışanlar İçin İSG: 'Anlamadım' Demek Mazeret Değil!",
+  "excerpt": "Türkçe bilmeyen işçilere İSG eğitimi nasıl verilmeli? Yasal sorumluluk, tercüman desteği, görsel materyal kullanımı ve çalışma izni.",
+  "content": "<h2>Dil Bariyeri Kazaya Davetiye Çıkarır</h2><p>İnşaat, tarım, tekstil ve hizmet sektöründe yabancı uyruklu çalışan sayısı hızla artıyor. İşveren, 'Ben eğitimi verdim, o Türkçe bilmiyordu, anlamadı' diyerek sorumluluktan kurtulamaz. Yasa der ki: <strong>'İşveren, çalışanların eğitimi aldığından ve anladığından emin olmalıdır.'</strong> Anlaşılmayan eğitim, verilmemiş sayılır.</p><h2>Nasıl Eğitim Verilmeli?</h2><ul><li><strong>Tercüman:</strong> Eğitim sırasında çalışanın kendi dilini bilen yeminli bir tercüman veya o dili iyi bilen başka bir işçi aracılığıyla anlık çeviri yapılmalıdır.</li><li><strong>Kendi Dilinde Doküman:</strong> Talimatlar, uyarı levhaları, taahhütnameler ve eğitim notları çalışanın diline (Arapça, Rusça, Farsça, İngilizce vb.) çevrilmelidir.</li><li><strong>Görsellerin Gücü:</strong> Dil bariyerini aşmanın en iyi yolu resimler, piktogramlar ve videolardır. 'Baret Tak' yazmak yerine, baret takan bir adam resmi koymak evrenseldir ve herkes anlar.</li></ul><h2>Yasal Statü ve Haklar</h2><p>Yabancı çalışanın çalışma izni olması veya olmaması (kaçak çalışması), İSG yükümlülüklerini değiştirmez. SGK'lı bir Türk işçi hangi İSG haklarına (KKD, sağlık gözetimi, eğitim) sahipse, yabancı işçi de aynı haklara sahiptir. Kaza olduğunda 'kaçak işçiydi' demek, cezayı hafifletmez, aksine katlar.</p>",
+  "coverImage": "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&q=80&w=2069",
+  "category": {
+    "name": "Eğitim",
+    "slug": "egitim"
+  },
+  "tags": [
+    {
+      "name": "Yabancı Çalışan",
+      "slug": "yabanci-calisan"
+    },
+    {
+      "name": "Eğitim",
+      "slug": "egitim"
+    },
+    {
+      "name": "İSG",
+      "slug": "isg"
+    }
+  ],
+  "author": {
+    "name": "ProSektorWeb Editör"
+  },
+  "publishedAt": "2026-01-14",
+  "readingTime": 7,
+  "featured": false
+}

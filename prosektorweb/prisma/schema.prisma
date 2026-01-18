@@ -38,11 +38,86 @@ model Company {
   
   // Relations
   workplaces  Workplace[]
+  invoices    Invoice[]
 
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
   @@index([name])
+}
+
+// ===============================
+// FATURA & ÖDEME SİSTEMİ
+// ===============================
+
+enum InvoiceStatus {
+  DRAFT       // Taslak
+  PENDING     // Bekliyor
+  PAID        // Ödendi
+  PARTIAL     // Kısmi Ödeme
+  CANCELLED   // İptal
+}
+
+enum PaymentMethod {
+  CASH        // Nakit
+  BANK        // Havale/EFT
+  CREDIT_CARD // Kredi Kartı
+  OTHER       // Diğer
+}
+
+model Invoice {
+  id            String        @id @default(uuid())
+  invoiceNo     String        @unique  // Fatura No (Örn: 2024-0001)
+  
+  // Firma Bağlantısı
+  companyId     String
+  company       Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  
+  // Tarihler
+  issueDate     DateTime      @default(now()) // Düzenleme Tarihi
+  dueDate       DateTime      // Vade Tarihi
+  
+  // Tutarlar
+  subtotal      Decimal       @db.Decimal(10, 2) // Ara Toplam
+  taxRate       Decimal       @default(20) @db.Decimal(5, 2) // KDV Oranı %
+  taxAmount     Decimal       @db.Decimal(10, 2) // KDV Tutarı
+  total         Decimal       @db.Decimal(10, 2) // Genel Toplam
+  paidAmount    Decimal       @default(0) @db.Decimal(10, 2) // Ödenen Tutar
+  
+  // Durum
+  status        InvoiceStatus @default(PENDING)
+  description   String?       @db.Text // Fatura Açıklaması
+  notes         String?       @db.Text // Notlar
+  
+  // Relations
+  payments      Payment[]
+  
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  @@index([companyId])
+  @@index([status])
+  @@index([issueDate])
+}
+
+model Payment {
+  id            String        @id @default(uuid())
+  
+  // Fatura Bağlantısı
+  invoiceId     String
+  invoice       Invoice       @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  
+  // Ödeme Bilgileri
+  amount        Decimal       @db.Decimal(10, 2) // Ödenen Tutar
+  paymentDate   DateTime      @default(now()) // Ödeme Tarihi
+  method        PaymentMethod @default(BANK) // Ödeme Yöntemi
+  reference     String?       // Dekont/Referans No
+  notes         String?       @db.Text
+  
+  createdAt     DateTime      @default(now())
+
+  @@index([invoiceId])
+  @@index([paymentDate])
 }
 
 // 2. İşyerleri (SGK Dosyaları / Şantiyeler)

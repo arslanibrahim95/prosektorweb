@@ -13,7 +13,8 @@ import {
     Settings,
     Bell,
     Search,
-    ChevronDown
+    ChevronDown,
+    Receipt
 } from 'lucide-react'
 
 export default async function AdminLayout({
@@ -79,6 +80,15 @@ export default async function AdminLayout({
                     <Link href="/admin/employees" className="flex items-center gap-3 px-4 py-3 rounded-xl text-neutral-300 hover:bg-white/5 hover:text-white font-medium transition-all">
                         <Users className="w-5 h-5" />
                         Çalışanlar
+                    </Link>
+
+                    {/* Finans */}
+                    <div className="px-3 py-2 mt-6 text-xs font-bold text-neutral-500 uppercase tracking-wider">
+                        Finans
+                    </div>
+                    <Link href="/admin/invoices" className="flex items-center gap-3 px-4 py-3 rounded-xl text-neutral-300 hover:bg-white/5 hover:text-white font-medium transition-all">
+                        <Receipt className="w-5 h-5" />
+                        Faturalar
                     </Link>
 
                     {/* İçerik */}
