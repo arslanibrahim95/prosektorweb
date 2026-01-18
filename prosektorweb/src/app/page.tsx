@@ -7,6 +7,8 @@ import { ModalSystem, type ModalState } from '@/components/landing/ModalSystem'
 import { ContactForm } from '@/components/landing/ContactForm'
 import { Navbar } from '@/components/layout/Navbar'
 import { Footer } from '@/components/layout/Footer'
+import BlurText from '@/components/ui/BlurText'
+import SpotlightCard from '@/components/ui/SpotlightCard'
 
 export default function HomePage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -50,7 +52,7 @@ export default function HomePage() {
 
       {/* Hero Section */}
       <section className="pt-32 pb-24 px-6 relative flex flex-col items-center text-center">
-        <div className="max-w-4xl mx-auto z-10">
+        <div className="max-w-4xl mx-auto z-10 flex flex-col items-center">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-brand-50/50 backdrop-blur-md border border-brand-100/50 rounded-full text-brand-700 text-sm font-semibold mb-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-400 opacity-75"></span>
@@ -59,11 +61,14 @@ export default function HomePage() {
             2026 Vizyonu İçin Hazır
           </div>
 
-          <h1 className="text-5xl md:text-7xl font-bold font-serif leading-[1.1] mb-8 text-neutral-900 tracking-tight drop-shadow-sm">
-            Merhaba,<br />
-            <span className="bg-gradient-to-r from-brand-600 to-brand-800 bg-clip-text text-transparent">OSGB’nizin Dijital Kimliği</span><br />
-            Artık Bir Soru İşareti Değil.
-          </h1>
+          <BlurText
+            text="Merhaba, OSGB’nizin Dijital Kimliği Artık Bir Soru İşareti Değil."
+            delay={50}
+            animateBy="words"
+            direction="top"
+            className="text-5xl md:text-7xl font-bold font-serif leading-[1.1] mb-8 text-neutral-900 tracking-tight drop-shadow-sm text-center justify-center"
+          />
+
           <p className="text-xl md:text-2xl text-neutral-600 max-w-2xl mx-auto mb-12 leading-relaxed font-light">
             İSG sektörünü tanıyor, OSGB’lere özel web sitelerini önceden hazırlıyor ve doğru kurumlarla buluşturuyoruz.
           </p>
@@ -98,7 +103,7 @@ export default function HomePage() {
               { icon: Clock, title: "Hızlı Sonuç", text: "Uzun toplantılarla vakit kaybetmezsiniz. Süreç net ve hızlıdır." },
               { icon: Target, title: "Sadece OSGB", text: "Tüm odağımız iş sağlığı ve güvenliği sektörü." },
             ].map((item, i) => (
-              <div key={i} className="group p-8 bg-white/40 backdrop-blur-xl border border-white/50 rounded-2xl shadow-sm hover:shadow-xl hover:bg-white/60 transition-all duration-300">
+              <SpotlightCard key={i} className="group border-white/50 bg-white/40 backdrop-blur-xl hover:shadow-xl hover:bg-white/60 transition-all duration-300" spotlightColor="rgba(220, 38, 38, 0.1)">
                 <div className="w-14 h-14 bg-brand-50 rounded-xl flex items-center justify-center text-brand-600 mb-6 group-hover:scale-110 group-hover:bg-brand-600 group-hover:text-white transition-all duration-300">
                   <item.icon className="w-7 h-7" />
                 </div>
@@ -106,7 +111,7 @@ export default function HomePage() {
                 <p className="text-neutral-600 leading-relaxed">
                   {item.text}
                 </p>
-              </div>
+              </SpotlightCard>
             ))}
           </div>
         </div>

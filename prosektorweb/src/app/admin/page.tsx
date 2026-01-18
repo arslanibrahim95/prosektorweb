@@ -21,6 +21,7 @@ import {
     Globe,
     Shield
 } from 'lucide-react'
+import SpotlightCard from '@/components/ui/SpotlightCard'
 
 export default async function SuperAdminDashboard() {
     // Fetch all stats with error handling
@@ -109,7 +110,7 @@ export default async function SuperAdminDashboard() {
             {/* Main Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {/* Firmalar */}
-                <div className="bg-white rounded-2xl border border-neutral-200 p-6 hover:shadow-lg transition-shadow group">
+                <SpotlightCard className="hover:shadow-lg transition-shadow group border-neutral-200" spotlightColor="rgba(59, 130, 246, 0.2)">
                     <div className="flex items-start justify-between mb-4">
                         <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/30">
                             <Building2 className="w-7 h-7 text-white" />
@@ -124,10 +125,10 @@ export default async function SuperAdminDashboard() {
                     <Link href="/admin/companies" className="flex items-center gap-2 text-sm text-blue-600 font-medium group-hover:gap-3 transition-all">
                         Detayları Gör <ArrowRight className="w-4 h-4" />
                     </Link>
-                </div>
+                </SpotlightCard>
 
                 {/* İşyerleri */}
-                <div className="bg-white rounded-2xl border border-neutral-200 p-6 hover:shadow-lg transition-shadow group">
+                <SpotlightCard className="hover:shadow-lg transition-shadow group border-neutral-200" spotlightColor="rgba(99, 102, 241, 0.2)">
                     <div className="flex items-start justify-between mb-4">
                         <div className="w-14 h-14 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-500/30">
                             <Layers className="w-7 h-7 text-white" />
@@ -138,10 +139,10 @@ export default async function SuperAdminDashboard() {
                     <Link href="/admin/workplaces" className="flex items-center gap-2 text-sm text-indigo-600 font-medium group-hover:gap-3 transition-all">
                         Detayları Gör <ArrowRight className="w-4 h-4" />
                     </Link>
-                </div>
+                </SpotlightCard>
 
                 {/* Çalışanlar */}
-                <div className="bg-white rounded-2xl border border-neutral-200 p-6 hover:shadow-lg transition-shadow group">
+                <SpotlightCard className="hover:shadow-lg transition-shadow group border-neutral-200" spotlightColor="rgba(168, 85, 247, 0.2)">
                     <div className="flex items-start justify-between mb-4">
                         <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg shadow-purple-500/30">
                             <Users className="w-7 h-7 text-white" />
@@ -156,10 +157,10 @@ export default async function SuperAdminDashboard() {
                     <Link href="/admin/employees" className="flex items-center gap-2 text-sm text-purple-600 font-medium group-hover:gap-3 transition-all">
                         Detayları Gör <ArrowRight className="w-4 h-4" />
                     </Link>
-                </div>
+                </SpotlightCard>
 
                 {/* Mesajlar */}
-                <div className="bg-white rounded-2xl border border-neutral-200 p-6 hover:shadow-lg transition-shadow group">
+                <SpotlightCard className="hover:shadow-lg transition-shadow group border-neutral-200" spotlightColor="rgba(249, 115, 22, 0.2)">
                     <div className="flex items-start justify-between mb-4">
                         <div className="w-14 h-14 bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl flex items-center justify-center shadow-lg shadow-orange-500/30">
                             <MessageSquare className="w-7 h-7 text-white" />
@@ -175,7 +176,7 @@ export default async function SuperAdminDashboard() {
                     <Link href="/admin/messages" className="flex items-center gap-2 text-sm text-orange-600 font-medium group-hover:gap-3 transition-all">
                         Mesajları Oku <ArrowRight className="w-4 h-4" />
                     </Link>
-                </div>
+                </SpotlightCard>
             </div>
 
             {/* Two Column Layout */}

@@ -4,12 +4,26 @@ import { useActionState, useEffect } from 'react'
 import { authenticate } from '@/actions/auth'
 import { AlertCircle, Loader2, Lock } from 'lucide-react'
 
+import Particles from '@/components/ui/Particles'
+
 export default function LoginPage() {
     const [errorMessage, formAction, isPending] = useActionState(authenticate, undefined)
 
     return (
-        <div className="min-h-screen bg-neutral-50 flex items-center justify-center p-4">
-            <div className="w-full max-w-md bg-white rounded-2xl shadow-xl border border-neutral-200 overflow-hidden">
+        <div className="relative min-h-screen bg-neutral-900 flex items-center justify-center p-4 overflow-hidden">
+            <div className="absolute inset-0">
+                <Particles
+                    particleColors={['#ffffff', '#3b82f6']}
+                    particleCount={200}
+                    particleSpread={10}
+                    speed={0.1}
+                    particleBaseSize={100}
+                    moveParticlesOnHover={true}
+                    alphaParticles={false}
+                    disableRotation={false}
+                />
+            </div>
+            <div className="relative z-10 w-full max-w-md bg-white rounded-2xl shadow-xl border border-neutral-200 overflow-hidden">
                 {/* Header */}
                 <div className="bg-brand-600 p-8 text-center">
                     <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center mx-auto mb-4 backdrop-blur-sm">
