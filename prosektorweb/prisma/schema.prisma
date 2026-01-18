@@ -46,6 +46,7 @@ model Company {
   notes       CompanyNote[]
   contacts    CompanyContact[]
   activities  CompanyActivity[]
+  domains     Domain[]
 
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -356,3 +357,104 @@ model SiteSetting {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+// ===============================
+// DOMAIN & DNS YÖNETİMİ
+// ===============================
+
+enum DomainStatus {
+  ACTIVE      // Aktif
+  PENDING     // Beklemede
+  EXPIRED     // Süresi Dolmuş
+  SUSPENDED   // Askıda
+}
+
+enum DnsRecordType {
+  A
+  AAAA
+  CNAME
+  MX
+  TXT
+  NS
+  SRV
+}
+
+// Domain Kayıtları
+model Domain {
+  id          String       @id @default(uuid())
+  name        String       @unique  // örn: firmaismi.com
+  extension   String                // .com, .com.tr
+  
+  // İlişkiler
+  companyId   String?
+  company     Company?     @relation(fields: [companyId], references: [id], onDelete: SetNull)
+  
+  // Durum
+  status      DomainStatus @default(PENDING)
+  registrar   String?      // Hangi registrar'dan alındı
+  
+  // Tarihler
+  registeredAt DateTime?
+  expiresAt    DateTime?
+  
+  // DNS Kayıtları
+  dnsRecords  DnsRecord[]
+  
+  // Sunucu Ayarları
+  serverIp    String?      // Yönlendirilecek IP
+  sslEnabled  Boolean      @default(false)
+  
+  // Notlar
+  notes       String?      @db.Text
+  
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@index([companyId])
+  @@index([status])
+  @@index([expiresAt])
+}
+
+// DNS Kayıtları
+model DnsRecord {
+  id        String        @id @default(uuid())
+  domainId  String
+  domain    Domain        @relation(fields: [domainId], references: [id], onDelete: Cascade)
+  
+  type      DnsRecordType
+  name      String        // @ veya subdomain
+  value     String        // IP, hostname vb.
+  ttl       Int           @default(3600)
+  priority  Int?          // MX için
+  
+  isActive  Boolean       @default(true)
+  
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  @@index([domainId])
+  @@index([type])
+}
+
+// API Yapılandırmaları (Registrar, Hosting vb.)
+model ApiConfig {
+  id          String   @id @default(uuid())
+  name        String   // İsimtescil, Cloudflare, GoDaddy vb.
+  provider    String   // ISIMTESCIL, CLOUDFLARE, GODADDY vb.
+  
+  // API Credentials (şifreli saklanmalı)
+  apiKey      String?  @db.Text
+  apiSecret   String?  @db.Text
+  apiEndpoint String?
+  
+  // Sunucu Bilgileri
+  defaultIp   String?  // Varsayılan sunucu IP'si
+  
+  isActive    Boolean  @default(true)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([provider])
+}
+
