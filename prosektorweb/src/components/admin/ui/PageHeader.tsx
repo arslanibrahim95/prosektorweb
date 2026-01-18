@@ -1,9 +1,10 @@
 import Link from 'next/link'
-import { LucideIcon } from 'lucide-react'
+import { LucideIcon, ChevronLeft } from 'lucide-react'
 
 interface PageHeaderProps {
     title: string
     description: string
+    backUrl?: string
     action?: {
         label: string
         href: string
@@ -11,12 +12,22 @@ interface PageHeaderProps {
     }
 }
 
-export function PageHeader({ title, description, action }: PageHeaderProps) {
+export function PageHeader({ title, description, backUrl, action }: PageHeaderProps) {
     return (
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div>
-                <h1 className="text-3xl font-bold text-neutral-900 font-serif">{title}</h1>
-                <p className="text-neutral-500 mt-1">{description}</p>
+            <div className="flex items-center gap-4">
+                {backUrl && (
+                    <Link
+                        href={backUrl}
+                        className="p-2 text-neutral-400 hover:text-neutral-900 hover:bg-neutral-100 rounded-lg transition-colors"
+                    >
+                        <ChevronLeft className="w-6 h-6" />
+                    </Link>
+                )}
+                <div>
+                    <h1 className="text-3xl font-bold text-neutral-900 font-serif">{title}</h1>
+                    <p className="text-neutral-500 mt-1">{description}</p>
+                </div>
             </div>
             {action && (
                 <Link

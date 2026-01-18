@@ -542,6 +542,7 @@ model WebProject {
   // Domain bağlantısı (opsiyonel)
   domainId    String?
   domain      Domain?       @relation(fields: [domainId], references: [id], onDelete: SetNull)
+  tasks       Task[]
   
   // Proje durumu
   status      ProjectStatus @default(DRAFT)
@@ -696,3 +697,41 @@ model User {
   @@index([companyId])
 }
 
+
+// ===============================
+// TASK MANAGEMENT
+// ===============================
+
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  DONE
+  ARCHIVED
+}
+
+enum TaskPriority {
+  LOW
+  NORMAL
+  HIGH
+  URGENT
+}
+
+model Task {
+  id          String       @id @default(uuid())
+  title       String
+  description String?      @db.Text
+  status      TaskStatus   @default(TODO)
+  priority    TaskPriority @default(NORMAL)
+  dueDate     DateTime?
+  
+  // Relations
+  webProjectId String?
+  webProject   WebProject? @relation(fields: [webProjectId], references: [id], onDelete: SetNull)
+  
+  // Metadata
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  
+  @@index([webProjectId])
+  @@index([status])
+}
