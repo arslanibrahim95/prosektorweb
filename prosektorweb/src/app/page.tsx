@@ -2,8 +2,8 @@
 
 import React, { useState } from 'react'
 import Link from 'next/link'
-import { ChevronDown, Check, Menu, X, ArrowRight, Play, Star, Shield, Users, BarChart3, Clock, Zap, Target, Layout } from 'lucide-react'
-import { ModalSystem } from '@/components/landing/ModalSystem'
+import { ChevronDown, Check, Menu, X, ArrowRight, Play, Star, Shield, Users, BarChart3, Clock, Zap, Target, Layout, Briefcase, Eye } from 'lucide-react'
+import { ModalSystem, type ModalState } from '@/components/landing/ModalSystem'
 import { ContactForm } from '@/components/landing/ContactForm'
 import { Navbar } from '@/components/layout/Navbar'
 import { Footer } from '@/components/layout/Footer'
@@ -11,6 +11,7 @@ import { Footer } from '@/components/layout/Footer'
 export default function HomePage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [modalInitialState, setModalInitialState] = useState<ModalState>('A1')
 
   const openModal = (state: ModalState = 'A1') => {
     setModalInitialState(state)
@@ -249,17 +250,16 @@ export default function HomePage() {
         </div>
 
         <ContactForm />
-    </div>
-      </section >
+      </section>
 
-    {/* Footer */ }
-    < Footer variant = "landing" />
+      {/* Footer */}
+      <Footer variant="landing" />
 
       <ModalSystem
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         initialState={modalInitialState}
       />
-    </div >
+    </div>
   )
 }

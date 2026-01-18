@@ -8,7 +8,7 @@ const contactSchema = z.object({
     email: z.string().email('Geçerli bir e-posta adresi giriniz'),
     phone: z.string().optional(),
     message: z.string().min(10, 'Mesajınız en az 10 karakter olmalıdır'),
-    kvkk: z.literal('on', { errorMap: () => ({ message: 'KVKK onayı zorunludur' }) })
+    kvkk: z.literal('on', { message: 'KVKK onayı zorunludur' })
 })
 
 export type ContactState = {
