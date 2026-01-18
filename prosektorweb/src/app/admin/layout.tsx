@@ -66,37 +66,15 @@ export default async function AdminLayout({
                         Dashboard
                     </Link>
 
-                    {/* OSGB Modülleri */}
+                    {/* Web Ajansı */}
                     <div className="px-3 py-2 mt-6 text-xs font-bold text-neutral-500 uppercase tracking-wider">
-                        OSGB Modülleri
+                        Web Ajansı
                     </div>
                     <Link href="/admin/companies" className="flex items-center gap-3 px-4 py-3 rounded-xl text-neutral-300 hover:bg-white/5 hover:text-white font-medium transition-all">
-                        <Building2 className="w-5 h-5" />
-                        Firmalar
-                        <span className="ml-auto text-xs bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded-full">0</span>
-                    </Link>
-                    <Link href="/admin/workplaces" className="flex items-center gap-3 px-4 py-3 rounded-xl text-neutral-300 hover:bg-white/5 hover:text-white font-medium transition-all">
-                        <Layers className="w-5 h-5" />
-                        İşyerleri
-                    </Link>
-                    <Link href="/admin/employees" className="flex items-center gap-3 px-4 py-3 rounded-xl text-neutral-300 hover:bg-white/5 hover:text-white font-medium transition-all">
                         <Users className="w-5 h-5" />
-                        Çalışanlar
+                        Müşteriler
+                        <span className="ml-auto text-xs bg-brand-500/20 text-brand-400 px-2 py-0.5 rounded-full">CRM</span>
                     </Link>
-
-                    {/* Finans */}
-                    <div className="px-3 py-2 mt-6 text-xs font-bold text-neutral-500 uppercase tracking-wider">
-                        Finans
-                    </div>
-                    <Link href="/admin/invoices" className="flex items-center gap-3 px-4 py-3 rounded-xl text-neutral-300 hover:bg-white/5 hover:text-white font-medium transition-all">
-                        <Receipt className="w-5 h-5" />
-                        Faturalar
-                    </Link>
-
-                    {/* Web Hizmetleri */}
-                    <div className="px-3 py-2 mt-6 text-xs font-bold text-neutral-500 uppercase tracking-wider">
-                        Web Hizmetleri
-                    </div>
                     <Link href="/admin/projects" className="flex items-center gap-3 px-4 py-3 rounded-xl text-neutral-300 hover:bg-white/5 hover:text-white font-medium transition-all">
                         <LayoutDashboard className="w-5 h-5" />
                         Web Projeleri
@@ -108,6 +86,15 @@ export default async function AdminLayout({
                     <Link href="/admin/domains/register" className="flex items-center gap-3 px-4 py-3 rounded-xl text-neutral-300 hover:bg-white/5 hover:text-white font-medium transition-all">
                         <ShoppingCart className="w-5 h-5" />
                         Domain Satın Al
+                    </Link>
+
+                    {/* Finans */}
+                    <div className="px-3 py-2 mt-6 text-xs font-bold text-neutral-500 uppercase tracking-wider">
+                        Finans
+                    </div>
+                    <Link href="/admin/invoices" className="flex items-center gap-3 px-4 py-3 rounded-xl text-neutral-300 hover:bg-white/5 hover:text-white font-medium transition-all">
+                        <Receipt className="w-5 h-5" />
+                        Faturalar
                     </Link>
 
                     {/* İçerik */}

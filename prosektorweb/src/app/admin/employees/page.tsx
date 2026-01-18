@@ -1,14 +1,22 @@
+import { getEmployees } from '@/actions/employee'
 import Link from 'next/link'
-import { Users, Plus, Construction } from 'lucide-react'
+import { Plus, Search, Users, MapPin, Building2, Phone } from 'lucide-react'
 
-export default function EmployeesPage() {
+interface EmployeesPageProps {
+    searchParams: Promise<{ q?: string }>
+}
+
+export default async function EmployeesPage({ searchParams }: EmployeesPageProps) {
+    const params = await searchParams
+    const q = params.q || ''
+    const employees = await getEmployees(q)
+
     return (
         <div className="space-y-6">
-            {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-3xl font-bold text-neutral-900 font-serif">Çalışanlar</h1>
-                    <p className="text-neutral-500 mt-1">Personel listesi ve yönetimi</p>
+                    <p className="text-neutral-500 mt-1">Sistemdeki kayıtlı tüm personel listesi</p>
                 </div>
                 <Link
                     href="/admin/employees/new"
@@ -19,21 +27,61 @@ export default function EmployeesPage() {
                 </Link>
             </div>
 
-            {/* Coming Soon */}
-            <div className="bg-white rounded-2xl border border-neutral-200 p-16 text-center">
-                <div className="w-20 h-20 bg-purple-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                    <Construction className="w-10 h-10 text-purple-600" />
-                </div>
-                <h3 className="text-xl font-bold text-neutral-900 mb-2">Geliştirme Aşamasında</h3>
-                <p className="text-neutral-500 max-w-md mx-auto">
-                    Çalışan yönetimi modülü yakında aktif olacak. Şu an için firmalara çalışan eklemek için önce firma oluşturmanız gerekmektedir.
-                </p>
-                <Link
-                    href="/admin/companies"
-                    className="inline-flex items-center gap-2 mt-6 px-6 py-3 bg-neutral-100 text-neutral-700 rounded-xl font-medium hover:bg-neutral-200 transition-colors"
-                >
-                    Firmalara Git
-                </Link>
+            {/* Search */}
+            <div className="bg-white rounded-xl border border-neutral-200 p-4">
+                <form className="relative">
+                    <Search className="w-5 h-5 text-neutral-400 absolute left-4 top-1/2 -translate-y-1/2" />
+                    <input
+                        type="text"
+                        name="q"
+                        defaultValue={q}
+                        placeholder="İsim, TC no veya işyeri ara..."
+                        className="w-full pl-12 pr-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500"
+                    />
+                </form>
+            </div>
+
+            {/* List */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {employees.map((employee) => (
+                    <Link
+                        key={employee.id}
+                        href={`/admin/employees/${employee.id}`}
+                        className="bg-white p-6 rounded-2xl border border-neutral-200 hover:border-brand-300 hover:shadow-lg transition-all group"
+                    >
+                        <div className="flex items-start gap-4">
+                            <div className="w-12 h-12 bg-purple-50 rounded-2xl flex items-center justify-center text-purple-600 group-hover:bg-purple-600 group-hover:text-white transition-colors">
+                                <Users className="w-6 h-6" />
+                            </div>
+                            <div>
+                                <h3 className="text-lg font-bold text-neutral-900">{employee.firstName} {employee.lastName}</h3>
+                                <div className="text-sm text-neutral-500">{employee.position || 'Pozisyon Yok'}</div>
+                            </div>
+                        </div>
+
+                        <div className="mt-4 space-y-2 text-sm text-neutral-500">
+                            <div className="flex items-center gap-2">
+                                <Building2 className="w-4 h-4" />
+                                {employee.workplace.title}
+                            </div>
+                            <div className="flex items-center gap-2 text-xs text-neutral-400">
+                                ({employee.workplace.company.name})
+                            </div>
+                            {employee.phone && (
+                                <div className="flex items-center gap-2">
+                                    <Phone className="w-4 h-4" />
+                                    {employee.phone}
+                                </div>
+                            )}
+                        </div>
+                    </Link>
+                ))}
+
+                {employees.length === 0 && (
+                    <div className="col-span-full text-center py-12 text-neutral-500">
+                        Kayıt bulunamadı.
+                    </div>
+                )}
             </div>
         </div>
     )
