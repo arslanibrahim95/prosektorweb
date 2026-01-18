@@ -253,17 +253,28 @@ import { prisma } from '@/lib/prisma'
 
 export async function getCloudflareService(): Promise<CloudflareService | null> {
     try {
+        // 1. Önce environment variable'dan kontrol et
+        const envToken = process.env.CLOUDFLARE_API_TOKEN
+        if (envToken) {
+            return new CloudflareService(envToken)
+        }
+
+        // 2. Yoksa database'den al
         const config = await prisma.apiConfig.findUnique({
             where: { provider: 'CLOUDFLARE' },
         })
 
-        if (!config?.apiKey) {
-            return null
+        if (config?.apiKey) {
+            return new CloudflareService(config.apiKey)
         }
 
-        return new CloudflareService(config.apiKey)
+        return null
     } catch (error) {
         console.error('getCloudflareService error:', error)
         return null
     }
+}
+
+export function getDefaultServerIp(): string {
+    return process.env.DEFAULT_SERVER_IP || ''
 }
