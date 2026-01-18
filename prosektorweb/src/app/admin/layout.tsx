@@ -15,7 +15,8 @@ import {
     Search,
     ChevronDown,
     Receipt,
-    Globe
+    Globe,
+    ShoppingCart
 } from 'lucide-react'
 
 export default async function AdminLayout({
@@ -98,7 +99,11 @@ export default async function AdminLayout({
                     </div>
                     <Link href="/admin/domains" className="flex items-center gap-3 px-4 py-3 rounded-xl text-neutral-300 hover:bg-white/5 hover:text-white font-medium transition-all">
                         <Globe className="w-5 h-5" />
-                        Domain Sorgulama
+                        Domain Yönetimi
+                    </Link>
+                    <Link href="/admin/domains/register" className="flex items-center gap-3 px-4 py-3 rounded-xl text-neutral-300 hover:bg-white/5 hover:text-white font-medium transition-all">
+                        <ShoppingCart className="w-5 h-5" />
+                        Domain Satın Al
                     </Link>
 
                     {/* İçerik */}

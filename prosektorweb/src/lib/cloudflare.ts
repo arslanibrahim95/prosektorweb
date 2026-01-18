@@ -243,6 +243,202 @@ export class CloudflareService {
             return { success: false, error: 'DNS kayıtları oluşturulamadı' }
         }
     }
+
+    // ==========================================
+    // DOMAIN REGISTRAR - CHECK AVAILABILITY
+    // ==========================================
+
+    async getAccountId(): Promise<string | null> {
+        try {
+            const response = await this.request<Array<{ id: string }>>('/accounts')
+            if (response.success && response.result.length > 0) {
+                return response.result[0].id
+            }
+            return null
+        } catch (error) {
+            console.error('getAccountId error:', error)
+            return null
+        }
+    }
+
+    async checkDomainAvailability(domain: string): Promise<{
+        available: boolean
+        premium: boolean
+        price?: number
+        currency?: string
+        error?: string
+    }> {
+        try {
+            const accountId = await this.getAccountId()
+            if (!accountId) {
+                return { available: false, premium: false, error: 'Hesap bulunamadı' }
+            }
+
+            // Check if domain is available for registration
+            const response = await this.request<{
+                available: boolean
+                premium: boolean
+                can_register: boolean
+            }>(`/accounts/${accountId}/registrar/domains/${domain}/check`)
+
+            if (!response.success) {
+                return {
+                    available: false,
+                    premium: false,
+                    error: response.errors[0]?.message || 'Kontrol edilemedi'
+                }
+            }
+
+            return {
+                available: response.result.available && response.result.can_register,
+                premium: response.result.premium,
+            }
+        } catch (error) {
+            console.error('checkDomainAvailability error:', error)
+            return { available: false, premium: false, error: 'API hatası' }
+        }
+    }
+
+    // ==========================================
+    // DOMAIN REGISTRAR - GET PRICING
+    // ==========================================
+
+    async getDomainPricing(tld: string): Promise<{
+        registerPrice?: number
+        renewPrice?: number
+        currency?: string
+        error?: string
+    }> {
+        try {
+            const accountId = await this.getAccountId()
+            if (!accountId) {
+                return { error: 'Hesap bulunamadı' }
+            }
+
+            // Get TLD pricing
+            const response = await this.request<Array<{
+                name: string
+                registration_fee: number
+                renewal_fee: number
+            }>>(`/accounts/${accountId}/registrar/tlds`)
+
+            if (!response.success) {
+                return { error: response.errors[0]?.message }
+            }
+
+            const tldInfo = response.result.find(t => t.name === tld.replace('.', ''))
+            if (!tldInfo) {
+                return { error: 'Bu uzantı desteklenmiyor' }
+            }
+
+            return {
+                registerPrice: tldInfo.registration_fee,
+                renewPrice: tldInfo.renewal_fee,
+                currency: 'USD',
+            }
+        } catch (error) {
+            console.error('getDomainPricing error:', error)
+            return { error: 'Fiyat alınamadı' }
+        }
+    }
+
+    // ==========================================
+    // DOMAIN REGISTRAR - REGISTER DOMAIN
+    // ==========================================
+
+    async registerDomain(
+        domain: string,
+        years: number = 1,
+        contactInfo: {
+            firstName: string
+            lastName: string
+            organization?: string
+            address: string
+            city: string
+            state?: string
+            postalCode: string
+            country: string
+            phone: string
+            email: string
+        }
+    ): Promise<{ success: boolean; domain?: any; error?: string }> {
+        try {
+            const accountId = await this.getAccountId()
+            if (!accountId) {
+                return { success: false, error: 'Hesap bulunamadı' }
+            }
+
+            // First check availability
+            const availCheck = await this.checkDomainAvailability(domain)
+            if (!availCheck.available) {
+                return { success: false, error: 'Domain müsait değil' }
+            }
+
+            // Register the domain
+            const response = await this.request<{
+                name: string
+                expires_at: string
+                registered_at: string
+            }>(`/accounts/${accountId}/registrar/domains`, 'POST', {
+                name: domain,
+                years: years,
+                auto_renew: true,
+                privacy: true,
+                registrant: {
+                    first_name: contactInfo.firstName,
+                    last_name: contactInfo.lastName,
+                    organization: contactInfo.organization || '',
+                    address: contactInfo.address,
+                    city: contactInfo.city,
+                    state: contactInfo.state || '',
+                    zip: contactInfo.postalCode,
+                    country: contactInfo.country,
+                    phone: contactInfo.phone,
+                    email: contactInfo.email,
+                },
+            })
+
+            if (response.success) {
+                return { success: true, domain: response.result }
+            }
+
+            return { success: false, error: response.errors[0]?.message || 'Kayıt başarısız' }
+        } catch (error) {
+            console.error('registerDomain error:', error)
+            return { success: false, error: 'API hatası' }
+        }
+    }
+
+    // ==========================================
+    // DOMAIN REGISTRAR - LIST REGISTERED DOMAINS
+    // ==========================================
+
+    async listRegisteredDomains(): Promise<Array<{
+        name: string
+        status: string
+        expires_at: string
+        auto_renew: boolean
+    }>> {
+        try {
+            const accountId = await this.getAccountId()
+            if (!accountId) return []
+
+            const response = await this.request<Array<{
+                name: string
+                status: string
+                expires_at: string
+                auto_renew: boolean
+            }>>(`/accounts/${accountId}/registrar/domains`)
+
+            if (response.success) {
+                return response.result
+            }
+            return []
+        } catch (error) {
+            console.error('listRegisteredDomains error:', error)
+            return []
+        }
+    }
 }
 
 // ==========================================
