@@ -47,7 +47,7 @@ export async function GET(request: Request) {
         ])
 
         // Parse tags from JSON string
-        const formattedPosts = posts.map(post => ({
+        const formattedPosts = posts.map((post: any) => ({
             ...post,
             tags: typeof post.tags === 'string' ? JSON.parse(post.tags) : post.tags
         }))

@@ -2,27 +2,15 @@
 
 import React, { useState } from 'react'
 import Link from 'next/link'
-import {
-  Check,
-  ChevronDown,
-  ChevronRight,
-  Clock,
-  Briefcase,
-  Target,
-  Shield,
-  Eye,
-  Menu,
-  X,
-  Phone,
-  Mail,
-  ArrowRight
-} from 'lucide-react'
-import { ModalSystem, ModalState } from '@/components/landing/ModalSystem'
+import { ChevronDown, Check, Menu, X, ArrowRight, Play, Star, Shield, Users, BarChart3, Clock, Zap, Target, Layout } from 'lucide-react'
+import { ModalSystem } from '@/components/landing/ModalSystem'
+import { ContactForm } from '@/components/landing/ContactForm'
+import { Navbar } from '@/components/layout/Navbar'
+import { Footer } from '@/components/layout/Footer'
 
 export default function HomePage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [modalInitialState, setModalInitialState] = useState<ModalState>('A1')
 
   const openModal = (state: ModalState = 'A1') => {
     setModalInitialState(state)
@@ -57,57 +45,7 @@ export default function HomePage() {
       <div className="fixed inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 -z-10 pointer-events-none brightness-100 contrast-150" />
 
       {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/70 backdrop-blur-xl border-b border-white/20 shadow-sm supports-[backdrop-filter]:bg-white/60">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 group">
-            {/* Logo Placeholder - Text based as per temp file 'psw' */}
-            <span className="text-2xl font-bold tracking-tighter text-neutral-900 group-hover:text-brand-600 transition-colors">
-              psw
-            </span>
-          </Link>
-
-          {/* Desktop Menu */}
-          <div className="hidden md:flex items-center gap-8 text-[15px] font-medium text-neutral-600">
-            <Link href="#neden-biz" className="hover:text-brand-600 transition-colors">Neden Biz?</Link>
-            <Link href="#nasil-calisiriz" className="hover:text-brand-600 transition-colors">Nasıl Çalışırız?</Link>
-            <Link href="#fiyatlandirma" className="hover:text-brand-600 transition-colors">Fiyatlandırma</Link>
-            <Link href="#sss" className="hover:text-brand-600 transition-colors">SSS</Link>
-            <Link href="#iletisim" className="hover:text-brand-600 transition-colors">İletişim</Link>
-          </div>
-
-          <button
-            onClick={() => openModal('A2')}
-            className="hidden md:block px-5 py-2 bg-brand-600 text-white rounded-md text-sm font-semibold shadow-sm hover:bg-brand-700 transition-all hover:shadow-md active:bg-brand-800"
-          >
-            Giriş Yap
-          </button>
-
-          {/* Mobile Menu Toggle */}
-          <button
-            className="md:hidden p-2 text-neutral-600"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          >
-            {mobileMenuOpen ? <X /> : <Menu />}
-          </button>
-        </div>
-
-        {/* Mobile Menu Dropdown */}
-        {mobileMenuOpen && (
-          <div className="md:hidden bg-white border-b border-neutral-200 px-6 py-4 space-y-4">
-            <Link href="#neden-biz" className="block text-neutral-600 font-medium" onClick={() => setMobileMenuOpen(false)}>Neden Biz?</Link>
-            <Link href="#nasil-calisiriz" className="block text-neutral-600 font-medium" onClick={() => setMobileMenuOpen(false)}>Nasıl Çalışırız?</Link>
-            <Link href="#fiyatlandirma" className="block text-neutral-600 font-medium" onClick={() => setMobileMenuOpen(false)}>Fiyatlandırma</Link>
-            <Link href="#sss" className="block text-neutral-600 font-medium" onClick={() => setMobileMenuOpen(false)}>SSS</Link>
-            <Link href="#iletisim" className="block text-neutral-600 font-medium" onClick={() => setMobileMenuOpen(false)}>İletişim</Link>
-            <button
-              onClick={() => { setMobileMenuOpen(false); openModal('A2'); }}
-              className="w-full text-center px-5 py-3 bg-brand-600 text-white rounded-md text-sm font-semibold shadow-sm"
-            >
-              Giriş Yap
-            </button>
-          </div>
-        )}
-      </nav>
+      <Navbar variant="landing" onOpenLogin={() => openModal('A2')} />
 
       {/* Hero Section */}
       <section className="pt-32 pb-24 px-6 relative flex flex-col items-center text-center">
@@ -310,69 +248,18 @@ export default function HomePage() {
           <p className="text-neutral-500">Soru, öneri ve talepleriniz için mesaj bırakın.<br />En geç 1 iş günü içinde dönüş yaparız.</p>
         </div>
 
-        <div className="max-w-md mx-auto bg-white p-8 rounded-2xl border border-neutral-200 shadow-lg">
-          <form className="space-y-4">
-            <div>
-              <label className="block text-sm font-semibold text-neutral-700 mb-1">Ad Soyad</label>
-              <input type="text" className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-lg focus:border-brand-500 focus:ring-2 focus:ring-brand-200 outline-none transition-all" placeholder="Adınız Soyadınız" />
-            </div>
-            <div>
-              <label className="block text-sm font-semibold text-neutral-700 mb-1">Telefon</label>
-              <input type="tel" className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-lg focus:border-brand-500 focus:ring-2 focus:ring-brand-200 outline-none transition-all" placeholder="05XX XXX XX XX" />
-            </div>
-            <div>
-              <label className="block text-sm font-semibold text-neutral-700 mb-1">E-posta</label>
-              <input type="email" className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-lg focus:border-brand-500 focus:ring-2 focus:ring-brand-200 outline-none transition-all" placeholder="ornek@osgb.com" />
-            </div>
-            <div>
-              <label className="block text-sm font-semibold text-neutral-700 mb-1">Mesaj</label>
-              <textarea rows={4} className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-lg focus:border-brand-500 focus:ring-2 focus:ring-brand-200 outline-none transition-all resize-none" placeholder="Mesajınız..."></textarea>
-            </div>
-            <div className="flex items-start gap-3">
-              <input type="checkbox" id="kvkk" className="mt-1 w-4 h-4 text-brand-600 rounded border-neutral-300 focus:ring-brand-500" />
-              <label htmlFor="kvkk" className="text-sm text-neutral-500">KVKK onay formunu okudum, onaylıyorum.</label>
-            </div>
-            <button className="w-full py-3.5 bg-gradient-to-r from-brand-700 to-brand-600 text-white rounded-lg font-bold shadow-md hover:from-brand-800 hover:to-brand-700 transition-all">
-              GÖNDER
-            </button>
-          </form>
-        </div>
-      </section>
+        <ContactForm />
+    </div>
+      </section >
 
-      {/* Footer */}
-      <footer className="py-12 px-6 bg-[#2a0a0a] text-neutral-400 border-t border-[#451a1a]">
-        <div className="max-w-7xl mx-auto grid md:grid-cols-3 gap-8 text-sm">
-          <div>
-            <span className="text-2xl font-bold text-white block mb-4">psw</span>
-            <p className="leading-relaxed opacity-80">
-              OSGB’lere özel profesyonel web çözümleri. Dijital kimliğinizi sektörün diline uygun tasarlıyoruz.
-            </p>
-          </div>
-
-          <div className="flex flex-col gap-2">
-            <a href="#" className="hover:text-white transition-colors">Mesafeli Satış Sözleşmesi</a>
-            <a href="#" className="hover:text-white transition-colors">İptal ve İade Koşulları</a>
-            <a href="#" className="hover:text-white transition-colors">Gizlilik ve Çerez Politikası</a>
-            <a href="#" className="hover:text-white transition-colors">KVKK Aydınlatma Metni</a>
-          </div>
-
-          <div>
-            <p className="font-bold text-white mb-2">Güvenli Ödeme Altyapısı</p>
-            <p className="text-xs opacity-60 mb-4 tracking-widest">VISA • MASTERCARD • TROY</p>
-            <p className="text-white">hello@prosektorweb.com</p>
-            <p className="text-white">0 555 555 55 55</p>
-          </div>
-        </div>
-        <div className="max-w-7xl mx-auto mt-12 pt-8 border-t border-neutral-800 text-center text-xs opacity-50">
-          © 2026 Prosektorweb. Tüm hakları saklıdır.
-        </div>
-      </footer>
+    {/* Footer */ }
+    < Footer variant = "landing" />
 
       <ModalSystem
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         initialState={modalInitialState}
       />
-    </div>
+    </div >
   )
 }

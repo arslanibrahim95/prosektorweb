@@ -7,10 +7,117 @@ generator client {
 
 datasource db {
   provider = "mysql"
+  url      = env("DATABASE_URL")
 }
 
 // ===============================
-// BLOG SYSTEM
+// CORE OSGB SYSTEM (NEW)
+// ===============================
+
+enum DangerClass {
+  LESS_DANGEROUS // Az Tehlikeli
+  DANGEROUS      // Tehlikeli
+  VERY_DANGEROUS // Çok Tehlikeli
+}
+
+enum EmployeeGender {
+  MALE
+  FEMALE
+}
+
+// 1. Firmalar (Müşteri Ana Cari)
+model Company {
+  id          String   @id @default(uuid())
+  name        String   // Firma Resmi Ünvanı
+  taxId       String?  // VKN / TC Kimlik No
+  taxOffice   String?  // Vergi Dairesi
+  email       String?
+  phone       String?
+  address     String?  @db.Text
+  isActive    Boolean  @default(true)
+  
+  // Relations
+  workplaces  Workplace[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([name])
+}
+
+// 2. İşyerleri (SGK Dosyaları / Şantiyeler)
+model Workplace {
+  id             String      @id @default(uuid())
+  title          String      // Şube Adı / Şantiye Adı (Örn: Merkez, Ankara Şube)
+  sgkId          String?     // SGK Sicil Numarası (26 hane)
+  dangerClass    DangerClass @default(LESS_DANGEROUS)
+  naceCode       String?     // 6 Haneli NACE Kodu
+  province       String?     // İl
+  district       String?     // İlçe
+  address        String?     @db.Text
+  isActive       Boolean     @default(true)
+
+  // Relations
+  companyId      String
+  company        Company     @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  employees      Employee[]
+
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  @@index([companyId])
+  @@index([sgkId])
+}
+
+// 3. Çalışanlar (Personel Listesi)
+model Employee {
+  id             String         @id @default(uuid())
+  tcNo           String?        @unique // TC Kimlik No
+  firstName      String
+  lastName       String
+  gender         EmployeeGender?
+  birthDate      DateTime?
+  position       String?        // Görevi (Örn: Kaynakçı)
+  recruitmentDate DateTime?     // İşe Giriş Tarihi
+  phone          String?
+  email          String?
+  isActive       Boolean        @default(true)
+
+  // Relations
+  workplaceId    String
+  workplace      Workplace      @relation(fields: [workplaceId], references: [id], onDelete: Cascade)
+
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  @@index([workplaceId])
+  @@index([tcNo])
+  @@index([firstName, lastName])
+}
+
+// 4. OSGB Personeli (Hekim / Uzman / Ofis)
+enum UserRole {
+  ADMIN
+  DOCTOR
+  EXPERT
+  OFFICE
+}
+
+model BoardUser {
+  id             String   @id @default(uuid())
+  email          String   @unique
+  password       String   // Hashed Password
+  firstName      String?
+  lastName       String?
+  role           UserRole @default(OFFICE)
+  isActive       Boolean  @default(true)
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+// ===============================
+// BLOG SYSTEM (LEGACY / PUBLIC)
 // ===============================
 
 model BlogCategory {
