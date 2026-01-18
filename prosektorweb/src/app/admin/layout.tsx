@@ -97,6 +97,10 @@ export default async function AdminLayout({
                     <div className="px-3 py-2 mt-6 text-xs font-bold text-neutral-500 uppercase tracking-wider">
                         Web Hizmetleri
                     </div>
+                    <Link href="/admin/projects" className="flex items-center gap-3 px-4 py-3 rounded-xl text-neutral-300 hover:bg-white/5 hover:text-white font-medium transition-all">
+                        <LayoutDashboard className="w-5 h-5" />
+                        Web Projeleri
+                    </Link>
                     <Link href="/admin/domains" className="flex items-center gap-3 px-4 py-3 rounded-xl text-neutral-300 hover:bg-white/5 hover:text-white font-medium transition-all">
                         <Globe className="w-5 h-5" />
                         Domain Yönetimi

@@ -47,6 +47,7 @@ model Company {
   contacts    CompanyContact[]
   activities  CompanyActivity[]
   domains     Domain[]
+  webProjects WebProject[]
 
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -399,6 +400,7 @@ model Domain {
   
   // DNS Kayıtları
   dnsRecords  DnsRecord[]
+  webProjects WebProject[]
   
   // Sunucu Ayarları
   serverIp    String?      // Yönlendirilecek IP
@@ -458,3 +460,58 @@ model ApiConfig {
   @@unique([provider])
 }
 
+// ===============================
+// WEB PROJELERİ (Web Ajansı)
+// ===============================
+
+enum ProjectStatus {
+  DRAFT       // Taslak
+  DESIGNING   // Tasarım
+  DEVELOPMENT // Geliştirme
+  REVIEW      // Müşteri İncelemesi
+  APPROVED    // Onaylandı
+  DEPLOYING   // Deploy Ediliyor
+  LIVE        // Yayında
+  PAUSED      // Durduruldu
+  CANCELLED   // İptal
+}
+
+model WebProject {
+  id          String        @id @default(uuid())
+  name        String        // Proje adı (örn: Firma Adı Web Sitesi)
+  
+  // Firma bağlantısı
+  companyId   String
+  company     Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  
+  // Domain bağlantısı (opsiyonel)
+  domainId    String?
+  domain      Domain?       @relation(fields: [domainId], references: [id], onDelete: SetNull)
+  
+  // Proje durumu
+  status      ProjectStatus @default(DRAFT)
+  
+  // Site bilgileri
+  siteUrl     String?       // Canlı site URL (örn: https://firma.com)
+  previewUrl  String?       // Demo/önizleme URL
+  repoUrl     String?       // Git repo (varsa)
+  
+  // Fiyatlandırma
+  price       Decimal?      @db.Decimal(10, 2)
+  isPaid      Boolean       @default(false)
+  paidAt      DateTime?
+  
+  // Tarihler
+  startedAt   DateTime?     // Başlangıç tarihi
+  completedAt DateTime?     // Tamamlanma tarihi
+  
+  // Notlar
+  notes       String?       @db.Text
+  
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@index([companyId])
+  @@index([domainId])
+  @@index([status])
+}
