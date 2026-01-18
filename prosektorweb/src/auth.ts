@@ -20,11 +20,15 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                     const { email, password } = parsedCredentials.data
                     // CONSTANT: Simple Admin Credentials for V1
                     // In a real production app, fetch this from the database and hash passwords
-                    if (email === "admin@prosektorweb.com" && password === "admin123") {
+
+                    const adminEmail = process.env.ADMIN_EMAIL || "admin@prosektorweb.com";
+                    const adminPassword = process.env.ADMIN_PASSWORD || "6509d6d5a0e97a0c8d79c76e"; // Fallback to a generated secure string if env is missing
+
+                    if (email === adminEmail && password === adminPassword) {
                         return {
                             id: "1",
                             name: "Admin User",
-                            email: "admin@prosektorweb.com",
+                            email: adminEmail,
                         }
                     }
                 }

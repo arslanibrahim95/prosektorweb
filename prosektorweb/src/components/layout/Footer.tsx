@@ -24,17 +24,17 @@ export function Footer({ variant = 'landing' }: FooterProps) {
                 </div>
 
                 <div className="flex flex-col gap-2">
-                    <Link href="#" className="hover:text-white transition-colors">Mesafeli Satış Sözleşmesi</Link>
-                    <Link href="#" className="hover:text-white transition-colors">İptal ve İade Koşulları</Link>
-                    <Link href="#" className="hover:text-white transition-colors">Gizlilik ve Çerez Politikası</Link>
-                    <Link href="#" className="hover:text-white transition-colors">KVKK Aydınlatma Metni</Link>
+                    <Link href="/mesafeli-satis-sozlesmesi" className="hover:text-white transition-colors">Mesafeli Satış Sözleşmesi</Link>
+                    <Link href="/mesafeli-satis-sozlesmesi" className="hover:text-white transition-colors">İptal ve İade Koşulları</Link>
+                    <Link href="/gizlilik-ve-kvkk" className="hover:text-white transition-colors">Gizlilik ve Çerez Politikası</Link>
+                    <Link href="/gizlilik-ve-kvkk" className="hover:text-white transition-colors">KVKK Aydınlatma Metni</Link>
                 </div>
 
                 <div>
                     <p className="font-bold text-white mb-2">Güvenli Ödeme Altyapısı</p>
                     <p className="text-xs opacity-60 mb-4 tracking-widest">VISA • MASTERCARD • TROY</p>
                     <p className="text-white">hello@prosektorweb.com</p>
-                    <p className="text-white">0 555 555 55 55</p>
+                    <p className="text-white">+90 551 703 85 99</p>
                 </div>
             </div>
             <div className="max-w-7xl mx-auto mt-12 pt-8 border-t border-neutral-800 text-center text-xs opacity-50">

@@ -1,6 +1,6 @@
 import { auth, signOut } from "@/auth"
 import Link from 'next/link'
-import { LayoutDashboard, FileText, MessageSquare, LogOut, ExternalLink, Shield } from 'lucide-react'
+import { LayoutDashboard, FileText, MessageSquare, LogOut, ExternalLink, Shield, Users, Briefcase } from 'lucide-react'
 
 export default async function AdminLayout({
     children,
