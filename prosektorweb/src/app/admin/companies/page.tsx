@@ -60,6 +60,7 @@ export default async function CompaniesPage({ searchParams }: CompaniesPageProps
                             type="text"
                             name="search"
                             defaultValue={search}
+                            aria-label="Firma ara"
                             placeholder="Firma adı, VKN veya e-posta ile ara..."
                             className="w-full pl-12 pr-4 py-3 bg-neutral-50 border-0 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
                         />
@@ -168,6 +169,7 @@ export default async function CompaniesPage({ searchParams }: CompaniesPageProps
                                                 href={`/admin/companies/${company.id}`}
                                                 className="p-2 text-neutral-400 hover:text-neutral-900 hover:bg-neutral-100 rounded-lg transition-colors"
                                                 title="Detay"
+                                                aria-label={`${company.name} detayını görüntüle`}
                                             >
                                                 <Eye className="w-5 h-5" />
                                             </Link>
@@ -175,6 +177,7 @@ export default async function CompaniesPage({ searchParams }: CompaniesPageProps
                                                 href={`/admin/companies/${company.id}/edit`}
                                                 className="p-2 text-neutral-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                                                 title="Düzenle"
+                                                aria-label={`${company.name} düzenle`}
                                             >
                                                 <Edit className="w-5 h-5" />
                                             </Link>
@@ -196,6 +199,7 @@ export default async function CompaniesPage({ searchParams }: CompaniesPageProps
                                     <Link
                                         href={`/admin/companies?page=${currentPage - 1}${search ? `&search=${search}` : ''}`}
                                         className="p-2 text-neutral-400 hover:text-neutral-900 hover:bg-neutral-100 rounded-lg transition-colors"
+                                        aria-label="Önceki sayfa"
                                     >
                                         <ChevronLeft className="w-5 h-5" />
                                     </Link>
@@ -204,6 +208,7 @@ export default async function CompaniesPage({ searchParams }: CompaniesPageProps
                                     <Link
                                         href={`/admin/companies?page=${currentPage + 1}${search ? `&search=${search}` : ''}`}
                                         className="p-2 text-neutral-400 hover:text-neutral-900 hover:bg-neutral-100 rounded-lg transition-colors"
+                                        aria-label="Sonraki sayfa"
                                     >
                                         <ChevronRight className="w-5 h-5" />
                                     </Link>
