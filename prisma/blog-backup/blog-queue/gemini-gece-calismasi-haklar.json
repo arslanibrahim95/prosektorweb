@@ -1,0 +1,31 @@
+{
+  "slug": "gece-calismalarinda-yasal-sureler-ve-saglik-gözetimi",
+  "title": "Gece Vardiyası Kuralları: 7.5 Saat Sınırı ve Sağlık Raporu",
+  "excerpt": "İşçiler gece en fazla kaç saat çalışabilir? Postalar halinde çalışma yönetmeliği, gece çalışması sağlık raporu, fazla mesai yasağı ve vardiya değişimi.",
+  "content": "<h2>Gece Çalışması Biyolojiye Aykırıdır</h2><p>İnsan vücudu gündüz yaşamaya, gece uyumaya programlıdır. Gece çalışmak (Kanunen saat 20:00 - 06:00 arası), vücut ritmini (sirkadiyen ritim) bozar, hormon dengesini alt üst eder ve dikkati dağıtır. Bu yüzden İş Kanunu, gece çalışanlarını korumak için ekstra sınırlar getirmiştir.</p><h2>7.5 Saat Kuralı: Kırmızı Çizgi</h2><p>Genel kural olarak, gece çalışmaları <strong>7.5 saati geçemez</strong>. Gece vardiyasında çalışan bir işçiye, 'iş yetişmedi' denilerek fazla mesai yaptırılamaz. (Turizm, özel güvenlik ve sağlık gibi bazı istisnai sektörlerde, işçinin yazılı onayı ile bu süre uzayabilir, ancak 11 saatlik dinlenme süresi korunmalıdır).</p><h2>'Gece Çalışabilir' Raporu</h2><p>Herkes gece çalışamaz. Gece postasında çalıştırılacak işçilerin, işe başlamadan önce <strong>'Gece çalışabilir'</strong> ibareli sağlık raporu alması zorunludur. Ayrıca en az 2 yılda bir periyodik olarak sağlık kontrolleri tekrarlanmalıdır. Sağlığı bozulan işçi (uyku bozukluğu, psikolojik sorunlar vb.), işveren tarafından gündüz vardiyasına alınmalıdır.</p><h2>Vardiya Değişimi (Rotasyon)</h2><p>Sürekli gece çalışmak (gececi olmak) yasaktır. Gece ve gündüz vardiyaları sıra ile değiştirilmelidir (Örn: 1 hafta gece, 1 hafta gündüz). Gece vardiyasından çıkan işçi, <strong>en az 11 saat</strong> kesintisiz dinlenmeden tekrar işbaşı yaptırılamaz.</p>",
+  "coverImage": "https://images.unsplash.com/photo-1506500595368-6622fb4476e3?auto=format&fit=crop&q=80&w=2070",
+  "category": {
+    "name": "Mevzuat",
+    "slug": "mevzuat"
+  },
+  "tags": [
+    {
+      "name": "Gece Çalışması",
+      "slug": "gece-calismasi"
+    },
+    {
+      "name": "Vardiya",
+      "slug": "vardiya"
+    },
+    {
+      "name": "Sağlık",
+      "slug": "saglik"
+    }
+  ],
+  "author": {
+    "name": "ProSektorWeb Editör"
+  },
+  "publishedAt": "2026-01-14",
+  "readingTime": 7,
+  "featured": false
+}

@@ -1,0 +1,31 @@
+{
+  "slug": "meslek-hastaligi-tespiti-ve-tazminat-davasi-sureci",
+  "title": "İşten Dolayı Hasta Olmak: Meslek Hastalığı Tespit ve Tazminat Süreci",
+  "excerpt": "Silikozis, bel fıtığı, işitme kaybı... İşiniz sağlığınızı bozduysa ne yapmalısınız? SGK tespit süreci, illiyet bağı, maluliyet oranı ve tazminat davası.",
+  "content": "<h2>Kaza Anlıktır, Hastalık Ömürlük</h2><p>İş kazası gürültülüdür, herkes duyar. Ama meslek hastalığı sessizdir, sinsidir. Yıllarca ciğerinize dolan toz, kulağınızı sağır eden gürültü veya her gün kaldırdığınız o ağır koli... Bir gün gelir, nefes alamaz, yürüyemez veya duyamaz hale gelirsiniz. Bu, kader değil, <strong>Meslek Hastalığı</strong>dır ve tazminat hakkınız vardır.</p><p>5510 sayılı Kanuna göre, sigortalının çalıştığı işin niteliğinden dolayı tekrarlanan bir sebeple veya işyeri şartları yüzünden uğradığı geçici veya sürekli hastalık, bedensel veya ruhsal özürlülük halleridir.</p><h2>En Sık Görülen Meslek Hastalıkları</h2><ul><li><strong>Solunum:</strong> Silikozis (Kot kumlama, maden, seramik), Asbestozis, Mesleki Astım.</li><li><strong>Kas-İskelet:</strong> Bel fıtığı, boyun fıtığı, karpal tünel sendromu (Yazılımcılar, montaj işçileri).</li><li><strong>Fiziksel:</strong> Gürültüye bağlı işitme kaybı.</li><li><strong>Kimyasal:</strong> Kurşun zehirlenmesi, cilt kanserleri, egzama.</li></ul><h2>Hakkınızı Nasıl Ararsınız? (Adım Adım)</h2><ol><li><strong>Yetkili Hastane:</strong> Her doktor meslek hastalığı raporu veremez. Sadece 'Meslek Hastalıkları Hastanesi', 'Devlet Üniversite Hastaneleri' ve 'Eğitim ve Araştırma Hastaneleri'nin yetkili kurulları bu tanıyı koyabilir.</li><li><strong>Tıbbi Rapor:</strong> Heyet, hastalığınız ile yaptığınız iş arasında bir bağ (illiyet bağı) kurarsa 'Meslek Hastalığı Tıbbi Tanı Raporu' düzenler.</li><li><strong>SGK Denetimi:</strong> Raporla SGK'ya başvurulur. SGK müfettişleri eski işyerinize gidip inceleme yapar. 'Gerçekten bu hastalık bu işyerindeki şartlardan mı oldu?' diye bakarlar.</li><li><strong>Maluliyet Oranı:</strong> Hastalık kesinleşirse, SGK Sağlık Kurulu işçinin 'Çalışma Gücü Kaybı Oranını' (%) belirler. Oran %10 ve üzerindeyse, işçiye ömür boyu <strong>'Sürekli İş Göremezlik Geliri'</strong> (Maaş) bağlanır.</li></ol><h2>İşverene Tazminat Davası</h2><p>SGK'nın bağladığı maaş işçinin zararını karşılamazsa (ki genelde karşılamaz), işçi İş Mahkemesi'ne giderek eski işverenine dava açar. 'Sağlığımı kaybettim, artık çalışamıyorum, acı çekiyorum' diyerek <strong>Maddi ve Manevi Tazminat</strong> ister. Eğer işveren İSG önlemlerini almadıysa, yüklü tazminatlar öder.</p><h2>Yükümlülük Süresi Nedir?</h2><p>İşten ayrıldıktan yıllar sonra da meslek hastalığı ortaya çıkabilir. Örneğin gürültülü işten ayrıldınız, 6 ay sonra sağır olduğunuz anlaşıldı. Bu 'Yükümlülük Süresi' içindedir. Silikozis gibi hastalıklarda bu süre 15-20 yıla kadar uzayabilir. Hakkınız kaybolmaz.</p>",
+  "coverImage": "https://images.unsplash.com/photo-1507652313519-d4e9174996dd?auto=format&fit=crop&q=80&w=2070",
+  "category": {
+    "name": "Hukuk",
+    "slug": "hukuk"
+  },
+  "tags": [
+    {
+      "name": "Meslek Hastalığı",
+      "slug": "meslek-hastaligi"
+    },
+    {
+      "name": "Dava",
+      "slug": "dava"
+    },
+    {
+      "name": "SGK",
+      "slug": "sgk"
+    }
+  ],
+  "author": {
+    "name": "ProSektorWeb Editör"
+  },
+  "publishedAt": "2026-01-14",
+  "readingTime": 8,
+  "featured": false
+}

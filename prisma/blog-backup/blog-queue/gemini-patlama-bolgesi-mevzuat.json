@@ -1,0 +1,31 @@
+{
+  "slug": "patlamadan-korunma-dokumani-pkd-yonetmeligi-ozeti",
+  "title": "PKD (Patlamadan Korunma Dokümanı): Sadece Bir Evrak Değil",
+  "excerpt": "Yanıcı gaz veya toz bulunan işyerleri için zorunlu olan PKD nedir? ATEX ve Zone hesabı nasıl yapılır? 3 temel koruma ilkesi.",
+  "content": "<h2>Görünmez Bir Kıvılcım Fabrikayı Yok Edebilir</h2><p>Patlama riski deyince aklımıza hemen rafineriler veya benzin istasyonları gelir. Oysa bir un fabrikası, bir mobilya atölyesi (talaş tozu) veya basit bir boyahane de doğru koşullar oluştuğunda bomba gibi patlayabilir. İşyerinde yanıcı kimyasal, gaz veya toz bulunan herkesin <strong>'Patlamadan Korunma Dokümanı' (PKD)</strong> hazırlaması yasal zorunluluktur.</p><h2>Yönetmelik İşverene Ne Der?</h2><p>'Patlayıcı Ortamların Tehlikelerinden Çalışanların Korunması Hakkında Yönetmelik', işverene 3 temel görev verir:</p><ol><li><strong>Patlamayı Önle (Birincil Önlem):</strong> Mümkünse yanıcı maddeyi kullanma veya daha az tehlikeli olanla değiştir. Ortamda patlayıcı karışım (gaz/toz bulutu) oluşmasını engelle (İyi havalandırma).</li><li><strong>Ateşlemeyi Önle (İkincil Önlem):</strong> Patlayıcı ortam oluşsa bile, onu ateşleyecek kaynağı yok et. Statik elektriği önle (topraklama), sıcak yüzeyleri izole et ve en önemlisi <strong>Ex-Proof</strong> (Kıvılcım çıkarmaz) ekipman kullan.</li><li><strong>Etkiyi Azalt (Üçüncül Önlem):</strong> Her şeye rağmen patlama olursa, çalışanları koru. Patlama kapakları, basınca dayanıklı binalar kullan.</li></ol><h2>Zone (Bölge) Haritası</h2><p>PKD'nin en teknik kısmı budur. İşyeri risk bölgelerine ayrılır:</p><ul><li><strong>Zone 0 / 20:</strong> Patlayıcı ortam sürekli var (Tankın içi).</li><li><strong>Zone 1 / 21:</strong> Ara sıra oluşuyor (Dolum ağzı çevresi).</li><li><strong>Zone 2 / 22:</strong> Nadiren oluşuyor (Deponun geri kalanı).</li></ul><p>Bu bölgelere göre uygun ekipman seçilmezse (Örn: Zone 1'de normal lamba kullanılırsa), o lamba anahtarına basmak son hareketiniz olabilir.</p>",
+  "coverImage": "https://images.unsplash.com/photo-1627065027668-7b7bd81e55aa?auto=format&fit=crop&q=80&w=2070",
+  "category": {
+    "name": "Mevzuat",
+    "slug": "mevzuat"
+  },
+  "tags": [
+    {
+      "name": "PKD",
+      "slug": "pkd"
+    },
+    {
+      "name": "ATEX",
+      "slug": "atex"
+    },
+    {
+      "name": "Patlama",
+      "slug": "patlama"
+    }
+  ],
+  "author": {
+    "name": "ProSektorWeb Editör"
+  },
+  "publishedAt": "2026-01-14",
+  "readingTime": 7,
+  "featured": false
+}

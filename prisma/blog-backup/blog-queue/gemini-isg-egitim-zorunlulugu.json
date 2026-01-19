@@ -1,0 +1,31 @@
+{
+  "slug": "isg-egitimlerine-katilmayan-personele-ne-yapilmali",
+  "title": "Eğitime Gelmeyen İşçi: Tutanak, İhtar ve Fesih Süreci",
+  "excerpt": "İşveren eğitim vermek zorunda, peki işçi almak zorunda mı? Eğitime katılmamakta direnen personele uygulanacak yasal yaptırımlar.",
+  "content": "<h2>Eğitim Haktır Ama Aynı Zamanda Görevdir</h2><p>6331 sayılı Kanun, işverene eğitim verme yükümlülüğü getirirken, çalışana da <strong>'Eğitimlere katılmak ve kurallara uymak'</strong> yükümlülüğü getirir. Bir işçi 'Ben zaten bu işi biliyorum, eğitime ihtiyacım yok' diyerek eğitime gelmezse, sadece kendini değil, tüm işyerini riske atar ve suç işlemiş olur.</p><h2>Eğitim Mesai Sayılır mı?</h2><p>Evet. İSG eğitimleri kural olarak iş saatleri içinde verilmelidir. Eğer işin aksamaması için mesai dışında (akşam veya hafta sonu) verilirse, bu süre <strong>fazla mesai</strong> olarak ücretlendirilmeli veya izin olarak verilmelidir.</p><h2>Katılmayan İşçiye Uygulanacak Adımlar</h2><ol><li><strong>Yazılı Davet:</strong> Eğitim tarihi, saati ve yeri işçiye yazılı olarak duyurulur veya tebliğ edilir.</li><li><strong>Tutanak:</strong> Eğitime mazeretsiz gelmeyen işçi için 'Eğitime Katılmama/Devamsızlık Tutanağı' tutulur.</li><li><strong>Savunma:</strong> İşçiden savunma istenir. Geçerli mazereti (Rapor vb.) yoksa ihtar verilir.</li><li><strong>Fesih:</strong> İşçi eğitim almamakta ve iş güvenliğini tehlikeye atmakta ısrar ederse, işverenin <strong>haklı nedenle fesih</strong> hakkı doğar. Çünkü eğitimsiz işçi, saatli bomba gibidir.</li></ol>",
+  "coverImage": "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&q=80&w=2070",
+  "category": {
+    "name": "Eğitim",
+    "slug": "egitim"
+  },
+  "tags": [
+    {
+      "name": "Eğitim",
+      "slug": "egitim"
+    },
+    {
+      "name": "Disiplin",
+      "slug": "disiplin"
+    },
+    {
+      "name": "Tutanak",
+      "slug": "tutanak"
+    }
+  ],
+  "author": {
+    "name": "ProSektorWeb Editör"
+  },
+  "publishedAt": "2026-01-14",
+  "readingTime": 6,
+  "featured": false
+}

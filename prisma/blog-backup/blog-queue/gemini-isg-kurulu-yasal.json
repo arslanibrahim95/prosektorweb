@@ -1,0 +1,31 @@
+{
+  "slug": "isg-kurulu-yonetmeligi-ve-yasal-zorunluluklar",
+  "title": "50 Kişiyi Geçen İşyerinin Anayasası: İSG Kurulu",
+  "excerpt": "Hangi işyerleri kurul kurmak zorunda? Kurul kimlerden oluşur? Toplantı yapmamanın cezası ve alınan kararların bağlayıcılığı.",
+  "content": "<h2>Tek Adam Yönetimi Bitti, Ortak Akıl Var</h2><p>İş güvenliği, sadece patronun emriyle veya uzmanın raporuyla yürümez. 6331 sayılı Kanun, demokrasiyi işyerine getirir. Eğer <strong>50 ve daha fazla çalışanınız</strong> varsa ve işyerinizde 6 aydan uzun süreli işler yapılıyorsa, <strong>İş Sağlığı ve Güvenliği Kurulu</strong> kurmak ve işletmek zorundasınız.</p><h2>Kurulun Gücü</h2><p>İSG Kurulu, bir 'sohbet toplantısı' değildir. Kurulda alınan kararlar (Örn: 'Havalandırma sistemi yenilenecek', 'İşçilere yanmaz elbise alınacak'), işveren için <strong>bağlayıcıdır</strong>. İşveren, bu kararları uygulamak zorundadır. Uygulamazsa ve kaza olursa, 'Bilinçli Taksir' ile suçlanır.</p><h2>Masada Kimler Var?</h2><p>Yasa, masada işyerinin tüm taraflarının olmasını ister:</p><ul><li><strong>İşveren veya Vekili (Başkan):</strong> Harcama yetkisi olan, patron adına karar verebilen biri.</li><li><strong>İş Güvenliği Uzmanı (Sekreter):</strong> Toplantıyı organize eden, defteri tutan kişi.</li><li><strong>İşyeri Hekimi.</strong></li><li><strong>İnsan Kaynakları / İdari İşler Sorumlusu.</strong></li><li><strong>Çalışan Temsilcisi:</strong> İşçilerin seçtiği, onların sorunlarını dile getiren kişi.</li><li><strong>Usta / Formen:</strong> Sahayı ve işi teknik olarak bilen bir usta.</li></ul><h2>Toplantı Sıklığı</h2><ul><li><strong>Çok Tehlikeli Sınıf:</strong> Ayda 1 kez.</li><li><strong>Tehlikeli Sınıf:</strong> 2 ayda 1 kez.</li><li><strong>Az Tehlikeli Sınıf:</strong> 3 ayda 1 kez.</li></ul><h2>Kurul Kurmamanın Cezası</h2><p>Eğer şartları taşıdığınız halde kurul kurmazsanız veya kurup düzenli toplantı yapmazsanız, her ay için ayrı ayrı idari para cezası ödersiniz. 2026 yılında bu ceza, her ihlal için yaklaşık 15-20 bin TL seviyelerindedir. Bir yıl boyunca toplantı yapmamanın maliyeti yüz binlerce lirayı bulabilir.</p><h2>Sıkça Sorulan Sorular</h2><h3>Toplantı mesai saatinde mi yapılır?</h3><p>Evet. Kurul üyelerinin toplantıda geçirdiği süreler çalışma süresinden sayılır. Eğer mesai dışında yapılırsa fazla mesai ödenmelidir.</p>",
+  "coverImage": "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&q=80&w=2032",
+  "category": {
+    "name": "Mevzuat",
+    "slug": "mevzuat"
+  },
+  "tags": [
+    {
+      "name": "İSG Kurulu",
+      "slug": "isg-kurulu"
+    },
+    {
+      "name": "Yönetim",
+      "slug": "yonetim"
+    },
+    {
+      "name": "Yasal Zorunluluk",
+      "slug": "yasal-zorunluluk"
+    }
+  ],
+  "author": {
+    "name": "ProSektorWeb Editör"
+  },
+  "publishedAt": "2026-01-14",
+  "readingTime": 7,
+  "featured": false
+}

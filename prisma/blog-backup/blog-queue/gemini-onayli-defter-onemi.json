@@ -1,0 +1,31 @@
+{
+  "slug": "onayli-defter-nedir-tespit-ve-oneri-defteri-onemi",
+  "title": "İSG'nin Kara Kutusu: Onaylı Defter ve İspat Gücü",
+  "excerpt": "İş güvenliği uzmanı ile işveren arasındaki resmi iletişim aracı. Noter onaylı defterin yasal niteliği, kaybolursa ne olur ve işveren imzalamazsa süreç nasıl işler?",
+  "content": "<h2>Söz Uçar, Defter Kalır</h2><p>İş güvenliği uzmanı sahada bir risk gördü (Örn: 'Pres makinesinin sensörü yok'). Patronu uyardı, patron 'Tamam hallederiz' dedi ama yapmadı. 3 gün sonra işçi elini o makineye kaptırdı. Mahkemede uzman 'Ben söylemiştim' der, patron 'Bana söylemedi' der. Hakim kime inanır? Yazılı delili olana.</p><p>İşte <strong>Tespit ve Öneri Defteri (Onaylı Defter)</strong>, bu tartışmayı bitiren tek resmi belgedir. Uzman buraya yazdığı an, işverene <strong>'Yasal Tebligat'</strong> yapmış sayılır. Artık sorumluluk işverene geçmiştir.</p><h2>Defterin Özellikleri</h2><ul><li><strong>Resmi Onay:</strong> Defterin her sayfası kullanımdan önce Noter veya Çalışma ve İş Kurumu İl Müdürlüğü tarafından mühürlenmiş olmalıdır. Onaysız defter, bakkal defteridir, yasal hükmü yoktur.</li><li><strong>Otokopili:</strong> 3 nüshadır. Yazdığınızda alta geçer. Asıl suret (pembe) işverende kalır, bir suret (mavi) uzmanda, bir suret (sarı) hekimde.</li><li><strong>Saklama:</strong> Defter dolunca yenisi alınır ama eskisi en az 15 yıl saklanmak zorundadır. Müfettiş denetimde ilk bunu ister.</li></ul><h2>İşveren İmzalamazsa?</h2><p>Bu çok sık yaşanan bir durumdur. Uzman yazar, işveren 'Ben bunu imzalamam, başıma iş açarsın' der. Hiç sorun değil. 6331 sayılı Kanun der ki: <strong>'İmzalanması halinde işverene tebliğ edilmiş sayılır.'</strong></p><p>Peki ya imzalamazsa? Uzman, yazdığı sayfayı koparır ve durumu tutanak altına alır. Daha da garantiye almak isterse, deftere yazdığı hususları Noter kanalıyla işverene ihtarname olarak çeker. Bu, en güçlü delildir.</p><h2>Deftere Ne Yazılmalı?</h2><p>Defter 'günlük' değildir. Sadece tespit edilen eksiklikler ve alınması gereken önlemler yazılır. 'Bugün hava güzel' yazılmaz. 'X nolu makinenin koruyucusu takılmalı', 'Yüksekte çalışma eğitimi verilmeli', 'Acil çıkış kapısı onarılmalı' gibi somut ve teknik öneriler yazılır.</p>",
+  "coverImage": "https://images.unsplash.com/photo-1544396821-4dd40b938ad3?auto=format&fit=crop&q=80&w=2073",
+  "category": {
+    "name": "Mevzuat",
+    "slug": "mevzuat"
+  },
+  "tags": [
+    {
+      "name": "Onaylı Defter",
+      "slug": "onayli-defter"
+    },
+    {
+      "name": "Yasal Belge",
+      "slug": "yasal-belge"
+    },
+    {
+      "name": "İSG Uzmanı",
+      "slug": "isg-uzmani"
+    }
+  ],
+  "author": {
+    "name": "ProSektorWeb Editör"
+  },
+  "publishedAt": "2026-01-14",
+  "readingTime": 7,
+  "featured": false
+}

@@ -1,0 +1,191 @@
+@import "tailwindcss";
+
+:root {
+  /* ========================================================================
+     Fluent UI Design Tokens (Fluent Blue #0078D4)
+     Source: fluentui-master/packages/tokens
+     ======================================================================== */
+
+  /* --- Colors: Brand (Blue #0078D4) --- */
+  /* --- Colors: Brand (Red #DC2626) --- */
+  --colorBrandBackground: #dc2626;
+  /* Primary Red */
+  --colorBrandBackgroundHover: #b91c1c;
+  /* Darker Red */
+  --colorBrandBackgroundPressed: #991b1b;
+  /* Even Darker */
+  /* Brand 40 */
+
+  --colorBrandForeground1: #dc2626;
+  --colorBrandForeground2: #b91c1c;
+  /* Brand 70 */
+
+  /* --- Colors: Neutral --- */
+  --colorNeutralForeground1: #242424;
+  /* Grey 14 */
+  --colorNeutralForeground2: #424242;
+  /* Grey 26 */
+  --colorNeutralForeground3: #616161;
+  /* Grey 38 */
+  --colorNeutralForeground4: #707070;
+  /* Grey 44 */
+
+  --colorNeutralBackground1: #ffffff;
+  /* White */
+  --colorNeutralBackground2: #fafafa;
+  /* Grey 98 */
+  --colorNeutralBackground3: #f5f5f5;
+  /* Grey 96 */
+  --colorNeutralBackground4: #f0f0f0;
+  /* Grey 94 */
+
+  --colorNeutralStroke1: #d1d1d1;
+  /* Grey 82 */
+  --colorNeutralStroke2: #e0e0e0;
+  /* Grey 88 */
+
+  /* --- Typography --- */
+  --font-fluent: 'Segoe UI', 'Segoe UI Web (West European)', -apple-system, BlinkMacSystemFont, Roboto, 'Helvetica Neue', sans-serif;
+  --font-heading: var(--font-playfair);
+  --font-body: var(--font-inter);
+
+  /* --- Radius --- */
+  --radius-none: 0px;
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+
+  /* --- Shadows (Elevation) --- */
+  /* Shadow 2 matches Fluent v9 Shadow 2 */
+  --shadow-2: 0 0 2px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.14);
+  /* Shadow 4 matches Fluent v9 Shadow 4 */
+  --shadow-4: 0 0 2px rgba(0, 0, 0, 0.12), 0 2px 4px rgba(0, 0, 0, 0.14);
+  /* Shadow 8 matches Fluent v9 Shadow 8 */
+  --shadow-8: 0 0 2px rgba(0, 0, 0, 0.12), 0 4px 8px rgba(0, 0, 0, 0.14);
+  /* Shadow 16 matches Fluent v9 Shadow 16 */
+  --shadow-16: 0 0 2px rgba(0, 0, 0, 0.12), 0 8px 16px rgba(0, 0, 0, 0.14);
+
+  /* --- Legacy/Compat Variables (Mapped to Fluent) --- */
+  --background: var(--colorNeutralBackground1);
+  --foreground: var(--colorNeutralForeground1);
+  --primary: var(--colorBrandBackground);
+  --primary-foreground: #ffffff;
+  --muted: var(--colorNeutralBackground3);
+  --muted-foreground: var(--colorNeutralForeground3);
+  --card: var(--colorNeutralBackground2);
+  --card-foreground: var(--colorNeutralForeground1);
+  --popover: var(--colorNeutralBackground1);
+  --popover-foreground: var(--colorNeutralForeground1);
+  --border: var(--colorNeutralStroke1);
+  --input: var(--colorNeutralStroke1);
+  --ring: var(--colorBrandBackground);
+  --radius: var(--radius-md);
+
+  /* Shadcn/UI Specific Mappings */
+  --secondary: var(--colorNeutralBackground3);
+  --secondary-foreground: var(--colorNeutralForeground1);
+  --accent: var(--colorNeutralBackground3);
+  --accent-foreground: var(--colorNeutralForeground1);
+  --destructive: #d13438;
+  /* Fluent Error Red */
+  --destructive-foreground: #ffffff;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-hover: var(--colorBrandBackgroundHover);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+
+  /* Fluent Specific Utilities */
+  --color-fluent-brand: var(--colorBrandBackground);
+  --color-fluent-brand-hover: var(--colorBrandBackgroundHover);
+  --color-fluent-brand-pressed: var(--colorBrandBackgroundPressed);
+
+  --color-fluent-text-1: var(--colorNeutralForeground1);
+  --color-fluent-text-2: var(--colorNeutralForeground2);
+
+  --color-fluent-bg-2: var(--colorNeutralBackground2);
+
+  --font-fluent: var(--font-fluent);
+
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+
+  --shadow-fluent-card: var(--shadow-4);
+  --shadow-fluent-hover: var(--shadow-8);
+
+  /* Fluent Brand Palette */
+  /* Fluent Brand Palette (Royal Red Theme) */
+  --color-brand-50: #fdf2f2;
+  --color-brand-100: #fde8e8;
+  --color-brand-200: #fbd5d5;
+  --color-brand-300: #f8b4b4;
+  --color-brand-400: #f98080;
+  --color-brand-500: #f05252;
+  --color-brand-600: #c81e1e;
+  /* deeper royal red */
+  --color-brand-700: #9b1c1c;
+  --color-brand-800: #771d1d;
+  --color-brand-900: #581616;
+}
+
+@layer base {
+  body {
+    @apply bg-background text-foreground;
+    @apply bg-background text-foreground;
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-heading);
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #999;
+}
+
+::selection {
+  background-color: rgba(139, 30, 30, 0.1);
+  color: var(--primary);
+}

@@ -1,0 +1,31 @@
+{
+  "slug": "uzaktan-calisma-yonetmeligi-ve-evden-calisanin-isg-haklari",
+  "title": "Evde Çalışırken Düşersem İş Kazası mı? Uzaktan Çalışma Yönetmeliği",
+  "excerpt": "Home-office çalışanlar için işverenin İSG yükümlülükleri, ergonomik ekipman sağlama, ev kazalarının hukuki boyutu ve Yargıtay kararları.",
+  "content": "<h2>Evim Ofisim Oldu, Riskler Ne Oldu?</h2><p>Pandemiyle hayatımıza giren 'Uzaktan Çalışma' (Remote Work), artık kalıcı bir model. İş Kanunu'na eklenen maddeler ve 'Uzaktan Çalışma Yönetmeliği', evden çalışmayı yasal bir zemine oturttu. Ancak hem işverenlerin hem de çalışanların kafasındaki en büyük soru şu: Evde çalışırken ayağım kayıp düşsem, bu iş kazası mıdır?</p><h2>Yargıtay: Evet, İş Kazasıdır!</h2><p>Yargıtay kararlarına göre; eğer çalışan, iş saatleri içinde ve işiyle ilgili bir eylem yaparken (bilgisayar başında, işle ilgili telefonla konuşurken) kaza geçirirse, bu kesinlikle <strong>İş Kazası</strong>dır. Hatta evde çay almak için mutfağa giderken düşmesi veya kalp krizi geçirmesi bile, 'işin yürütümü' ve 'işverenin otoritesi altında olma' kapsamında değerlendirilebilir.</p><h2>İşverenin Yükümlülükleri</h2><p>İşveren, 'Ev senin, ne yaparsan yap' diyemez. Yönetmeliğe göre işveren:</p><ul><li><strong>Bilgilendirme:</strong> Çalışanı evdeki riskler (elektrik prizleri, ergonomi, aydınlatma) konusunda bilgilendirmeli ve uzaktan eğitim vermelidir.</li><li><strong>Ekipman:</strong> İşin yapılması için gereken araçları (laptop, monitör, kulaklık) sağlamalıdır. Ergonomik sandalye ve masa sağlama yükümlülüğü ise iş sözleşmesine bağlıdır, ancak İSG açısından önerilir.</li><li><strong>İletişim:</strong> Çalışanın psikososyal sağlığı (izolasyon hissi, tükenmişlik) için düzenli iletişim kurulmalı ve mesai saatlerine (Bağlantıyı kesme hakkı) saygı gösterilmelidir.</li></ul><h2>Sıkça Sorulan Sorular</h2><h3>İşveren evimi denetleyebilir mi?</h3><p>Hayır. Anayasal 'Konut Dokunulmazlığı' nedeniyle işveren veya İSG uzmanı, çalışanın izni olmadan eve girip risk analizi yapamaz. Bunun yerine uzaktan eğitimler ve çalışanın dolduracağı kontrol listeleri (Check-list) ile evdeki güvenlik koşulları takip edilir.</p>",
+  "coverImage": "https://images.unsplash.com/photo-1593642632823-8f78536709c6?auto=format&fit=crop&q=80&w=2070",
+  "category": {
+    "name": "Mevzuat",
+    "slug": "mevzuat"
+  },
+  "tags": [
+    {
+      "name": "Uzaktan Çalışma",
+      "slug": "uzaktan-calisma"
+    },
+    {
+      "name": "Home Office",
+      "slug": "home-office"
+    },
+    {
+      "name": "Hukuk",
+      "slug": "hukuk"
+    }
+  ],
+  "author": {
+    "name": "ProSektorWeb Editör"
+  },
+  "publishedAt": "2026-01-14",
+  "readingTime": 7,
+  "featured": false
+}

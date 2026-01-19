@@ -1,0 +1,788 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+// ===============================
+// CORE OSGB SYSTEM (NEW)
+// ===============================
+
+enum DangerClass {
+  LESS_DANGEROUS // Az Tehlikeli
+  DANGEROUS      // Tehlikeli
+  VERY_DANGEROUS // Çok Tehlikeli
+}
+
+enum EmployeeGender {
+  MALE
+  FEMALE
+}
+
+// 1. Firmalar (Müşteri Ana Cari)
+model Company {
+  id          String   @id @default(uuid())
+  name        String   // Firma Resmi Ünvanı
+  taxId       String?  // VKN / TC Kimlik No
+  taxOffice   String?  // Vergi Dairesi
+  email       String?
+  phone       String?
+  address     String?  @db.Text
+  isActive    Boolean  @default(true)
+  
+  // CRM Fields
+  status      CompanyStatus @default(LEAD)
+  source      String?       // Nereden geldi (Web, Referans, vb.)
+  
+  // Relations
+  workplaces  Workplace[]
+  invoices    Invoice[]
+  notes       CompanyNote[]
+  contacts    CompanyContact[]
+  activities  CompanyActivity[]
+  domains     Domain[]
+  webProjects WebProject[]
+  proposals   Proposal[]
+  tickets     Ticket[]
+  services    Service[]
+  users       User[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([name])
+  @@index([status])
+}
+
+// ===============================
+// CRM SİSTEMİ
+// ===============================
+
+enum CompanyStatus {
+  LEAD        // Potansiyel Müşteri
+  PROSPECT    // İlgilenen
+  NEGOTIATION // Görüşme Aşamasında
+  CUSTOMER    // Müşteri
+  CHURNED     // Kaybedilen
+}
+
+// Firma Notları
+model CompanyNote {
+  id          String   @id @default(uuid())
+  companyId   String
+  company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  
+  content     String   @db.Text
+  isPinned    Boolean  @default(false)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([companyId])
+  @@index([createdAt])
+}
+
+// Firma İletişim Kişileri
+model CompanyContact {
+  id          String   @id @default(uuid())
+  companyId   String
+  company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  
+  name        String
+  title       String?  // Ünvan (Müdür, Muhasebe, vb.)
+  phone       String?
+  email       String?
+  isPrimary   Boolean  @default(false)
+  
+  createdAt   DateTime @default(now())
+
+  @@index([companyId])
+}
+
+enum ActivityType {
+  CALL        // Telefon Görüşmesi
+  EMAIL       // E-posta
+  MEETING     // Toplantı
+  NOTE        // Not
+  TASK        // Görev
+  REMINDER    // Hatırlatma
+}
+
+// Firma Aktiviteleri
+model CompanyActivity {
+  id          String       @id @default(uuid())
+  companyId   String
+  company     Company      @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  
+  type        ActivityType
+  title       String
+  description String?      @db.Text
+  dueDate     DateTime?    // Hatırlatma/Görev için
+  isCompleted Boolean      @default(false)
+  
+  createdAt   DateTime     @default(now())
+
+  @@index([companyId])
+  @@index([type])
+  @@index([dueDate])
+}
+
+// ===============================
+// FATURA & ÖDEME SİSTEMİ
+// ===============================
+
+enum InvoiceStatus {
+  DRAFT       // Taslak
+  PENDING     // Bekliyor
+  PAID        // Ödendi
+  PARTIAL     // Kısmi Ödeme
+  CANCELLED   // İptal
+}
+
+enum PaymentMethod {
+  CASH        // Nakit
+  BANK        // Havale/EFT
+  CREDIT_CARD // Kredi Kartı
+  OTHER       // Diğer
+}
+
+model Invoice {
+  id            String        @id @default(uuid())
+  invoiceNo     String        @unique  // Fatura No (Örn: 2024-0001)
+  
+  // Firma Bağlantısı
+  companyId     String
+  company       Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  
+  // Tarihler
+  issueDate     DateTime      @default(now()) // Düzenleme Tarihi
+  dueDate       DateTime      // Vade Tarihi
+  
+  // Tutarlar
+  subtotal      Decimal       @db.Decimal(10, 2) // Ara Toplam
+  taxRate       Decimal       @default(20) @db.Decimal(5, 2) // KDV Oranı %
+  taxAmount     Decimal       @db.Decimal(10, 2) // KDV Tutarı
+  total         Decimal       @db.Decimal(10, 2) // Genel Toplam
+  paidAmount    Decimal       @default(0) @db.Decimal(10, 2) // Ödenen Tutar
+  
+  // Durum
+  status        InvoiceStatus @default(PENDING)
+  description   String?       @db.Text // Fatura Açıklaması
+  notes         String?       @db.Text // Notlar
+  
+  // Relations
+  payments      Payment[]
+  
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  @@index([companyId])
+  @@index([status])
+  @@index([issueDate])
+}
+
+model Payment {
+  id            String        @id @default(uuid())
+  
+  // Fatura Bağlantısı
+  invoiceId     String
+  invoice       Invoice       @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  
+  // Ödeme Bilgileri
+  amount        Decimal       @db.Decimal(10, 2) // Ödenen Tutar
+  paymentDate   DateTime      @default(now()) // Ödeme Tarihi
+  method        PaymentMethod @default(BANK) // Ödeme Yöntemi
+  reference     String?       // Dekont/Referans No
+  notes         String?       @db.Text
+  
+  createdAt     DateTime      @default(now())
+
+  @@index([invoiceId])
+  @@index([paymentDate])
+}
+
+// 2. İşyerleri (SGK Dosyaları / Şantiyeler)
+model Workplace {
+  id             String      @id @default(uuid())
+  title          String      // Şube Adı / Şantiye Adı (Örn: Merkez, Ankara Şube)
+  sgkId          String?     // SGK Sicil Numarası (26 hane)
+  dangerClass    DangerClass @default(LESS_DANGEROUS)
+  naceCode       String?     // 6 Haneli NACE Kodu
+  province       String?     // İl
+  district       String?     // İlçe
+  address        String?     @db.Text
+  isActive       Boolean     @default(true)
+
+  // Relations
+  companyId      String
+  company        Company     @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  employees      Employee[]
+
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  @@index([companyId])
+  @@index([sgkId])
+}
+
+// 3. Çalışanlar (Personel Listesi)
+model Employee {
+  id             String         @id @default(uuid())
+  tcNo           String?        @unique // TC Kimlik No
+  firstName      String
+  lastName       String
+  gender         EmployeeGender?
+  birthDate      DateTime?
+  position       String?        // Görevi (Örn: Kaynakçı)
+  recruitmentDate DateTime?     // İşe Giriş Tarihi
+  phone          String?
+  email          String?
+  isActive       Boolean        @default(true)
+
+  // Relations
+  workplaceId    String
+  workplace      Workplace      @relation(fields: [workplaceId], references: [id], onDelete: Cascade)
+
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  @@index([workplaceId])
+  @@index([tcNo])
+  @@index([firstName, lastName])
+}
+
+// 4. OSGB Personeli (Hekim / Uzman / Ofis)
+enum UserRole {
+  ADMIN
+  DOCTOR
+  EXPERT
+  OFFICE
+}
+
+model BoardUser {
+  id             String   @id @default(uuid())
+  email          String   @unique
+  password       String   // Hashed Password
+  firstName      String?
+  lastName       String?
+  role           UserRole @default(OFFICE)
+  isActive       Boolean  @default(true)
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+// ===============================
+// BLOG SYSTEM (LEGACY / PUBLIC)
+// ===============================
+
+model BlogCategory {
+  id        String     @id @default(uuid())
+  name      String
+  slug      String     @unique
+  posts     BlogPost[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  @@index([slug])
+}
+
+model BlogPost {
+  id              String        @id @default(uuid())
+  title           String        @db.VarChar(500)
+  slug            String        @unique
+  excerpt         String?       @db.Text
+  content         String        @db.MediumText
+  coverImage      String?       @db.VarChar(1000)
+  
+  // Category
+  categoryId      String?
+  category        BlogCategory? @relation(fields: [categoryId], references: [id])
+  
+  // Tags (stored as JSON array)
+  tags            Json?         @default("[]")
+  
+  // Meta
+  authorName      String?       @default("ProSektorWeb")
+  readingTime     Int?          @default(5)
+  viewCount       Int           @default(0)
+  
+  // SEO
+  metaTitle       String?       @db.VarChar(500)
+  metaDescription String?       @db.VarChar(500)
+  
+  // Status
+  published       Boolean       @default(true)
+  featured        Boolean       @default(false)
+  
+  // Timestamps
+  publishedAt     DateTime      @default(now())
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@index([slug])
+  @@index([categoryId])
+  @@index([published])
+  @@index([featured])
+  @@index([publishedAt])
+}
+
+// ===============================
+// CONTACT / LEADS
+// ===============================
+
+model ContactMessage {
+  id        String   @id @default(uuid())
+  name      String
+  email     String
+  phone     String?
+  company   String?
+  message   String   @db.Text
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([read])
+  @@index([createdAt])
+}
+
+// ===============================
+// SITE SETTINGS
+// ===============================
+
+model SiteSetting {
+  id        String   @id @default(uuid())
+  key       String   @unique
+  value     String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ===============================
+// DOMAIN & DNS YÖNETİMİ
+// ===============================
+
+enum DomainStatus {
+  ACTIVE      // Aktif
+  PENDING     // Beklemede
+  EXPIRED     // Süresi Dolmuş
+  SUSPENDED   // Askıda
+}
+
+enum DnsRecordType {
+  A
+  AAAA
+  CNAME
+  MX
+  TXT
+  NS
+  SRV
+}
+
+// Domain Kayıtları
+model Domain {
+  id          String       @id @default(uuid())
+  name        String       @unique  // örn: firmaismi.com
+  extension   String                // .com, .com.tr
+  
+  // İlişkiler
+  companyId   String?
+  company     Company?     @relation(fields: [companyId], references: [id], onDelete: SetNull)
+  
+  // Durum
+  status      DomainStatus @default(PENDING)
+  registrar   String?      // Hangi registrar'dan alındı
+  
+  // Tarihler
+  registeredAt DateTime?
+  expiresAt    DateTime?
+  
+  // DNS Kayıtları
+  dnsRecords  DnsRecord[]
+  webProjects WebProject[]
+  
+  // Sunucu Ayarları
+  serverIp    String?      // Yönlendirilecek IP
+  sslEnabled  Boolean      @default(false)
+  
+  // Notlar
+  notes       String?      @db.Text
+  
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+}
+
+// 6. Teklif Yönetimi
+enum ProposalStatus {
+  DRAFT       // Taslak
+  SENT        // Gönderildi
+  ACCEPTED    // Onaylandı
+  REJECTED    // Reddedildi
+  EXPIRED     // Süresi Doldu
+}
+
+model Proposal {
+  id          String         @id @default(uuid())
+  
+  // Müşteri Bağlantısı
+  companyId   String
+  company     Company        @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  
+  // Teklif Detayları
+  subject     String         // Teklif Konusu
+  validUntil  DateTime?      // Geçerlilik Tarihi
+  status      ProposalStatus @default(DRAFT)
+  currency    String         @default("TRY") // TRY, USD, EUR
+  
+  // Tutarlar (Otomatik hesaplanacak)
+  subtotal    Decimal        @default(0) @db.Decimal(10, 2)
+  taxRate     Decimal        @default(20) @db.Decimal(5, 2)
+  taxAmount   Decimal        @default(0) @db.Decimal(10, 2)
+  total       Decimal        @default(0) @db.Decimal(10, 2)
+  
+  // İçerik
+  notes       String?        @db.Text
+  items       ProposalItem[]
+  
+  // Dönüşüm Takibi
+  convertedAt DateTime?      // Faturaya dönüştürüldüğü tarih
+  invoiceId   String?        // Oluşturulan fatura ID'si
+  
+  // Müşteri Onayı
+  approvedAt  DateTime?      // Müşteri onay tarihi
+  approvalToken String?      @unique // Dijital onay linki için token
+  
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  @@index([companyId])
+  @@index([status])
+}
+
+model ProposalItem {
+  id          String   @id @default(uuid())
+  
+  proposalId  String
+  proposal    Proposal @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  
+  description String   // Hizmet / Ürün Açıklaması
+  quantity    Int      @default(1)
+  unitPrice   Decimal  @db.Decimal(10, 2)
+  totalPrice  Decimal  @db.Decimal(10, 2) // quantity * unitPrice
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([proposalId])
+}
+
+// DNS Kayıtları
+model DnsRecord {
+  id        String        @id @default(uuid())
+  domainId  String
+  domain    Domain        @relation(fields: [domainId], references: [id], onDelete: Cascade)
+  
+  type      DnsRecordType
+  name      String        // @ veya subdomain
+  value     String        // IP, hostname vb.
+  ttl       Int           @default(3600)
+  priority  Int?          // MX için
+  
+  isActive  Boolean       @default(true)
+  
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  @@index([domainId])
+  @@index([type])
+}
+
+// API Yapılandırmaları (Registrar, Hosting vb.)
+model ApiConfig {
+  id          String   @id @default(uuid())
+  name        String   // İsimtescil, Cloudflare, GoDaddy vb.
+  provider    String   // ISIMTESCIL, CLOUDFLARE, GODADDY vb.
+  
+  // API Credentials (şifreli saklanmalı)
+  apiKey      String?  @db.Text
+  apiSecret   String?  @db.Text
+  apiEndpoint String?
+  
+  // Sunucu Bilgileri
+  defaultIp   String?  // Varsayılan sunucu IP'si
+  
+  isActive    Boolean  @default(true)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([provider])
+}
+
+// ===============================
+// WEB PROJELERİ (Web Ajansı)
+// ===============================
+
+enum ProjectStatus {
+  DRAFT       // Taslak
+  DESIGNING   // Tasarım
+  DEVELOPMENT // Geliştirme
+  REVIEW      // Müşteri İncelemesi
+  APPROVED    // Onaylandı
+  DEPLOYING   // Deploy Ediliyor
+  LIVE        // Yayında
+  PAUSED      // Durduruldu
+  CANCELLED   // İptal
+}
+
+model WebProject {
+  id          String        @id @default(uuid())
+  name        String        // Proje adı (örn: Firma Adı Web Sitesi)
+  
+  // Firma bağlantısı
+  companyId   String
+  company     Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  
+  // Domain bağlantısı (opsiyonel)
+  domainId    String?
+  domain      Domain?       @relation(fields: [domainId], references: [id], onDelete: SetNull)
+  tasks       Task[]
+  portfolio   Portfolio?
+  
+  // Proje durumu
+  status      ProjectStatus @default(DRAFT)
+  
+  // Site bilgileri
+  siteUrl     String?       // Canlı site URL (örn: https://firma.com)
+  previewUrl  String?       // Demo/önizleme URL
+  repoUrl     String?       // Git repo (varsa)
+  
+  // Fiyatlandırma
+  price       Decimal?      @db.Decimal(10, 2)
+  isPaid      Boolean       @default(false)
+  paidAt      DateTime?
+  
+  // Tarihler
+  startedAt   DateTime?     // Başlangıç tarihi
+  completedAt DateTime?     // Tamamlanma tarihi
+  
+  // Notlar
+  notes       String?       @db.Text
+  
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@index([companyId])
+  @@index([domainId])
+  @@index([status])
+}
+
+// ===============================
+// DESTEK SİSTEMİ (Ticket System)
+// ===============================
+
+enum TicketPriority {
+  LOW
+  NORMAL
+  HIGH
+  URGENT
+}
+
+enum TicketStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+enum TicketCategory {
+  WEB_DESIGN
+  SEO
+  ADS
+  HOSTING
+  OTHER
+}
+
+model Ticket {
+  id          String         @id @default(uuid())
+  companyId   String
+  company     Company        @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  subject     String
+  priority    TicketPriority @default(NORMAL)
+  status      TicketStatus   @default(OPEN)
+  category    TicketCategory @default(OTHER)
+  messages    TicketMessage[]
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  @@index([companyId])
+  @@index([status])
+  @@index([priority])
+}
+
+model TicketMessage {
+  id          String   @id @default(uuid())
+  ticketId    String
+  ticket      Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  content     String   @db.Text
+  isStaffReply Boolean @default(false)
+  attachmentUrl String?
+  createdAt   DateTime @default(now())
+
+  @@index([ticketId])
+}
+
+// ===============================
+// ABONELİK SİSTEMİ (Services)
+// ===============================
+
+enum ServiceType {
+  HOSTING
+  DOMAIN
+  SEO
+  MAINTENANCE
+  SOCIAL_MEDIA
+  ADS
+  OTHER
+}
+
+enum BillingCycle {
+  MONTHLY
+  YEARLY
+  ONETIME
+}
+
+enum ServiceStatus {
+  ACTIVE
+  CANCELLED
+  EXPIRED
+}
+
+model Service {
+  id          String         @id @default(uuid())
+  companyId   String
+  company     Company        @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  name        String
+  type        ServiceType    @default(OTHER)
+  price       Decimal        @db.Decimal(10, 2)
+  currency    String         @default("TRY")
+  billingCycle BillingCycle  @default(YEARLY)
+  startDate   DateTime       @default(now())
+  renewDate   DateTime
+  status      ServiceStatus  @default(ACTIVE)
+  isReminderSent Boolean     @default(false)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  @@index([companyId])
+  @@index([status])
+  @@index([renewDate])
+}
+
+// ===============================
+// AUTH & USERS
+// ===============================
+
+enum Role {
+  ADMIN
+  CLIENT
+}
+
+model User {
+  id          String    @id @default(uuid())
+  name        String?
+  email       String    @unique
+  password    String
+  role        Role      @default(CLIENT)
+  companyId   String?
+  company     Company?  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([companyId])
+}
+
+
+// ===============================
+// TASK MANAGEMENT
+// ===============================
+
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  DONE
+  ARCHIVED
+}
+
+enum TaskPriority {
+  LOW
+  NORMAL
+  HIGH
+  URGENT
+}
+
+model Task {
+  id          String       @id @default(uuid())
+  title       String
+  description String?      @db.Text
+  status      TaskStatus   @default(TODO)
+  priority    TaskPriority @default(NORMAL)
+  dueDate     DateTime?
+  
+  // Subtask relations
+  parentId    String?
+  parent      Task?        @relation("SubTasks", fields: [parentId], references: [id], onDelete: Cascade)
+  subTasks    Task[]       @relation("SubTasks")
+  
+  // Assignment & Time tracking
+  assignedTo  String?      // User name or email
+  estimatedHours Int?
+  actualHours Int?
+  
+  // Relations
+  webProjectId String?
+  webProject   WebProject? @relation(fields: [webProjectId], references: [id], onDelete: SetNull)
+  
+  // Metadata
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  
+  @@index([webProjectId])
+  @@index([status])
+  @@index([parentId])
+}
+
+model Portfolio {
+  id           String      @id @default(uuid())
+  
+  // Project relation
+  webProjectId String      @unique
+  webProject   WebProject  @relation(fields: [webProjectId], references: [id], onDelete: Cascade)
+  
+  // Content
+  title        String
+  slug         String      @unique
+  description  String      @db.Text
+  coverImage   String?
+  technologies Json?       // ["Next.js", "Tailwind CSS"]
+  clientQuote  String?     @db.Text
+  clientName   String?
+  results      String?     @db.Text // "SEO %200 artış, sayfa hızı 3x..."
+  
+  // Display
+  isFeatured   Boolean     @default(false)
+  isPublished  Boolean     @default(false)
+  publishedAt  DateTime?
+  displayOrder Int         @default(0)
+  
+  // Metadata
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  
+  @@index([isPublished])
+  @@index([displayOrder])
+}
