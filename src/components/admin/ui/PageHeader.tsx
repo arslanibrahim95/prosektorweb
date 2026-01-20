@@ -19,6 +19,7 @@ export function PageHeader({ title, description, backUrl, action }: PageHeaderPr
                 {backUrl && (
                     <Link
                         href={backUrl}
+                        aria-label="Geri dön"
                         className="p-2 text-neutral-400 hover:text-neutral-900 hover:bg-neutral-100 rounded-lg transition-colors"
                     >
                         <ChevronLeft className="w-6 h-6" />

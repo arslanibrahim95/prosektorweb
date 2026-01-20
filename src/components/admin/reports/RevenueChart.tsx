@@ -31,7 +31,7 @@ export function RevenueChart({ data }: RevenueChartProps) {
                     axisLine={{ stroke: '#e5e7eb' }}
                 />
                 <Tooltip
-                    formatter={(value: number) => [formatCurrency(value), 'Gelir']}
+                    formatter={(value: any) => [formatCurrency(value), 'Gelir']}
                     contentStyle={{
                         borderRadius: '12px',
                         border: '1px solid #e5e7eb',

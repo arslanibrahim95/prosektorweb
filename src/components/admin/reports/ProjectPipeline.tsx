@@ -18,7 +18,7 @@ export function ProjectPipeline({ data }: ProjectPipelineProps) {
                     outerRadius={100}
                     paddingAngle={2}
                     dataKey="value"
-                    label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
+                    label={({ name, percent }) => `${name} (${((percent || 0) * 100).toFixed(0)}%)`}
                     labelLine={false}
                 >
                     {data.map((entry, index) => (
@@ -26,7 +26,7 @@ export function ProjectPipeline({ data }: ProjectPipelineProps) {
                     ))}
                 </Pie>
                 <Tooltip
-                    formatter={(value: number) => [`${value} proje`, '']}
+                    formatter={(value: any) => [`${value} proje`, '']}
                     contentStyle={{
                         borderRadius: '12px',
                         border: '1px solid #e5e7eb',
