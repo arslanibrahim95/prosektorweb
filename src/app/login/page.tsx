@@ -1,13 +1,61 @@
 'use client'
 
-import { useActionState } from 'react'
-import { authenticate } from '@/actions/auth'
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { signIn } from 'next-auth/react'
 import { AlertCircle, Loader2, User, Mail, Lock, ArrowRight, Sparkles } from 'lucide-react'
 import Link from 'next/link'
 import Particles from '@/components/ui/Particles'
 
 export default function LoginPage() {
-    const [errorMessage, formAction, isPending] = useActionState(authenticate, undefined)
+    const [error, setError] = useState<string | null>(null)
+    const [isPending, setIsPending] = useState(false)
+    const router = useRouter()
+
+    async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+        e.preventDefault()
+        setError(null)
+        setIsPending(true)
+
+        const formData = new FormData(e.currentTarget)
+        const email = formData.get('email') as string
+        const password = formData.get('password') as string
+
+        // Validate
+        if (!email || !email.includes('@')) {
+            setError('Lütfen geçerli bir e-posta adresi girin.')
+            setIsPending(false)
+            return
+        }
+
+        if (!password || password.length < 6) {
+            setError('Şifre en az 6 karakter olmalıdır.')
+            setIsPending(false)
+            return
+        }
+
+        try {
+            const result = await signIn('credentials', {
+                email,
+                password,
+                redirect: false,
+            })
+
+            if (result?.error) {
+                setError('E-posta veya şifre hatalı.')
+                setIsPending(false)
+                return
+            }
+
+            // Success - redirect to portal
+            router.push('/portal')
+            router.refresh()
+
+        } catch (err) {
+            setError('Beklenmeyen bir hata oluştu.')
+            setIsPending(false)
+        }
+    }
 
     return (
         <div className="relative min-h-screen bg-gradient-to-br from-neutral-900 via-neutral-800 to-neutral-900 flex items-center justify-center p-4 overflow-hidden">
@@ -64,7 +112,7 @@ export default function LoginPage() {
 
                     {/* Form */}
                     <div className="p-8 bg-white">
-                        <form action={formAction} className="space-y-5">
+                        <form onSubmit={handleSubmit} className="space-y-5">
                             <div className="space-y-1">
                                 <label className="block text-sm font-semibold text-neutral-700">E-posta Adresi</label>
                                 <div className="relative">
@@ -95,10 +143,10 @@ export default function LoginPage() {
                                 </div>
                             </div>
 
-                            {errorMessage && (
+                            {error && (
                                 <div className="p-4 bg-red-50 text-red-600 text-sm rounded-xl flex items-center gap-3 border border-red-100">
                                     <AlertCircle className="w-5 h-5 shrink-0" />
-                                    <p>{errorMessage}</p>
+                                    <p>{error}</p>
                                 </div>
                             )}
 
