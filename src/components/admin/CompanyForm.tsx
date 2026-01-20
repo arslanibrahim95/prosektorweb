@@ -45,7 +45,7 @@ export function CompanyForm({ company }: CompanyFormProps) {
         <form action={action} className="space-y-6">
             {/* Error Message */}
             {state.error && (
-                <div className="p-4 bg-red-50 border border-red-200 rounded-xl flex items-center gap-3 text-red-700">
+                <div role="alert" className="p-4 bg-red-50 border border-red-200 rounded-xl flex items-center gap-3 text-red-700">
                     <AlertCircle className="w-5 h-5" />
                     <span>{state.error}</span>
                 </div>
@@ -63,13 +63,15 @@ export function CompanyForm({ company }: CompanyFormProps) {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Firma Adı */}
                     <div className="md:col-span-2">
-                        <label className="block text-sm font-semibold text-neutral-700 mb-2">
+                        <label htmlFor="name" className="block text-sm font-semibold text-neutral-700 mb-2">
                             Firma Adı <span className="text-red-500">*</span>
                         </label>
                         <input
+                            id="name"
                             type="text"
                             name="name"
                             required
+                            aria-required="true"
                             defaultValue={company?.name || ''}
                             placeholder="Örn: ABC İnşaat A.Ş."
                             className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all"
@@ -78,10 +80,11 @@ export function CompanyForm({ company }: CompanyFormProps) {
 
                     {/* VKN */}
                     <div>
-                        <label className="block text-sm font-semibold text-neutral-700 mb-2">
+                        <label htmlFor="taxId" className="block text-sm font-semibold text-neutral-700 mb-2">
                             Vergi Kimlik No (VKN)
                         </label>
                         <input
+                            id="taxId"
                             type="text"
                             name="taxId"
                             defaultValue={company?.taxId || ''}
@@ -92,10 +95,11 @@ export function CompanyForm({ company }: CompanyFormProps) {
 
                     {/* Vergi Dairesi */}
                     <div>
-                        <label className="block text-sm font-semibold text-neutral-700 mb-2">
+                        <label htmlFor="taxOffice" className="block text-sm font-semibold text-neutral-700 mb-2">
                             Vergi Dairesi
                         </label>
                         <input
+                            id="taxOffice"
                             type="text"
                             name="taxOffice"
                             defaultValue={company?.taxOffice || ''}
@@ -106,10 +110,11 @@ export function CompanyForm({ company }: CompanyFormProps) {
 
                     {/* E-posta */}
                     <div>
-                        <label className="block text-sm font-semibold text-neutral-700 mb-2">
+                        <label htmlFor="email" className="block text-sm font-semibold text-neutral-700 mb-2">
                             E-posta
                         </label>
                         <input
+                            id="email"
                             type="email"
                             name="email"
                             defaultValue={company?.email || ''}
@@ -120,10 +125,11 @@ export function CompanyForm({ company }: CompanyFormProps) {
 
                     {/* Telefon */}
                     <div>
-                        <label className="block text-sm font-semibold text-neutral-700 mb-2">
+                        <label htmlFor="phone" className="block text-sm font-semibold text-neutral-700 mb-2">
                             Telefon
                         </label>
                         <input
+                            id="phone"
                             type="tel"
                             name="phone"
                             defaultValue={company?.phone || ''}
@@ -134,10 +140,11 @@ export function CompanyForm({ company }: CompanyFormProps) {
 
                     {/* Adres */}
                     <div className="md:col-span-2">
-                        <label className="block text-sm font-semibold text-neutral-700 mb-2">
+                        <label htmlFor="address" className="block text-sm font-semibold text-neutral-700 mb-2">
                             Adres
                         </label>
                         <textarea
+                            id="address"
                             name="address"
                             rows={3}
                             defaultValue={company?.address || ''}

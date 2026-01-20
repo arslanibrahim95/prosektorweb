@@ -11,8 +11,11 @@ export default async function AdminPortfolioPage() {
             <PageHeader
                 title="Portfolyo"
                 description="Tamamlanan projeleri vitrine çevirin"
-                actionLabel="Yeni Ekle"
-                actionHref="/admin/portfolio/new"
+                action={{
+                    label: "Yeni Ekle",
+                    href: "/admin/portfolio/new",
+                    icon: Plus
+                }}
             />
 
             {portfolios.length === 0 ? (
