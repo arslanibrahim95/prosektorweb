@@ -127,3 +127,56 @@ export async function createClientTicket(formData: FormData) {
         return { success: false, error: 'Talep oluşturulurken hata oluştu.' }
     }
 }
+
+// Get single project by ID (with security check)
+export async function getProjectById(projectId: string) {
+    const companyId = await getClientCompanyId()
+    if (!companyId) return null
+
+    return await prisma.webProject.findFirst({
+        where: {
+            id: projectId,
+            companyId // Security: only their own projects
+        },
+        include: {
+            domain: true,
+            company: {
+                select: { name: true }
+            }
+        }
+    })
+}
+
+// Get single invoice by ID (with security check)
+export async function getInvoiceById(invoiceId: string) {
+    const companyId = await getClientCompanyId()
+    if (!companyId) return null
+
+    return await prisma.invoice.findFirst({
+        where: {
+            id: invoiceId,
+            companyId
+        },
+        include: {
+            payments: {
+                orderBy: { paymentDate: 'desc' }
+            },
+            company: {
+                select: { name: true }
+            }
+        }
+    })
+}
+
+// Get company profile
+export async function getClientProfile() {
+    const companyId = await getClientCompanyId()
+    if (!companyId) return null
+
+    return await prisma.company.findUnique({
+        where: { id: companyId },
+        include: {
+            contacts: true
+        }
+    })
+}
