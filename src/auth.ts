@@ -33,7 +33,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                     .safeParse(credentials)
 
                 if (!parsedCredentials.success) {
-                    console.log('[AUTH] Validation failed:', parsedCredentials.error.errors)
+                    console.log('[AUTH] Validation failed:', parsedCredentials.error)
                     return null
                 }
 
