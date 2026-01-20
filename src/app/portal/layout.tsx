@@ -3,7 +3,7 @@ import { redirect } from "next/navigation"
 import Link from 'next/link'
 import {
     LayoutDashboard, Layers, Receipt, Ticket, LogOut, Building2,
-    Globe, FileText, Settings, Clock, CreditCard
+    Globe, FileText, Settings, Clock, CreditCard, BarChart3
 } from 'lucide-react'
 import { signOut } from '@/auth'
 import { prisma } from '@/lib/prisma'
@@ -64,6 +64,10 @@ export default async function PortalLayout({
                     {/* Hizmetler */}
                     <p className="px-4 py-2 mt-4 text-xs font-semibold text-neutral-500 uppercase tracking-wider">Hizmetler</p>
 
+                    <Link href="/portal/analytics" className="flex items-center gap-3 px-4 py-3 rounded-xl text-neutral-300 hover:bg-white/5 hover:text-white font-medium transition-all">
+                        <BarChart3 className="w-5 h-5" />
+                        Site Analitiği
+                    </Link>
                     <Link href="/portal/services" className="flex items-center gap-3 px-4 py-3 rounded-xl text-neutral-300 hover:bg-white/5 hover:text-white font-medium transition-all">
                         <Clock className="w-5 h-5" />
                         Aboneliklerim

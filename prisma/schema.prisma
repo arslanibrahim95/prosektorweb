@@ -552,6 +552,7 @@ model WebProject {
   domain      Domain?       @relation(fields: [domainId], references: [id], onDelete: SetNull)
   tasks       Task[]
   portfolio   Portfolio?
+  analytics   SiteAnalytics?
   
   // Proje durumu
   status      ProjectStatus @default(DRAFT)
@@ -785,4 +786,115 @@ model Portfolio {
   
   @@index([isPublished])
   @@index([displayOrder])
+}
+
+// ===============================
+// ANALYTICS SYSTEM
+// ===============================
+
+enum LeadType {
+  CONTACT_FORM
+  PHONE_CLICK
+  WHATSAPP
+  EMAIL_CLICK
+  CALLBACK_REQUEST
+}
+
+// Site Analytics Summary (updated periodically)
+model SiteAnalytics {
+  id                 String      @id @default(uuid())
+  
+  // Project relation
+  projectId          String      @unique
+  project            WebProject  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  
+  // Traffic Metrics
+  totalVisitors      Int         @default(0)
+  uniqueVisitors     Int         @default(0)
+  pageViews          Int         @default(0)
+  bounceRate         Decimal     @default(0) @db.Decimal(5,2)
+  avgSessionDuration Int         @default(0) // seconds
+  
+  // Device Distribution (percentages)
+  mobilePercent      Decimal     @default(0) @db.Decimal(5,2)
+  desktopPercent     Decimal     @default(0) @db.Decimal(5,2)
+  tabletPercent      Decimal     @default(0) @db.Decimal(5,2)
+  
+  // Performance Scores (0-100)
+  pageSpeedScore     Int?
+  mobileScore        Int?
+  seoScore           Int?
+  accessibilityScore Int?
+  
+  // Uptime & SSL
+  uptimePercent      Decimal     @default(100) @db.Decimal(5,2)
+  sslValidUntil      DateTime?
+  sslStatus          String?     // VALID, EXPIRING_SOON, EXPIRED
+  
+  // SEO Metrics
+  domainAuthority    Int?
+  backlinks          Int         @default(0)
+  indexedPages       Int         @default(0)
+  
+  // Top Traffic Sources (JSON)
+  trafficSources     Json?       // [{name: "Google", percent: 45}, ...]
+  topPages           Json?       // [{path: "/", views: 1000}, ...]
+  topCountries       Json?       // [{country: "TR", percent: 80}, ...]
+  
+  // Timestamps
+  lastUpdated        DateTime    @default(now())
+  createdAt          DateTime    @default(now())
+  updatedAt          DateTime    @updatedAt
+  
+  @@index([projectId])
+}
+
+// Daily Statistics (for charts)
+model DailyStats {
+  id          String   @id @default(uuid())
+  projectId   String
+  date        DateTime @db.Date
+  
+  // Metrics
+  visitors    Int      @default(0)
+  uniqueVisitors Int   @default(0)
+  pageViews   Int      @default(0)
+  bounceRate  Decimal  @default(0) @db.Decimal(5,2)
+  avgDuration Int      @default(0)
+  
+  // Leads
+  leads       Int      @default(0)
+  
+  createdAt   DateTime @default(now())
+  
+  @@unique([projectId, date])
+  @@index([projectId])
+  @@index([date])
+}
+
+// Lead Captures (form submissions, clicks, etc.)
+model LeadCapture {
+  id          String    @id @default(uuid())
+  projectId   String
+  
+  // Lead Info
+  type        LeadType  @default(CONTACT_FORM)
+  source      String?   // page URL where lead was captured
+  
+  // Contact Info (optional - from forms)
+  name        String?
+  email       String?
+  phone       String?
+  message     String?   @db.Text
+  
+  // Metadata
+  metadata    Json?     // extra data
+  ipAddress   String?
+  userAgent   String?
+  
+  createdAt   DateTime  @default(now())
+  
+  @@index([projectId])
+  @@index([type])
+  @@index([createdAt])
 }
