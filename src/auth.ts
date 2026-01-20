@@ -7,11 +7,13 @@ import bcrypt from "bcryptjs"
 
 async function getUser(email: string) {
     try {
+        console.log(`[AUTH] Looking up user: ${email}`)
         const user = await prisma.user.findUnique({ where: { email } })
+        console.log(`[AUTH] User found: ${user ? 'Yes' : 'No'}`)
         return user
     } catch (error) {
-        console.error('Failed to fetch user:', error)
-        throw new Error('Failed to fetch user.')
+        console.error('[AUTH] Database error:', error)
+        throw new Error('Veritabanı bağlantı hatası.')
     }
 }
 
@@ -24,51 +26,54 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                 password: { label: "Password", type: "password" },
             },
             authorize: async (credentials) => {
+                console.log('[AUTH] Authorize called with:', credentials?.email)
+
                 const parsedCredentials = z
                     .object({ email: z.string().email(), password: z.string().min(6) })
                     .safeParse(credentials)
 
-                if (parsedCredentials.success) {
-                    const { email, password } = parsedCredentials.data
+                if (!parsedCredentials.success) {
+                    console.log('[AUTH] Validation failed:', parsedCredentials.error.errors)
+                    return null
+                }
 
-                    // 1. Check Database User
-                    const user = await getUser(email)
-                    if (user) {
-                        const passwordsMatch = await bcrypt.compare(password, user.password)
-                        if (passwordsMatch) {
-                            return {
-                                id: user.id,
-                                name: user.name,
-                                email: user.email,
-                                role: user.role, // Custom field
-                                companyId: user.companyId
-                            }
-                        }
-                    }
+                const { email, password } = parsedCredentials.data
 
-                    // 2. Fallback to Env Admin (Root User) - Only if DB user not found/nomatch
-                    // This creates a virtual admin session if no DB user exists or if credentials match env
-                    const adminEmail = process.env.ADMIN_EMAIL || "admin@prosektorweb.com";
-                    // For security, only allow env fallback if NO DB user matched (already handled above)
-                    // But we simply check if credentials match env vars separately.
+                // 1. Check Database User
+                const user = await getUser(email)
+                if (user) {
+                    console.log(`[AUTH] Checking password for DB user: ${email}`)
+                    const passwordsMatch = await bcrypt.compare(password, user.password)
+                    console.log(`[AUTH] Password match: ${passwordsMatch}`)
 
-                    // Hardcoded fallback for "bootstrap" access
-                    // Note: Ideally you should seed an Admin user to DB and remove this.
-                    if (email === adminEmail) {
-                        const adminPassword = process.env.ADMIN_PASSWORD || "6509d6d5a0e97a0c8d79c76e";
-                        if (password === adminPassword) {
-                            return {
-                                id: "root-admin",
-                                name: "Root Admin",
-                                email: adminEmail,
-                                role: "ADMIN",
-                                companyId: null
-                            }
+                    if (passwordsMatch) {
+                        console.log(`[AUTH] SUCCESS - DB user authenticated: ${email}, role: ${user.role}`)
+                        return {
+                            id: user.id,
+                            name: user.name,
+                            email: user.email,
+                            role: user.role,
+                            companyId: user.companyId
                         }
                     }
                 }
 
-                console.log('Invalid credentials')
+                // 2. Fallback to Env Admin (Root User)
+                const adminEmail = process.env.ADMIN_EMAIL || "admin@prosektorweb.com"
+                const adminPassword = process.env.ADMIN_PASSWORD || "6509d6d5a0e97a0c8d79c76e"
+
+                if (email === adminEmail && password === adminPassword) {
+                    console.log(`[AUTH] SUCCESS - Root admin authenticated: ${email}`)
+                    return {
+                        id: "root-admin",
+                        name: "Root Admin",
+                        email: adminEmail,
+                        role: "ADMIN",
+                        companyId: null
+                    }
+                }
+
+                console.log(`[AUTH] FAILED - Invalid credentials for: ${email}`)
                 return null
             },
         }),
