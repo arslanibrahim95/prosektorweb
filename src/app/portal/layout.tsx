@@ -1,9 +1,18 @@
 import { auth } from "@/auth"
 import { redirect } from "next/navigation"
 import Link from 'next/link'
-import { LayoutDashboard, Layers, Receipt, Ticket, LogOut } from 'lucide-react'
-import { signOut } from '@/auth' // We need to handle signout client-side or server-side? 
-// Actually signOut in auth.ts is server-side friendly helper or we use client form.
+import { LayoutDashboard, Layers, Receipt, Ticket, LogOut, Building2 } from 'lucide-react'
+import { signOut } from '@/auth'
+import { prisma } from '@/lib/prisma'
+
+async function getCompanyName(companyId: string | null) {
+    if (!companyId) return null
+    const company = await prisma.company.findUnique({
+        where: { id: companyId },
+        select: { name: true }
+    })
+    return company?.name
+}
 
 export default async function PortalLayout({
     children,
@@ -11,21 +20,25 @@ export default async function PortalLayout({
     children: React.ReactNode
 }) {
     const session = await auth()
-
-    // Safety check - though middleware/auth.config handles this
-    if (!session || (session.user as any).role !== 'CLIENT') {
-        // redirect('/login') // Let auth.config handle or allow admin?
-    }
+    const companyId = (session?.user as any)?.companyId
+    const companyName = await getCompanyName(companyId)
 
     return (
         <div className="min-h-screen bg-neutral-50 flex">
             {/* Sidebar */}
             <aside className="w-64 bg-slate-900 text-white fixed h-full z-10 hidden md:flex flex-col">
                 <div className="p-6 border-b border-white/10">
-                    <h2 className="text-xl font-bold tracking-tight text-white flex items-center gap-2">
-                        <span className="w-8 h-8 rounded-lg bg-brand-500 flex items-center justify-center text-white">P</span>
-                        Müşteri Paneli
-                    </h2>
+                    <div className="flex items-center gap-3">
+                        <span className="w-10 h-10 rounded-xl bg-brand-500 flex items-center justify-center text-white">
+                            <Building2 className="w-5 h-5" />
+                        </span>
+                        <div className="overflow-hidden">
+                            <h2 className="text-lg font-bold text-white truncate">
+                                {companyName || 'Portal'}
+                            </h2>
+                            <p className="text-xs text-neutral-400">Müşteri Paneli</p>
+                        </div>
+                    </div>
                 </div>
 
                 <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
