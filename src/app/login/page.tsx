@@ -1,8 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { signIn } from 'next-auth/react'
+import { signIn, useSession } from 'next-auth/react'
 import { AlertCircle, Loader2, User, Mail, Lock, ArrowRight, Sparkles } from 'lucide-react'
 import Link from 'next/link'
 import Particles from '@/components/ui/Particles'
@@ -11,6 +11,14 @@ export default function LoginPage() {
     const [error, setError] = useState<string | null>(null)
     const [isPending, setIsPending] = useState(false)
     const router = useRouter()
+    const { status } = useSession()
+
+    // Redirect if already authenticated
+    useEffect(() => {
+        if (status === 'authenticated') {
+            router.push('/portal')
+        }
+    }, [status, router])
 
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault()
@@ -35,26 +43,43 @@ export default function LoginPage() {
         }
 
         try {
+            console.log('[LOGIN] Attempting signIn for:', email)
+
             const result = await signIn('credentials', {
                 email,
                 password,
                 redirect: false,
             })
 
+            console.log('[LOGIN] SignIn result:', result)
+
             if (result?.error) {
+                console.log('[LOGIN] Error:', result.error)
                 setError('E-posta veya şifre hatalı.')
                 setIsPending(false)
                 return
             }
 
-            // Success - redirect to portal
-            router.push('/portal')
-            router.refresh()
+            if (result?.ok) {
+                console.log('[LOGIN] Success, redirecting to /portal')
+                router.push('/portal')
+                router.refresh()
+            }
 
         } catch (err) {
+            console.error('[LOGIN] Exception:', err)
             setError('Beklenmeyen bir hata oluştu.')
             setIsPending(false)
         }
+    }
+
+    // Show loading while checking session
+    if (status === 'loading') {
+        return (
+            <div className="min-h-screen bg-neutral-900 flex items-center justify-center">
+                <Loader2 className="w-8 h-8 text-white animate-spin" />
+            </div>
+        )
     }
 
     return (
