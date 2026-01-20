@@ -2,6 +2,7 @@
 
 import { signIn } from '@/auth'
 import { AuthError } from 'next-auth'
+import { redirect } from 'next/navigation'
 
 export async function authenticate(prevState: string | undefined, formData: FormData) {
     const email = formData.get('email') as string
@@ -20,34 +21,18 @@ export async function authenticate(prevState: string | undefined, formData: Form
         // Step 2: Attempt sign in
         console.log(`[AUTH] Login attempt for: ${email}`)
 
-        await signIn('credentials', {
+        const result = await signIn('credentials', {
             email,
             password,
-            redirect: false, // Don't redirect, handle manually
+            redirect: false,
         })
 
-        // Step 3: Success - will be redirected by middleware
-        console.log(`[AUTH] Login successful for: ${email}`)
+        console.log(`[AUTH] SignIn result:`, result)
 
     } catch (error) {
-        console.log(`[AUTH] Login failed for: ${email}`, error)
+        console.log(`[AUTH] Error caught:`, error)
 
-        if (error instanceof AuthError) {
-            switch (error.type) {
-                case 'CredentialsSignin':
-                    return 'E-posta veya şifre hatalı. Lütfen bilgilerinizi kontrol edin.'
-                case 'AccessDenied':
-                    return 'Bu hesaba erişim izniniz yok.'
-                case 'Verification':
-                    return 'E-posta doğrulaması gerekli.'
-                case 'Configuration':
-                    return 'Sunucu yapılandırma hatası. Lütfen yöneticiyle iletişime geçin.'
-                default:
-                    return `Giriş hatası: ${error.type || 'Bilinmeyen hata'}`
-            }
-        }
-
-        // Re-throw NEXT_REDIRECT for proper redirect handling
+        // NEXT_REDIRECT error is expected for successful login
         if (error && typeof error === 'object' && 'digest' in error) {
             const digest = (error as any).digest
             if (typeof digest === 'string' && digest.startsWith('NEXT_REDIRECT')) {
@@ -55,6 +40,23 @@ export async function authenticate(prevState: string | undefined, formData: Form
             }
         }
 
+        if (error instanceof AuthError) {
+            switch (error.type) {
+                case 'CredentialsSignin':
+                    return 'E-posta veya şifre hatalı. Lütfen bilgilerinizi kontrol edin.'
+                case 'AccessDenied':
+                    return 'Bu hesaba erişim izniniz yok.'
+                case 'Configuration':
+                    return 'Sunucu yapılandırma hatası. Lütfen yöneticiyle iletişime geçin.'
+                default:
+                    return `Giriş hatası: ${error.type || 'Bilinmeyen hata'}`
+            }
+        }
+
         return 'Beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.'
     }
+
+    // Step 3: Manual redirect after successful login
+    // Middleware will handle role-based routing
+    redirect('/portal')
 }
