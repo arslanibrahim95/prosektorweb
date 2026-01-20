@@ -1,7 +1,10 @@
 import { auth } from "@/auth"
 import { redirect } from "next/navigation"
 import Link from 'next/link'
-import { LayoutDashboard, Layers, Receipt, Ticket, LogOut, Building2 } from 'lucide-react'
+import {
+    LayoutDashboard, Layers, Receipt, Ticket, LogOut, Building2,
+    Globe, FileText, Settings, Clock, CreditCard
+} from 'lucide-react'
 import { signOut } from '@/auth'
 import { prisma } from '@/lib/prisma'
 
@@ -42,6 +45,9 @@ export default async function PortalLayout({
                 </div>
 
                 <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
+                    {/* Ana Bölümler */}
+                    <p className="px-4 py-2 text-xs font-semibold text-neutral-500 uppercase tracking-wider">Ana Menü</p>
+
                     <Link href="/portal" className="flex items-center gap-3 px-4 py-3 rounded-xl text-neutral-300 hover:bg-white/5 hover:text-white font-medium transition-all">
                         <LayoutDashboard className="w-5 h-5" />
                         Özet
@@ -50,13 +56,33 @@ export default async function PortalLayout({
                         <Layers className="w-5 h-5" />
                         Projelerim
                     </Link>
+                    <Link href="/portal/tickets" className="flex items-center gap-3 px-4 py-3 rounded-xl text-neutral-300 hover:bg-white/5 hover:text-white font-medium transition-all">
+                        <Ticket className="w-5 h-5" />
+                        Destek
+                    </Link>
+
+                    {/* Hizmetler */}
+                    <p className="px-4 py-2 mt-4 text-xs font-semibold text-neutral-500 uppercase tracking-wider">Hizmetler</p>
+
+                    <Link href="/portal/services" className="flex items-center gap-3 px-4 py-3 rounded-xl text-neutral-300 hover:bg-white/5 hover:text-white font-medium transition-all">
+                        <Clock className="w-5 h-5" />
+                        Aboneliklerim
+                    </Link>
+                    <Link href="/portal/domains" className="flex items-center gap-3 px-4 py-3 rounded-xl text-neutral-300 hover:bg-white/5 hover:text-white font-medium transition-all">
+                        <Globe className="w-5 h-5" />
+                        Domainlerim
+                    </Link>
+
+                    {/* Finansal */}
+                    <p className="px-4 py-2 mt-4 text-xs font-semibold text-neutral-500 uppercase tracking-wider">Finansal</p>
+
                     <Link href="/portal/invoices" className="flex items-center gap-3 px-4 py-3 rounded-xl text-neutral-300 hover:bg-white/5 hover:text-white font-medium transition-all">
                         <Receipt className="w-5 h-5" />
                         Faturalar
                     </Link>
-                    <Link href="/portal/tickets" className="flex items-center gap-3 px-4 py-3 rounded-xl text-neutral-300 hover:bg-white/5 hover:text-white font-medium transition-all">
-                        <Ticket className="w-5 h-5" />
-                        Destek
+                    <Link href="/portal/proposals" className="flex items-center gap-3 px-4 py-3 rounded-xl text-neutral-300 hover:bg-white/5 hover:text-white font-medium transition-all">
+                        <FileText className="w-5 h-5" />
+                        Teklifler
                     </Link>
                 </nav>
 
