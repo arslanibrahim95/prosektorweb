@@ -41,7 +41,7 @@ export default function HomePage() {
         <rect x="85%" y="10%" width="48" height="48" fill="rgba(0, 120, 212, 0.03)" />
         <circle cx="50%" cy="55%" r="400" fill="url(#grid-pattern)" opacity="0.4" />
         <path d="M 50 200 L 70 200 M 60 190 L 60 210" stroke="#cbd5e1" strokeWidth="2" />
-        <path d="M 90% 300 L calc(90% + 20px) 300 M calc(90% + 10px) 290 L calc(90% + 10px) 310" stroke="#cbd5e1" strokeWidth="2" />
+        <path d="M 1100 300 L 1120 300 M 1110 290 L 1110 310" stroke="#cbd5e1" strokeWidth="2" />
       </svg>
 
       {/* Noise Texture */}
