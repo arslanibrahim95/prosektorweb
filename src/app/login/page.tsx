@@ -62,8 +62,8 @@ export default function LoginPage() {
 
             if (result?.ok) {
                 console.log('[LOGIN] Success, redirecting to /portal')
-                router.push('/portal')
-                router.refresh()
+                // Hard redirect to bypass any client-side caching
+                window.location.href = '/portal'
             }
 
         } catch (err) {
