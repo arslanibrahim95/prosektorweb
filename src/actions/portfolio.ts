@@ -155,7 +155,7 @@ export async function getProjectsForPortfolio() {
     // Get completed projects that don't have a portfolio yet
     return await prisma.webProject.findMany({
         where: {
-            status: 'COMPLETED',
+            status: 'LIVE',
             portfolio: null
         },
         select: {
