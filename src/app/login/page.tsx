@@ -29,8 +29,8 @@ export default function LoginPage() {
                     <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center mx-auto mb-4 backdrop-blur-sm">
                         <Lock className="w-6 h-6 text-white" />
                     </div>
-                    <h1 className="text-2xl font-bold text-white font-serif">Yönetici Girişi</h1>
-                    <p className="text-brand-100 text-sm mt-2">Lütfen devam etmek için giriş yapın</p>
+                    <h1 className="text-2xl font-bold text-white font-serif">Müşteri Paneli</h1>
+                    <p className="text-brand-100 text-sm mt-2">Projelerinizi ve faturalarınızı görüntüleyin</p>
                 </div>
 
                 {/* Form */}

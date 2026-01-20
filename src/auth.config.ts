@@ -14,17 +14,16 @@ export const authConfig = {
 
             if (isOnAdmin) {
                 if (isLoggedIn && userRole === 'ADMIN') return true;
-                return false; // Redirect unauthenticated or non-admins
+                return false;
             }
 
             if (isOnPortal) {
-                if (isLoggedIn && userRole === 'CLIENT') return true;
-                if (isLoggedIn && userRole === 'ADMIN') return true;
+                if (isLoggedIn && (userRole === 'CLIENT' || userRole === 'ADMIN')) return true;
                 return false;
             }
 
             return true;
         },
     },
-    providers: [], // Add providers with an empty array for now
+    providers: [],
 } satisfies NextAuthConfig;
