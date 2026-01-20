@@ -19,16 +19,8 @@ export const authConfig = {
 
             if (isOnPortal) {
                 if (isLoggedIn && userRole === 'CLIENT') return true;
-                if (isLoggedIn && userRole === 'ADMIN') return true; // Admins can see portal too? Or maybe not. Let's allow for now or redirect.
+                if (isLoggedIn && userRole === 'ADMIN') return true;
                 return false;
-            }
-
-            // Redirect logged-in users away from login page
-            if (isLoggedIn) {
-                if (nextUrl.pathname === '/login') {
-                    if (userRole === 'ADMIN') return Response.redirect(new URL('/admin', nextUrl));
-                    if (userRole === 'CLIENT') return Response.redirect(new URL('/portal', nextUrl));
-                }
             }
 
             return true;
