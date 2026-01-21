@@ -92,6 +92,29 @@ Aşağıdaki maddeler mevcut kod tabanındaki (`src/components` ve `src/app`) hi
 *   **Sorun:** `AdminShell.tsx` içindeki `main` alanı geniş ekranlarda (Ultra-wide monitörler) sonsuza kadar uzamaktadır.
 *   **Öneri:** `main` etiketi içine de bir `max-w-[1920px]` veya `max-w-7xl mx-auto` kısıtlaması getirilerek içeriğin çok dağılması engellenmelidir.
 
+## 7. Mikro-Hizalama ve Bileşen Standartları (Micro-Alignment)
+
+Admin Paneli ve Portal arasındaki görsel farkları gidermek için belirlenen standartlar.
+
+### Buton Boyutları
+*   **Sorun:** `SubmitButton` (`py-3`), Portal butonları (`py-2.5`) ve Landing butonları arasında yükseklik farkları var.
+*   **Standart:**
+    *   **Primary Button:** `h-10` (`py-2 px-4`) veya `h-12` (`py-3 px-6`). Proje genelinde **h-11 (py-2.5)** veya **h-12** tercih edilerek sabitlenmeli.
+    *   **Secondary Button:** `h-9` veya `h-10`.
+
+### Kart Yapısı (Cards)
+*   **Sorun:** Admin kartları `p-5`, Portal kartları `p-6`. Border radius `rounded-xl` ve `rounded-2xl` karışık.
+*   **Standart:**
+    *   **Padding:** Kartlar için **`p-6`** (24px) standart olmalı.
+    *   **Radius:** Ana kartlar için **`rounded-2xl`**, iç elemanlar (input, buton) için **`rounded-xl`** kullanılmalı.
+    *   **Border:** `border border-neutral-200` standarttır.
+
+### İkon Boyutları
+*   **Sorun:** Admin'de `w-4` (16px), Portal'da `w-6` (24px) ikonlar kullanılıyor.
+*   **Standart:**
+    *   **Navigasyon/Dashboard İkonları:** **`w-5 h-5`** (20px) ideal dengedir.
+    *   **Liste İçi Aksiyon İkonları:** **`w-4 h-4`** (16px).
+
 ### ✅ Hızlı Kontrol Listesi (Checklist)
 
 1.  [ ] Sayfa içeriği `max-w-7xl mx-auto` içinde mi?
