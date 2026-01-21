@@ -76,6 +76,22 @@ Bölümler (Section) ve elementler arasındaki dikey boşluk standartları.
 
 ---
 
+## 🔍 6. Mevcut Proje Analizi ve Tespitler (Eylem Planı)
+
+Aşağıdaki maddeler mevcut kod tabanındaki (`src/components` ve `src/app`) hizalama tutarsızlıklarını gidermek için önerilmektedir.
+
+### Landing Page vs Admin Panel Tutarsızlığı
+*   **Sorun:** Landing page (`Navbar.tsx`, `Footer.tsx`) genel olarak `px-6` (24px) kenar boşluğu kullanırken, Admin paneli (`AdminShell.tsx`) `px-4 lg:px-8` kullanmaktadır. Bu durum sayfa geçişlerinde içeriklerin hafifçe zıplamasına veya hizasının kaymasına neden olur.
+*   **Öneri:** Tüm projede yatay padding (horizontal padding) standardı olarak `px-6 sm:px-6 lg:px-8` kullanılmalı.
+
+### Landing Page Container Genişlikleri
+*   **Sorun:** `src/app/page.tsx` içinde farklı bölümlerde `max-w-4xl`, `max-w-6xl` ve `max-w-7xl` gibi değişken genişlikler kullanılmış.
+*   **Öneri:** Tüm `section` kapsayıcıları `max-w-7xl` olarak ayarlanmalı. İçerik daha dar olması gerekiyorsa (örneğin Hero metni), `max-w-7xl` içindeki bir alt `div`'e `max-w-3xl mx-auto` verilerek sınırlandırılmalı. Bu sayede sol/sağ kenar hizaları tüm sayfa boyunca (Logo ile hizalı şekilde) korunur.
+
+### Admin Panel Full-Width Taşması
+*   **Sorun:** `AdminShell.tsx` içindeki `main` alanı geniş ekranlarda (Ultra-wide monitörler) sonsuza kadar uzamaktadır.
+*   **Öneri:** `main` etiketi içine de bir `max-w-[1920px]` veya `max-w-7xl mx-auto` kısıtlaması getirilerek içeriğin çok dağılması engellenmelidir.
+
 ### ✅ Hızlı Kontrol Listesi (Checklist)
 
 1.  [ ] Sayfa içeriği `max-w-7xl mx-auto` içinde mi?
