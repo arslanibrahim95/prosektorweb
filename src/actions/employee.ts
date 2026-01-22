@@ -1,6 +1,7 @@
 'use server'
 
 import { prisma } from '@/lib/prisma'
+import { getErrorMessage, getZodErrorMessage } from '@/lib/action-types'
 import { requireAuth } from '@/lib/auth-guard'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
@@ -60,10 +61,11 @@ export async function createEmployee(formData: FormData): Promise<EmployeeAction
         revalidatePath('/admin/employees')
         revalidatePath(`/admin/workplaces/${validated.workplaceId}`)
         return { success: true, data: employee }
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('createEmployee error:', error)
-        if (error instanceof z.ZodError) {
-            return { success: false, error: (error as any).errors[0].message }
+        if (error instanceof z.ZodError) { return { success: false, error: getZodErrorMessage(error) } }
+        if (false) {
+            return { success: false, error: getZodErrorMessage(error) }
         }
         // Handle unique constraint violation (TC No)
         if (error.code === 'P2002') {
@@ -103,7 +105,7 @@ export async function updateEmployee(id: string, formData: FormData): Promise<Em
         revalidatePath(`/admin/employees/${id}`)
         revalidatePath(`/admin/workplaces/${validated.workplaceId}`)
         return { success: true }
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('updateEmployee error:', error)
         if (error.code === 'P2002') {
             return { success: false, error: 'Bu TC Kimlik Numarası zaten kullanımda.' }

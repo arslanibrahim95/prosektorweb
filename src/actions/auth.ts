@@ -26,11 +26,12 @@ export async function authenticate(prevState: string | undefined, formData: Form
             redirectTo: '/portal', // Let NextAuth handle the redirect
         })
 
-    } catch (error: any) {
-        console.log(`[AUTH] Error:`, error?.message || error)
+    } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : String(error)
+        console.log(`[AUTH] Error:`, errorMessage)
 
         // If it's a redirect, let it through
-        if (error?.digest?.includes('NEXT_REDIRECT')) {
+        if ((error as any)?.digest?.includes('NEXT_REDIRECT')) {
             throw error
         }
 

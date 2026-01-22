@@ -3,6 +3,7 @@
 import { prisma } from '@/lib/prisma'
 import { requireAuth } from '@/lib/auth-guard'
 import { logAudit } from '@/lib/audit'
+import { getErrorMessage, getZodErrorMessage } from '@/lib/action-types'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 import { TicketStatus, TicketPriority, TicketCategory } from '@prisma/client'
@@ -73,12 +74,13 @@ export async function createTicket(formData: FormData): Promise<TicketFormState>
 
         revalidatePath('/admin/tickets')
         return { success: true, data: ticket }
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('createTicket error:', error)
-        if (error instanceof z.ZodError) {
-            return { success: false, error: (error as any).errors[0].message }
+        if (error instanceof z.ZodError) { return { success: false, error: getZodErrorMessage(error) } }
+        if (false) {
+            return { success: false, error: getZodErrorMessage(error) }
         }
-        return { success: false, error: 'Talep oluşturulurken hata oluştu.' }
+        return { success: false, error: getErrorMessage(error) }
     }
 }
 

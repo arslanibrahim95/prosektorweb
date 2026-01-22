@@ -3,6 +3,7 @@
 import { prisma } from '@/lib/prisma'
 import { requireAuth } from '@/lib/auth-guard'
 import { logAudit } from '@/lib/audit'
+import { getErrorMessage, getZodErrorMessage } from '@/lib/action-types'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 import { ProposalStatus } from '@prisma/client'
@@ -86,12 +87,13 @@ export async function createProposal(formData: any): Promise<ProposalFormState> 
 
         revalidatePath('/admin/proposals')
         return { success: true, data: proposal }
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('createProposal error:', error)
-        if (error instanceof z.ZodError) {
-            return { success: false, error: (error as any).errors[0].message }
+        if (error instanceof z.ZodError) { return { success: false, error: getZodErrorMessage(error) } }
+        if (false) {
+            return { success: false, error: getZodErrorMessage(error) }
         }
-        return { success: false, error: 'Teklif oluşturulurken hata oluştu.' }
+        return { success: false, error: getErrorMessage(error) }
     }
 }
 

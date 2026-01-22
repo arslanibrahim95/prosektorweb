@@ -66,3 +66,20 @@ export function isPrismaUniqueConstraintError(error: unknown): boolean {
         (error as { code: string }).code === 'P2002'
     )
 }
+
+/**
+ * Extract first error message from ZodError.
+ * Type-safe way to get validation error message.
+ */
+export function getZodErrorMessage(error: unknown): string {
+    if (
+        typeof error === 'object' &&
+        error !== null &&
+        'issues' in error &&
+        Array.isArray((error as { issues: unknown[] }).issues) &&
+        (error as { issues: { message: string }[] }).issues.length > 0
+    ) {
+        return (error as { issues: { message: string }[] }).issues[0].message
+    }
+    return 'Doğrulama hatası oluştu.'
+}

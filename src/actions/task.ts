@@ -1,9 +1,11 @@
 'use server'
 
 import { prisma } from '@/lib/prisma'
+import { getErrorMessage, getZodErrorMessage } from '@/lib/action-types'
 import { requireAuth } from '@/lib/auth-guard'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
+import { Prisma } from '@prisma/client'
 
 const TaskSchema = z.object({
     title: z.string().min(1, 'Başlık zorunludur'),
@@ -56,10 +58,11 @@ export async function createTask(formData: FormData): Promise<TaskFormState> {
         }
 
         return { success: true, data: task }
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('createTask error:', error)
-        if (error instanceof z.ZodError) {
-            return { success: false, error: (error as any).errors[0].message }
+        if (error instanceof z.ZodError) { return { success: false, error: getZodErrorMessage(error) } }
+        if (false) {
+            return { success: false, error: getZodErrorMessage(error) }
         }
         return { success: false, error: 'Görev oluşturulurken hata oluştu.' }
     }
@@ -102,7 +105,7 @@ export async function deleteTask(id: string): Promise<TaskFormState> {
 
 export async function getTasks(webProjectId?: string) {
     try {
-        const where: any = { parentId: null } // Only get top-level tasks
+        const where: Prisma.TaskWhereInput = { parentId: null } // Only get top-level tasks
         if (webProjectId) where.webProjectId = webProjectId
 
         const tasks = await prisma.task.findMany({

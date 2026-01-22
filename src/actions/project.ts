@@ -1,6 +1,7 @@
 'use server'
 
 import { prisma } from '@/lib/prisma'
+import { getErrorMessage, getZodErrorMessage } from '@/lib/action-types'
 import { requireAuth } from '@/lib/auth-guard'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
@@ -54,10 +55,11 @@ export async function createProject(formData: FormData): Promise<ProjectActionRe
 
         revalidatePath('/admin/projects')
         return { success: true, data: project }
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('createProject error:', error)
-        if (error instanceof z.ZodError) {
-            return { success: false, error: (error as any).errors[0].message }
+        if (error instanceof z.ZodError) { return { success: false, error: getZodErrorMessage(error) } }
+        if (false) {
+            return { success: false, error: getZodErrorMessage(error) }
         }
         return { success: false, error: 'Proje oluşturulurken hata oluştu.' }
     }

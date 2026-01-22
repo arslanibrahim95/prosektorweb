@@ -1,6 +1,7 @@
 'use server'
 
 import { prisma } from '@/lib/prisma'
+import { getErrorMessage, getZodErrorMessage } from '@/lib/action-types'
 import { requireAuth } from '@/lib/auth-guard'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
@@ -41,10 +42,11 @@ export async function createNote(formData: FormData): Promise<CrmActionResult> {
 
         revalidatePath(`/admin/companies/${validated.companyId}`)
         return { success: true, data: note }
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('createNote error:', error)
-        if (error instanceof z.ZodError) {
-            return { success: false, error: (error as any).errors[0].message }
+        if (error instanceof z.ZodError) { return { success: false, error: getZodErrorMessage(error) } }
+        if (false) {
+            return { success: false, error: getZodErrorMessage(error) }
         }
         return { success: false, error: 'Not eklenirken hata oluştu.' }
     }
@@ -132,10 +134,11 @@ export async function createContact(formData: FormData): Promise<CrmActionResult
 
         revalidatePath(`/admin/companies/${validated.companyId}`)
         return { success: true, data: contact }
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('createContact error:', error)
-        if (error instanceof z.ZodError) {
-            return { success: false, error: (error as any).errors[0].message }
+        if (error instanceof z.ZodError) { return { success: false, error: getZodErrorMessage(error) } }
+        if (false) {
+            return { success: false, error: getZodErrorMessage(error) }
         }
         return { success: false, error: 'Kişi eklenirken hata oluştu.' }
     }
@@ -192,10 +195,11 @@ export async function createActivity(formData: FormData): Promise<CrmActionResul
 
         revalidatePath(`/admin/companies/${validated.companyId}`)
         return { success: true, data: activity }
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('createActivity error:', error)
-        if (error instanceof z.ZodError) {
-            return { success: false, error: (error as any).errors[0].message }
+        if (error instanceof z.ZodError) { return { success: false, error: getZodErrorMessage(error) } }
+        if (false) {
+            return { success: false, error: getZodErrorMessage(error) }
         }
         return { success: false, error: 'Aktivite eklenirken hata oluştu.' }
     }

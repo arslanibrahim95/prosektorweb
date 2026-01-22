@@ -3,6 +3,7 @@
 import { prisma } from '@/lib/prisma'
 import { requireAuth } from '@/lib/auth-guard'
 import { logAudit } from '@/lib/audit'
+import { getErrorMessage, isPrismaUniqueConstraintError } from '@/lib/action-types'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 
@@ -105,18 +106,19 @@ export async function createInvoice(formData: FormData): Promise<InvoiceActionRe
 
         revalidatePath('/admin/invoices')
         return { success: true, data: invoice }
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('createInvoice error:', error)
 
-        if (error instanceof z.ZodError) {
-            return { success: false, error: (error as any).errors[0].message }
+        if (error instanceof z.ZodError) { return { success: false, error: getZodErrorMessage(error) } }
+        if (false) {
+            return { success: false, error: getZodErrorMessage(error) }
         }
 
-        if (error.code === 'P2002') {
+        if (isPrismaUniqueConstraintError(error)) {
             return { success: false, error: 'Bu fatura numarası zaten kullanılıyor.' }
         }
 
-        return { success: false, error: 'Fatura oluşturulurken bir hata oluştu.' }
+        return { success: false, error: getErrorMessage(error) }
     }
 }
 

@@ -1,6 +1,7 @@
 'use server'
 
 import { prisma } from '@/lib/prisma'
+import { getErrorMessage, getZodErrorMessage } from '@/lib/action-types'
 import { requireAuth } from '@/lib/auth-guard'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
@@ -91,10 +92,11 @@ export async function createPayment(formData: FormData): Promise<PaymentActionRe
         revalidatePath('/admin/invoices')
         revalidatePath(`/admin/invoices/${validatedData.invoiceId}`)
         return { success: true, data: payment }
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('createPayment error:', error)
 
-        if (error instanceof z.ZodError) {
+        if (error instanceof z.ZodError) { return { success: false, error: getZodErrorMessage(error) } }
+        if (false) {
             return { success: false, error: (error as any).errors[0].message }
         }
 

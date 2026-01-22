@@ -1,6 +1,7 @@
 'use server'
 
 import { prisma } from '@/lib/prisma'
+import { getErrorMessage, getZodErrorMessage } from '@/lib/action-types'
 import { requireAuth } from '@/lib/auth-guard'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
@@ -64,13 +65,14 @@ export async function createDomain(formData: FormData): Promise<DomainActionResu
 
         revalidatePath('/admin/domains')
         return { success: true, data: domain }
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('createDomain error:', error)
         if (error.code === 'P2002') {
             return { success: false, error: 'Bu domain zaten kayıtlı.' }
         }
-        if (error instanceof z.ZodError) {
-            return { success: false, error: (error as any).errors[0].message }
+        if (error instanceof z.ZodError) { return { success: false, error: getZodErrorMessage(error) } }
+        if (false) {
+            return { success: false, error: getZodErrorMessage(error) }
         }
         return { success: false, error: 'Domain eklenirken hata oluştu.' }
     }
@@ -200,10 +202,11 @@ export async function createDnsRecord(formData: FormData): Promise<DomainActionR
         const domain = await prisma.domain.findUnique({ where: { id: validated.domainId } })
         revalidatePath(`/admin/domains/${validated.domainId}`)
         return { success: true, data: record }
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('createDnsRecord error:', error)
-        if (error instanceof z.ZodError) {
-            return { success: false, error: (error as any).errors[0].message }
+        if (error instanceof z.ZodError) { return { success: false, error: getZodErrorMessage(error) } }
+        if (false) {
+            return { success: false, error: getZodErrorMessage(error) }
         }
         return { success: false, error: 'DNS kaydı eklenirken hata oluştu.' }
     }

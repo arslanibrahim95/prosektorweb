@@ -1,6 +1,7 @@
 'use server'
 
 import { prisma } from '@/lib/prisma'
+import { getErrorMessage, getZodErrorMessage } from '@/lib/action-types'
 import { requireAuth } from '@/lib/auth-guard'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
@@ -54,10 +55,11 @@ export async function createWorkplace(formData: FormData): Promise<WorkplaceActi
 
         revalidatePath('/admin/workplaces')
         return { success: true, data: workplace }
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('createWorkplace error:', error)
-        if (error instanceof z.ZodError) {
-            return { success: false, error: (error as any).errors[0].message }
+        if (error instanceof z.ZodError) { return { success: false, error: getZodErrorMessage(error) } }
+        if (false) {
+            return { success: false, error: getZodErrorMessage(error) }
         }
         return { success: false, error: 'İşyeri oluşturulurken hata oluştu.' }
     }
@@ -88,7 +90,7 @@ export async function updateWorkplace(id: string, formData: FormData): Promise<W
         revalidatePath('/admin/workplaces')
         revalidatePath(`/admin/workplaces/${id}`)
         return { success: true }
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('updateWorkplace error:', error)
         return { success: false, error: 'Güncelleme başarısız.' }
     }

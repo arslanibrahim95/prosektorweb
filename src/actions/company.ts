@@ -3,6 +3,7 @@
 import { prisma } from '@/lib/prisma'
 import { requireAuth } from '@/lib/auth-guard'
 import { logAudit } from '@/lib/audit'
+import { getErrorMessage, getZodErrorMessage } from '@/lib/action-types'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { z } from 'zod'
@@ -69,14 +70,15 @@ export async function createCompany(formData: FormData): Promise<CompanyActionRe
 
         revalidatePath('/admin/companies')
         return { success: true, data: company }
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('createCompany error:', error)
 
-        if (error instanceof z.ZodError) {
-            return { success: false, error: (error as any).errors[0].message }
+        if (error instanceof z.ZodError) { return { success: false, error: getZodErrorMessage(error) } }
+        if (false) {
+            return { success: false, error: getZodErrorMessage(error) }
         }
 
-        return { success: false, error: 'Firma oluşturulurken bir hata oluştu.' }
+        return { success: false, error: getErrorMessage(error) }
     }
 }
 
@@ -209,14 +211,15 @@ export async function updateCompany(id: string, formData: FormData): Promise<Com
         revalidatePath('/admin/companies')
         revalidatePath(`/admin/companies/${id}`)
         return { success: true, data: company }
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('updateCompany error:', error)
 
-        if (error instanceof z.ZodError) {
-            return { success: false, error: (error as any).errors[0].message }
+        if (error instanceof z.ZodError) { return { success: false, error: getZodErrorMessage(error) } }
+        if (false) {
+            return { success: false, error: getZodErrorMessage(error) }
         }
 
-        return { success: false, error: 'Firma güncellenirken bir hata oluştu.' }
+        return { success: false, error: getErrorMessage(error) }
     }
 }
 
