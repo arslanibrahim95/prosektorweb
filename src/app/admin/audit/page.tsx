@@ -1,19 +1,13 @@
 import { getAuditLogs } from '@/lib/audit'
 import { formatDistanceToNow } from 'date-fns'
 import { tr } from 'date-fns/locale'
-import {
-    FileText,
-    Plus,
-    Trash2,
-    Edit,
-    LogIn,
-    LogOut,
-    ChevronLeft,
-    ChevronRight
-} from 'lucide-react'
-import Link from 'next/link'
+import { FileText, Plus, Trash2, Edit, LogIn, LogOut } from 'lucide-react'
+import { AuditFilters } from '@/components/admin/audit/AuditFilters'
+import { AuditPagination } from '@/components/admin/audit/AuditPagination'
+import { AuditAction } from '@prisma/client'
+import { Suspense } from 'react'
 
-const ACTION_ICONS = {
+const ACTION_ICONS: Record<AuditAction, React.ComponentType<{ className?: string }>> = {
     CREATE: Plus,
     UPDATE: Edit,
     DELETE: Trash2,
@@ -21,7 +15,7 @@ const ACTION_ICONS = {
     LOGOUT: LogOut,
 }
 
-const ACTION_COLORS = {
+const ACTION_COLORS: Record<AuditAction, string> = {
     CREATE: 'bg-green-100 text-green-700',
     UPDATE: 'bg-blue-100 text-blue-700',
     DELETE: 'bg-red-100 text-red-700',
@@ -29,12 +23,18 @@ const ACTION_COLORS = {
     LOGOUT: 'bg-gray-100 text-gray-700',
 }
 
-const ACTION_LABELS = {
+const ACTION_LABELS: Record<AuditAction, string> = {
     CREATE: 'Oluşturma',
     UPDATE: 'Güncelleme',
     DELETE: 'Silme',
     LOGIN: 'Giriş',
     LOGOUT: 'Çıkış',
+}
+
+// Type guard for AuditAction
+function isValidAuditAction(value: string | undefined): value is AuditAction {
+    if (!value) return false
+    return ['CREATE', 'UPDATE', 'DELETE', 'LOGIN', 'LOGOUT'].includes(value)
 }
 
 export default async function AuditPage({
@@ -45,7 +45,7 @@ export default async function AuditPage({
     const params = await searchParams
     const page = parseInt(params.page || '1')
     const entity = params.entity || undefined
-    const action = params.action as any || undefined
+    const action = isValidAuditAction(params.action) ? params.action : undefined
 
     const { logs, total, pages, currentPage } = await getAuditLogs({
         page,
@@ -66,29 +66,10 @@ export default async function AuditPage({
                 </div>
             </div>
 
-            {/* Filters */}
-            <div className="flex gap-4 flex-wrap">
-                <select
-                    className="px-3 py-2 border rounded-lg text-sm"
-                    defaultValue={entity || ''}
-                >
-                    <option value="">Tüm Modüller</option>
-                    <option value="Company">Firma</option>
-                    <option value="Invoice">Fatura</option>
-                    <option value="Proposal">Teklif</option>
-                    <option value="User">Kullanıcı</option>
-                </select>
-
-                <select
-                    className="px-3 py-2 border rounded-lg text-sm"
-                    defaultValue={action || ''}
-                >
-                    <option value="">Tüm İşlemler</option>
-                    <option value="CREATE">Oluşturma</option>
-                    <option value="UPDATE">Güncelleme</option>
-                    <option value="DELETE">Silme</option>
-                </select>
-            </div>
+            {/* Filters - Client Component */}
+            <Suspense fallback={<div className="h-10 bg-gray-100 rounded animate-pulse w-64" />}>
+                <AuditFilters currentEntity={entity} currentAction={action} />
+            </Suspense>
 
             {/* Table */}
             <div className="bg-white rounded-xl border overflow-hidden">
@@ -122,9 +103,9 @@ export default async function AuditPage({
                             </tr>
                         ) : (
                             logs.map((log) => {
-                                const Icon = ACTION_ICONS[log.action] || FileText
-                                const colorClass = ACTION_COLORS[log.action] || 'bg-gray-100 text-gray-700'
-                                const label = ACTION_LABELS[log.action] || log.action
+                                const Icon = ACTION_ICONS[log.action]
+                                const colorClass = ACTION_COLORS[log.action]
+                                const label = ACTION_LABELS[log.action]
 
                                 return (
                                     <tr key={log.id} className="hover:bg-gray-50">
@@ -150,7 +131,9 @@ export default async function AuditPage({
                                         <td className="px-6 py-4 text-sm text-gray-500">
                                             {log.details ? (
                                                 <code className="text-xs bg-gray-100 px-2 py-1 rounded">
-                                                    {JSON.stringify(log.details).slice(0, 50)}
+                                                    {typeof log.details === 'object'
+                                                        ? JSON.stringify(log.details).slice(0, 50)
+                                                        : String(log.details).slice(0, 50)}
                                                     {JSON.stringify(log.details).length > 50 && '...'}
                                                 </code>
                                             ) : (
@@ -171,34 +154,10 @@ export default async function AuditPage({
                 </table>
             </div>
 
-            {/* Pagination */}
-            {pages > 1 && (
-                <div className="flex items-center justify-between">
-                    <p className="text-sm text-gray-500">
-                        Sayfa {currentPage} / {pages}
-                    </p>
-                    <div className="flex gap-2">
-                        <Link
-                            href={`/admin/audit?page=${Math.max(1, currentPage - 1)}`}
-                            className={`p-2 rounded-lg border ${currentPage === 1
-                                    ? 'opacity-50 pointer-events-none'
-                                    : 'hover:bg-gray-50'
-                                }`}
-                        >
-                            <ChevronLeft className="w-5 h-5" />
-                        </Link>
-                        <Link
-                            href={`/admin/audit?page=${Math.min(pages, currentPage + 1)}`}
-                            className={`p-2 rounded-lg border ${currentPage === pages
-                                    ? 'opacity-50 pointer-events-none'
-                                    : 'hover:bg-gray-50'
-                                }`}
-                        >
-                            <ChevronRight className="w-5 h-5" />
-                        </Link>
-                    </div>
-                </div>
-            )}
+            {/* Pagination - Client Component */}
+            <Suspense fallback={null}>
+                <AuditPagination currentPage={currentPage} totalPages={pages} />
+            </Suspense>
         </div>
     )
 }

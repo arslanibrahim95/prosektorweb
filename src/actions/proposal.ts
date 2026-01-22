@@ -261,8 +261,11 @@ export async function approveProposalByToken(token: string) {
 
 /**
  * Convert an accepted proposal to an invoice
+ * Uses transaction for atomicity and retry logic for race conditions
  */
 export async function convertProposalToInvoice(proposalId: string) {
+    const MAX_RETRIES = 3
+
     try {
         await requireAuth()
 
@@ -279,52 +282,84 @@ export async function convertProposalToInvoice(proposalId: string) {
             return { success: false, error: 'Bu teklif zaten faturaya dönüştürülmüş.' }
         }
 
-        // Generate invoice number (YYYY-XXXX format)
-        const year = new Date().getFullYear()
-        const lastInvoice = await prisma.invoice.findFirst({
-            where: { invoiceNo: { startsWith: `${year}-` } },
-            orderBy: { invoiceNo: 'desc' }
-        })
+        // Retry loop for handling race conditions
+        for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+            try {
+                // Use transaction to ensure atomicity
+                const result = await prisma.$transaction(async (tx) => {
+                    // Generate invoice number inside transaction
+                    const year = new Date().getFullYear()
+                    const lastInvoice = await tx.invoice.findFirst({
+                        where: { invoiceNo: { startsWith: `${year}-` } },
+                        orderBy: { invoiceNo: 'desc' }
+                    })
 
-        let nextNum = 1
-        if (lastInvoice) {
-            const lastNum = parseInt(lastInvoice.invoiceNo.split('-')[1])
-            nextNum = lastNum + 1
+                    let nextNum = 1
+                    if (lastInvoice) {
+                        const lastNum = parseInt(lastInvoice.invoiceNo.split('-')[1])
+                        nextNum = lastNum + 1
+                    }
+                    const invoiceNo = `${year}-${String(nextNum).padStart(4, '0')}`
+
+                    // Create invoice with 30-day due date
+                    const dueDate = new Date()
+                    dueDate.setDate(dueDate.getDate() + 30)
+
+                    const invoice = await tx.invoice.create({
+                        data: {
+                            invoiceNo,
+                            companyId: proposal.companyId,
+                            dueDate,
+                            subtotal: proposal.subtotal,
+                            taxRate: proposal.taxRate,
+                            taxAmount: proposal.taxAmount,
+                            total: proposal.total,
+                            description: `${proposal.subject} - Teklif No: ${proposalId.slice(0, 8)}`,
+                            notes: proposal.notes
+                        }
+                    })
+
+                    // Update proposal with conversion info (same transaction)
+                    await tx.proposal.update({
+                        where: { id: proposalId },
+                        data: {
+                            convertedAt: new Date(),
+                            invoiceId: invoice.id
+                        }
+                    })
+
+                    return { invoiceId: invoice.id, invoiceNo }
+                })
+
+                // Success - revalidate and return
+                revalidatePath('/admin/proposals')
+                revalidatePath(`/admin/proposals/${proposalId}`)
+                revalidatePath('/admin/invoices')
+
+                return { success: true, invoiceId: result.invoiceId, invoiceNo: result.invoiceNo }
+
+            } catch (txError: unknown) {
+                // Check if it's a unique constraint violation (race condition)
+                const isUniqueViolation =
+                    typeof txError === 'object' &&
+                    txError !== null &&
+                    'code' in txError &&
+                    (txError as { code: string }).code === 'P2002'
+
+                if (isUniqueViolation && attempt < MAX_RETRIES) {
+                    // Wait a bit and retry
+                    await new Promise(resolve => setTimeout(resolve, 100 * attempt))
+                    continue
+                }
+
+                // Re-throw if not a unique violation or max retries reached
+                throw txError
+            }
         }
-        const invoiceNo = `${year}-${String(nextNum).padStart(4, '0')}`
 
-        // Create invoice with 30-day due date
-        const dueDate = new Date()
-        dueDate.setDate(dueDate.getDate() + 30)
+        // Should never reach here, but TypeScript needs it
+        return { success: false, error: 'Maksimum deneme sayısına ulaşıldı.' }
 
-        const invoice = await prisma.invoice.create({
-            data: {
-                invoiceNo,
-                companyId: proposal.companyId,
-                dueDate,
-                subtotal: proposal.subtotal,
-                taxRate: proposal.taxRate,
-                taxAmount: proposal.taxAmount,
-                total: proposal.total,
-                description: `${proposal.subject} - Teklif No: ${proposalId.slice(0, 8)}`,
-                notes: proposal.notes
-            }
-        })
-
-        // Update proposal with conversion info
-        await prisma.proposal.update({
-            where: { id: proposalId },
-            data: {
-                convertedAt: new Date(),
-                invoiceId: invoice.id
-            }
-        })
-
-        revalidatePath('/admin/proposals')
-        revalidatePath(`/admin/proposals/${proposalId}`)
-        revalidatePath('/admin/invoices')
-
-        return { success: true, invoiceId: invoice.id, invoiceNo }
     } catch (error) {
         console.error('convertProposalToInvoice error:', error)
         return { success: false, error: 'Faturaya dönüştürme başarısız.' }
