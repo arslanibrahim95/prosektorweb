@@ -29,6 +29,9 @@ export default function AdminLoginPage() {
                                     type="email"
                                     name="email"
                                     placeholder="E-posta"
+                                    aria-label="E-posta"
+                                    autoComplete="username"
+                                    autoFocus
                                     required
                                 />
                             </div>
@@ -39,6 +42,8 @@ export default function AdminLoginPage() {
                                     type="password"
                                     name="password"
                                     placeholder="Şifre"
+                                    aria-label="Şifre"
+                                    autoComplete="current-password"
                                     required
                                 />
                             </div>
