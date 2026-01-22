@@ -228,21 +228,31 @@ export async function deleteCompany(id: string): Promise<CompanyActionResult> {
     try {
         await requireAuth()
 
-        // Silinmeden önce firma adını al (log için)
-        const company = await prisma.company.findUnique({
-            where: { id },
-            select: { name: true },
-        })
+        // Use transaction to ensure atomicity: delete + audit log together
+        await prisma.$transaction(async (tx) => {
+            // Get company info before delete for audit
+            const company = await tx.company.findUnique({
+                where: { id },
+                select: { name: true },
+            })
 
-        await prisma.company.delete({
-            where: { id },
-        })
+            if (!company) {
+                throw new Error('Firma bulunamadı.')
+            }
 
-        await logAudit({
-            action: 'DELETE',
-            entity: 'Company',
-            entityId: id,
-            details: { name: company?.name },
+            await tx.company.delete({
+                where: { id },
+            })
+
+            // Create audit log inside transaction
+            await tx.auditLog.create({
+                data: {
+                    action: 'DELETE',
+                    entity: 'Company',
+                    entityId: id,
+                    details: { name: company.name },
+                },
+            })
         })
 
         revalidatePath('/admin/companies')
