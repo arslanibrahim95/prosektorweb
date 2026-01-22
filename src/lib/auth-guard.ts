@@ -43,14 +43,10 @@ export interface AuthenticatedUser {
 export async function requireAuth(allowedRoles: UserRole[] = ['ADMIN']) {
     const session = await auth()
 
-    if (!session?.user) {
-        throw new Error('Unauthorized: Oturum açmanız gerekiyor.')
-    }
+    const user = session?.user as AuthenticatedUser
 
-    const user = session.user as AuthenticatedUser
-
-    if (!user.role || !allowedRoles.includes(user.role)) {
-        throw new Error('Unauthorized: Bu işlem için yetkiniz yok.')
+    if (!user || !user.role || !allowedRoles.includes(user.role)) {
+        throw new Error('Unauthorized')
     }
 
     return { ...session, user }

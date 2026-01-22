@@ -17,13 +17,13 @@ describe('auth-guard', () => {
         it('should throw error when not authenticated', async () => {
             vi.mocked(auth).mockResolvedValue(null)
 
-            await expect(requireAuth()).rejects.toThrow('Unauthorized: Oturum açmanız gerekiyor.')
+            await expect(requireAuth()).rejects.toThrow('Unauthorized')
         })
 
         it('should throw error when user has no session', async () => {
             vi.mocked(auth).mockResolvedValue({ user: undefined } as any)
 
-            await expect(requireAuth()).rejects.toThrow('Unauthorized: Oturum açmanız gerekiyor.')
+            await expect(requireAuth()).rejects.toThrow('Unauthorized')
         })
 
         it('should throw error when user role is not allowed', async () => {
@@ -32,7 +32,7 @@ describe('auth-guard', () => {
             } as any)
 
             // Default requires ADMIN
-            await expect(requireAuth()).rejects.toThrow('Unauthorized: Bu işlem için yetkiniz yok.')
+            await expect(requireAuth()).rejects.toThrow('Unauthorized')
         })
 
         it('should return session when ADMIN user is authenticated', async () => {
