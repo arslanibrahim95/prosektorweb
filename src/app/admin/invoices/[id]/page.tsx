@@ -12,6 +12,8 @@ import {
     CheckCircle2
 } from 'lucide-react'
 import { PaymentForm } from '@/components/admin/PaymentForm'
+import { DownloadButton } from '@/components/pdf/DownloadButton'
+import { InvoiceDocument } from '@/components/pdf/InvoiceDocument'
 
 interface InvoiceDetailPageProps {
     params: Promise<{ id: string }>
@@ -81,6 +83,13 @@ export default async function InvoiceDetailPage({ params }: InvoiceDetailPagePro
                             </Link>
                         </p>
                     </div>
+                </div>
+
+                <div>
+                    <DownloadButton
+                        document={<InvoiceDocument data={JSON.parse(JSON.stringify(invoice))} />}
+                        fileName={`fatura-${invoice.invoiceNo}.pdf`}
+                    />
                 </div>
             </div>
 

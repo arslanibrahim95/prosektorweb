@@ -1,8 +1,10 @@
 import { getProposalById, updateProposalStatus, generateApprovalToken, convertProposalToInvoice } from '@/actions/proposal'
 import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
-import { ChevronLeft, FileText, Calendar, Building2, Download, Send, CheckCircle, XCircle, Receipt, LinkIcon, Copy, ExternalLink } from 'lucide-react'
+import { ChevronLeft, FileText, Calendar, Building2, Send, CheckCircle, XCircle, Receipt, LinkIcon, ExternalLink } from 'lucide-react'
 import { ProposalStatus } from '@prisma/client'
+import { DownloadButton } from '@/components/pdf/DownloadButton'
+import { ProposalDocument } from '@/components/pdf/ProposalDocument'
 
 interface PageProps {
     params: Promise<{ id: string }>
@@ -116,10 +118,11 @@ export default async function ProposalDetailPage({ params }: PageProps) {
                         </Link>
                     )}
 
-                    <button className="flex items-center gap-2 px-4 py-2 bg-neutral-100 text-neutral-700 rounded-xl hover:bg-neutral-200 transition-colors font-medium text-sm">
-                        <Download className="w-4 h-4" />
-                        PDF İndir
-                    </button>
+                    {/* PDF Download */}
+                    <DownloadButton
+                        document={<ProposalDocument data={JSON.parse(JSON.stringify(proposal))} />}
+                        fileName={`teklif-${proposal.id.slice(0, 8)}.pdf`}
+                    />
                 </div>
             </div>
 
