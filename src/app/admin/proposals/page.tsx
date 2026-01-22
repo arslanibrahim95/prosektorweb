@@ -23,17 +23,9 @@ export default async function ProposalsPage({ searchParams }: ProposalsPageProps
     const params = await searchParams
     const query = params.q || ''
 
-    // Note: Ideally getProposals should accept filters, but for now we filter client-side or modify action
-    // Assuming getProposals handles filtering or we do it here if action doesn't support it yet.
-    // Looking at action, it seems it gets all. Let's filter here for simple implementation or update action.
-    // For now, let's just fetch all and filter client side to preserve speed, or update action later.
-    const allProposals = await getProposals()
-    const proposals = query
-        ? allProposals.filter(p =>
-            p.subject.toLowerCase().includes(query.toLowerCase()) ||
-            p.company.name.toLowerCase().includes(query.toLowerCase())
-        )
-        : allProposals
+    // Use server-side search via getProposals
+    const { proposals } = await getProposals({ search: query })
+
 
     return (
         <div className="space-y-8">

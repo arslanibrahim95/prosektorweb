@@ -24,16 +24,9 @@ export default async function ServicesPage({ searchParams }: ServicesPageProps) 
     const params = await searchParams
     const query = params.q || ''
 
-    const upcomingRenewals = await getServices({ upcoming: true })
-    const allServices = await getServices()
+    const { services: upcomingRenewals } = await getServices({ upcoming: true })
+    const { services } = await getServices({ search: query })
 
-    // Filter client-side for now
-    const services = query
-        ? allServices.filter(s =>
-            s.name.toLowerCase().includes(query.toLowerCase()) ||
-            s.company.name.toLowerCase().includes(query.toLowerCase())
-        )
-        : allServices
 
     return (
         <div className="space-y-8">

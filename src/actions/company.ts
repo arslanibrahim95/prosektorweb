@@ -2,6 +2,7 @@
 
 import { prisma } from '@/lib/prisma'
 import { requireAuth } from '@/lib/auth-guard'
+import { logAudit } from '@/lib/audit'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { z } from 'zod'
@@ -57,6 +58,13 @@ export async function createCompany(formData: FormData): Promise<CompanyActionRe
                 phone: validatedData.phone || null,
                 address: validatedData.address || null,
             },
+        })
+
+        await logAudit({
+            action: 'CREATE',
+            entity: 'Company',
+            entityId: company.id,
+            details: { name: company.name },
         })
 
         revalidatePath('/admin/companies')
@@ -213,8 +221,21 @@ export async function deleteCompany(id: string): Promise<CompanyActionResult> {
     try {
         await requireAuth()
 
+        // Silinmeden önce firma adını al (log için)
+        const company = await prisma.company.findUnique({
+            where: { id },
+            select: { name: true },
+        })
+
         await prisma.company.delete({
             where: { id },
+        })
+
+        await logAudit({
+            action: 'DELETE',
+            entity: 'Company',
+            entityId: id,
+            details: { name: company?.name },
         })
 
         revalidatePath('/admin/companies')

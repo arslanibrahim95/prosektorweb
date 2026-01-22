@@ -12,13 +12,13 @@ const priorityConfig: Record<string, { label: string, color: string, icon: any }
 }
 
 export default async function TicketsPage() {
-    const tickets = await getTickets()
+    const { tickets } = await getTickets()
 
     // Group tickets by status for Kanban-like columns
     const columns = {
-        OPEN: tickets.filter((t: any) => t.status === 'OPEN'),
-        IN_PROGRESS: tickets.filter((t: any) => t.status === 'IN_PROGRESS'),
-        RESOLVED: tickets.filter((t: any) => t.status === 'RESOLVED'),
+        OPEN: tickets.filter((t) => t.status === 'OPEN'),
+        IN_PROGRESS: tickets.filter((t) => t.status === 'IN_PROGRESS'),
+        RESOLVED: tickets.filter((t) => t.status === 'RESOLVED'),
     }
 
     return (

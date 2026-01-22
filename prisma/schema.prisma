@@ -709,6 +709,40 @@ model User {
 
 
 // ===============================
+// AUDIT LOGS
+// ===============================
+
+enum AuditAction {
+  CREATE
+  UPDATE
+  DELETE
+  LOGIN
+  LOGOUT
+}
+
+model AuditLog {
+  id          String      @id @default(uuid())
+  action      AuditAction
+  entity      String      // "Company", "Invoice", "User", vb.
+  entityId    String?     // İlgili kaydın ID'si
+  
+  userId      String?     
+  userName    String?     // Kullanıcı silinse bile log kalsın
+  userEmail   String?
+  
+  details     Json?       // Değişiklik detayları (eski/yeni değer)
+  ipAddress   String?
+  userAgent   String?
+  
+  createdAt   DateTime    @default(now())
+  
+  @@index([entity, entityId])
+  @@index([userId])
+  @@index([createdAt])
+}
+
+
+// ===============================
 // TASK MANAGEMENT
 // ===============================
 
