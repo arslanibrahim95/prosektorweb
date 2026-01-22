@@ -1,7 +1,7 @@
 'use server'
 
 import { prisma } from '@/lib/prisma'
-import { getErrorMessage, getZodErrorMessage } from '@/lib/action-types'
+import { getErrorMessage, getZodErrorMessage, isPrismaUniqueConstraintError } from '@/lib/action-types'
 import { requireAuth } from '@/lib/auth-guard'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
@@ -67,7 +67,7 @@ export async function createDomain(formData: FormData): Promise<DomainActionResu
         return { success: true, data: domain }
     } catch (error: unknown) {
         console.error('createDomain error:', error)
-        if (error.code === 'P2002') {
+        if (isPrismaUniqueConstraintError(error)) {
             return { success: false, error: 'Bu domain zaten kayıtlı.' }
         }
         if (error instanceof z.ZodError) { return { success: false, error: getZodErrorMessage(error) } }

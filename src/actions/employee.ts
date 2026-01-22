@@ -1,7 +1,7 @@
 'use server'
 
 import { prisma } from '@/lib/prisma'
-import { getErrorMessage, getZodErrorMessage } from '@/lib/action-types'
+import { getErrorMessage, getZodErrorMessage, isPrismaUniqueConstraintError } from '@/lib/action-types'
 import { requireAuth } from '@/lib/auth-guard'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
@@ -68,7 +68,7 @@ export async function createEmployee(formData: FormData): Promise<EmployeeAction
             return { success: false, error: getZodErrorMessage(error) }
         }
         // Handle unique constraint violation (TC No)
-        if (error.code === 'P2002') {
+        if (isPrismaUniqueConstraintError(error)) {
             return { success: false, error: 'Bu TC Kimlik Numarası ile kayıtlı çalışan zaten var.' }
         }
         return { success: false, error: 'Çalışan oluşturulurken hata oluştu.' }
@@ -107,7 +107,7 @@ export async function updateEmployee(id: string, formData: FormData): Promise<Em
         return { success: true }
     } catch (error: unknown) {
         console.error('updateEmployee error:', error)
-        if (error.code === 'P2002') {
+        if (isPrismaUniqueConstraintError(error)) {
             return { success: false, error: 'Bu TC Kimlik Numarası zaten kullanımda.' }
         }
         return { success: false, error: 'Güncelleme başarısız.' }

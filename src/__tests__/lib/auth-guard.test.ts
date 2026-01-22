@@ -15,7 +15,7 @@ describe('auth-guard', () => {
 
     describe('requireAuth', () => {
         it('should throw error when not authenticated', async () => {
-            vi.mocked(auth).mockResolvedValue(null)
+            vi.mocked(auth).mockResolvedValue(null as any)
 
             await expect(requireAuth()).rejects.toThrow('Unauthorized')
         })
@@ -72,7 +72,7 @@ describe('auth-guard', () => {
 
     describe('getSession', () => {
         it('should return null when not authenticated', async () => {
-            vi.mocked(auth).mockResolvedValue(null)
+            vi.mocked(auth).mockResolvedValue(null as any)
 
             const result = await getSession()
 

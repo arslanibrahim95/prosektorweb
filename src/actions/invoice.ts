@@ -3,7 +3,7 @@
 import { prisma } from '@/lib/prisma'
 import { requireAuth } from '@/lib/auth-guard'
 import { logAudit } from '@/lib/audit'
-import { getErrorMessage, isPrismaUniqueConstraintError } from '@/lib/action-types'
+import { getErrorMessage, getZodErrorMessage, isPrismaUniqueConstraintError } from '@/lib/action-types'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 

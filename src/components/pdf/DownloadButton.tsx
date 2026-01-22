@@ -5,7 +5,7 @@ import { PDFDownloadLink } from '@react-pdf/renderer'
 import { FileDown, Loader2 } from 'lucide-react'
 
 interface DownloadButtonProps {
-    document: React.ReactElement
+    document: React.ReactElement<any>
     fileName: string
     label?: string
 }
