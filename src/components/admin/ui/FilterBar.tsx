@@ -53,6 +53,7 @@ export function FilterBar({ placeholder = "Ara...", statusOptions }: FilterBarPr
                     <input
                         type="text"
                         placeholder={placeholder}
+                        aria-label={placeholder}
                         defaultValue={searchParams.get('q')?.toString()}
                         onChange={(e) => handleSearch(e.target.value)}
                         className="w-full pl-12 pr-4 py-3 bg-neutral-50 border-0 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 transition-shadow"
@@ -61,6 +62,7 @@ export function FilterBar({ placeholder = "Ara...", statusOptions }: FilterBarPr
                 {statusOptions && (
                     <select
                         defaultValue={searchParams.get('status')?.toString() || ''}
+                        aria-label="Durum Filtresi"
                         onChange={(e) => handleStatusChange(e.target.value)}
                         className="px-4 py-3 bg-neutral-50 border-0 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 min-w-[200px] cursor-pointer"
                     >
