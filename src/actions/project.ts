@@ -1,6 +1,7 @@
 'use server'
 
 import { prisma } from '@/lib/prisma'
+import { requireAuth } from '@/lib/auth-guard'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 
@@ -28,6 +29,8 @@ const ProjectSchema = z.object({
 
 export async function createProject(formData: FormData): Promise<ProjectActionResult> {
     try {
+        await requireAuth()
+
         const rawData = {
             name: formData.get('name') as string,
             companyId: formData.get('companyId') as string,
@@ -108,6 +111,8 @@ export async function getProjectById(id: string) {
 
 export async function updateProject(id: string, formData: FormData): Promise<ProjectActionResult> {
     try {
+        await requireAuth()
+
         const data: any = {}
 
         const name = formData.get('name') as string
@@ -163,6 +168,8 @@ export async function updateProject(id: string, formData: FormData): Promise<Pro
 
 export async function updateProjectStatus(id: string, status: string): Promise<ProjectActionResult> {
     try {
+        await requireAuth()
+
         const data: any = { status }
 
         // Auto-set dates
@@ -192,6 +199,8 @@ export async function updateProjectStatus(id: string, status: string): Promise<P
 
 export async function deleteProject(id: string): Promise<ProjectActionResult> {
     try {
+        await requireAuth()
+
         await prisma.webProject.delete({ where: { id } })
         revalidatePath('/admin/projects')
         return { success: true }

@@ -1,6 +1,7 @@
 'use server'
 
 import { prisma } from '@/lib/prisma'
+import { requireAuth } from '@/lib/auth-guard'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 import { EmployeeGender } from '@prisma/client'
@@ -33,6 +34,8 @@ export interface EmployeeActionResult {
 
 export async function createEmployee(formData: FormData): Promise<EmployeeActionResult> {
     try {
+        await requireAuth()
+
         const rawData = {
             firstName: formData.get('firstName') as string,
             lastName: formData.get('lastName') as string,
@@ -72,6 +75,8 @@ export async function createEmployee(formData: FormData): Promise<EmployeeAction
 
 export async function updateEmployee(id: string, formData: FormData): Promise<EmployeeActionResult> {
     try {
+        await requireAuth()
+
         const rawData = {
             firstName: formData.get('firstName') as string,
             lastName: formData.get('lastName') as string,
@@ -109,6 +114,8 @@ export async function updateEmployee(id: string, formData: FormData): Promise<Em
 
 export async function deleteEmployee(id: string): Promise<EmployeeActionResult> {
     try {
+        await requireAuth()
+
         await prisma.employee.delete({ where: { id } })
         revalidatePath('/admin/employees')
         return { success: true }

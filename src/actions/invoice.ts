@@ -1,6 +1,7 @@
 'use server'
 
 import { prisma } from '@/lib/prisma'
+import { requireAuth } from '@/lib/auth-guard'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 
@@ -59,6 +60,8 @@ export async function generateInvoiceNo(): Promise<string> {
 
 export async function createInvoice(formData: FormData): Promise<InvoiceActionResult> {
     try {
+        await requireAuth()
+
         const rawData = {
             companyId: formData.get('companyId') as string,
             invoiceNo: formData.get('invoiceNo') as string,
@@ -194,6 +197,8 @@ export async function getInvoiceById(id: string) {
 
 export async function updateInvoiceStatus(id: string, status: string): Promise<InvoiceActionResult> {
     try {
+        await requireAuth()
+
         const invoice = await prisma.invoice.update({
             where: { id },
             data: { status: status as any },
@@ -214,6 +219,8 @@ export async function updateInvoiceStatus(id: string, status: string): Promise<I
 
 export async function deleteInvoice(id: string): Promise<InvoiceActionResult> {
     try {
+        await requireAuth()
+
         await prisma.invoice.delete({
             where: { id },
         })

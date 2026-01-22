@@ -1,6 +1,7 @@
 'use server'
 
 import { prisma } from '@/lib/prisma'
+import { requireAuth } from '@/lib/auth-guard'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 import { ProposalStatus } from '@prisma/client'
@@ -36,6 +37,8 @@ export type ProposalFormState = {
 
 export async function createProposal(formData: any): Promise<ProposalFormState> {
     try {
+        await requireAuth()
+
         // Client-side might send JSON instead of FormData for complex nested structures
         const validated = ProposalSchema.parse(formData)
 
@@ -86,6 +89,8 @@ export async function createProposal(formData: any): Promise<ProposalFormState> 
 
 export async function updateProposalStatus(id: string, status: ProposalStatus) {
     try {
+        await requireAuth()
+
         await prisma.proposal.update({
             where: { id },
             data: { status }
@@ -101,6 +106,8 @@ export async function updateProposalStatus(id: string, status: ProposalStatus) {
 
 export async function deleteProposal(id: string) {
     try {
+        await requireAuth()
+
         await prisma.proposal.delete({ where: { id } })
         revalidatePath('/admin/proposals')
         return { success: true }
@@ -114,23 +121,52 @@ export async function deleteProposal(id: string) {
 // QUERIES
 // ==========================================
 
-export async function getProposals(status?: ProposalStatus) {
+export async function getProposals(options?: {
+    status?: ProposalStatus
+    search?: string
+    page?: number
+    limit?: number
+}) {
+    const { status, search = '', page = 1, limit = 10 } = options || {}
+    const skip = (page - 1) * limit
+
     try {
         const where: any = {}
-        if (status) where.status = status
 
-        const proposals = await prisma.proposal.findMany({
-            where,
-            include: {
-                company: { select: { name: true } },
-                _count: { select: { items: true } }
-            },
-            orderBy: { createdAt: 'desc' }
-        })
-        return proposals
+        if (status) {
+            where.status = status
+        }
+
+        if (search) {
+            where.OR = [
+                { subject: { contains: search } },
+                { company: { name: { contains: search } } },
+            ]
+        }
+
+        const [proposals, total] = await Promise.all([
+            prisma.proposal.findMany({
+                where,
+                skip,
+                take: limit,
+                include: {
+                    company: { select: { id: true, name: true } },
+                    _count: { select: { items: true } }
+                },
+                orderBy: { createdAt: 'desc' }
+            }),
+            prisma.proposal.count({ where })
+        ])
+
+        return {
+            proposals,
+            total,
+            pages: Math.ceil(total / limit),
+            currentPage: page,
+        }
     } catch (error) {
         console.error('getProposals error:', error)
-        return []
+        return { proposals: [], total: 0, pages: 0, currentPage: 1 }
     }
 }
 
@@ -159,6 +195,8 @@ export async function getProposalById(id: string) {
  */
 export async function generateApprovalToken(proposalId: string) {
     try {
+        await requireAuth()
+
         const token = crypto.randomUUID()
 
         await prisma.proposal.update({
@@ -226,6 +264,8 @@ export async function approveProposalByToken(token: string) {
  */
 export async function convertProposalToInvoice(proposalId: string) {
     try {
+        await requireAuth()
+
         const proposal = await prisma.proposal.findUnique({
             where: { id: proposalId },
             include: { items: true, company: true }

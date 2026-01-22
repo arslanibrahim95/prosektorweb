@@ -1,6 +1,7 @@
 'use server'
 
 import { prisma } from '@/lib/prisma'
+import { requireAuth } from '@/lib/auth-guard'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 
@@ -30,6 +31,8 @@ const DomainSchema = z.object({
 
 export async function createDomain(formData: FormData): Promise<DomainActionResult> {
     try {
+        await requireAuth()
+
         const rawData = {
             name: formData.get('name') as string,
             extension: formData.get('extension') as string,
@@ -112,6 +115,8 @@ export async function getDomainById(id: string) {
 
 export async function updateDomain(id: string, formData: FormData): Promise<DomainActionResult> {
     try {
+        await requireAuth()
+
         const data: any = {}
 
         const serverIp = formData.get('serverIp') as string
@@ -142,6 +147,8 @@ export async function updateDomain(id: string, formData: FormData): Promise<Doma
 
 export async function deleteDomain(id: string): Promise<DomainActionResult> {
     try {
+        await requireAuth()
+
         await prisma.domain.delete({ where: { id } })
         revalidatePath('/admin/domains')
         return { success: true }
@@ -166,6 +173,8 @@ const DnsRecordSchema = z.object({
 
 export async function createDnsRecord(formData: FormData): Promise<DomainActionResult> {
     try {
+        await requireAuth()
+
         const rawData = {
             domainId: formData.get('domainId') as string,
             type: formData.get('type') as string,
@@ -202,6 +211,8 @@ export async function createDnsRecord(formData: FormData): Promise<DomainActionR
 
 export async function deleteDnsRecord(id: string, domainId: string): Promise<DomainActionResult> {
     try {
+        await requireAuth()
+
         await prisma.dnsRecord.delete({ where: { id } })
         revalidatePath(`/admin/domains/${domainId}`)
         return { success: true }
@@ -228,6 +239,8 @@ export async function getApiConfigs() {
 
 export async function saveApiConfig(formData: FormData): Promise<DomainActionResult> {
     try {
+        await requireAuth()
+
         const provider = formData.get('provider') as string
         const name = formData.get('name') as string
         const apiKey = formData.get('apiKey') as string

@@ -1,6 +1,7 @@
 'use server'
 
 import { prisma } from '@/lib/prisma'
+import { requireAuth } from '@/lib/auth-guard'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 import { DangerClass } from '@prisma/client'
@@ -32,6 +33,8 @@ export interface WorkplaceActionResult {
 
 export async function createWorkplace(formData: FormData): Promise<WorkplaceActionResult> {
     try {
+        await requireAuth()
+
         const rawData = {
             title: formData.get('title') as string,
             companyId: formData.get('companyId') as string,
@@ -62,6 +65,8 @@ export async function createWorkplace(formData: FormData): Promise<WorkplaceActi
 
 export async function updateWorkplace(id: string, formData: FormData): Promise<WorkplaceActionResult> {
     try {
+        await requireAuth()
+
         const rawData = {
             title: formData.get('title') as string,
             companyId: formData.get('companyId') as string,
@@ -91,6 +96,8 @@ export async function updateWorkplace(id: string, formData: FormData): Promise<W
 
 export async function deleteWorkplace(id: string): Promise<WorkplaceActionResult> {
     try {
+        await requireAuth()
+
         await prisma.workplace.delete({ where: { id } })
         revalidatePath('/admin/workplaces')
         return { success: true }

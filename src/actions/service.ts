@@ -1,6 +1,7 @@
 'use server'
 
 import { prisma } from '@/lib/prisma'
+import { requireAuth } from '@/lib/auth-guard'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 import { ServiceType, BillingCycle, ServiceStatus } from '@prisma/client'
@@ -41,6 +42,8 @@ function calculateRenewDate(start: Date, cycle: BillingCycle): Date {
 
 export async function createService(formData: FormData): Promise<ServiceFormState> {
     try {
+        await requireAuth()
+
         const rawData = {
             companyId: formData.get('companyId'),
             name: formData.get('name'),
@@ -88,6 +91,8 @@ export async function createService(formData: FormData): Promise<ServiceFormStat
 
 export async function renewService(id: string) {
     try {
+        await requireAuth()
+
         const service = await prisma.service.findUnique({ where: { id } })
         if (!service) throw new Error('Hizmet bulunamadı')
 
@@ -136,6 +141,8 @@ export async function renewService(id: string) {
 
 export async function updateServiceStatus(id: string, status: ServiceStatus) {
     try {
+        await requireAuth()
+
         await prisma.service.update({ where: { id }, data: { status } })
         revalidatePath('/admin/services')
         return { success: true }
@@ -146,6 +153,8 @@ export async function updateServiceStatus(id: string, status: ServiceStatus) {
 
 export async function deleteService(id: string) {
     try {
+        await requireAuth()
+
         await prisma.service.delete({ where: { id } })
         revalidatePath('/admin/services')
         return { success: true }
@@ -158,38 +167,63 @@ export async function deleteService(id: string) {
 // QUERIES
 // ==========================================
 
-export async function getServices(filter?: { status?: ServiceStatus, upcoming?: boolean }) {
+export async function getServices(options?: {
+    status?: ServiceStatus
+    upcoming?: boolean
+    search?: string
+    page?: number
+    limit?: number
+}) {
+    const { status, upcoming, search = '', page = 1, limit = 10 } = options || {}
+    const skip = (page - 1) * limit
+
     try {
         const where: any = {}
 
-        if (filter?.status) {
-            where.status = filter.status
+        if (status) {
+            where.status = status
         }
 
-        if (filter?.upcoming) {
+        if (upcoming) {
             // Get services expiring in next 30 days
             const thirtyDaysFromNow = new Date()
             thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30)
 
             where.renewDate = {
                 lte: thirtyDaysFromNow,
-                gte: new Date() // Don't show already expired ones if strictly looking for upcoming? Or include them?
-                // Let's explicitly look for ACTIVE services expiring soon
+                gte: new Date()
             }
             where.status = ServiceStatus.ACTIVE
         }
 
-        // Default sorting: Renew date asc (so closest deadlines are first)
-        const services = await prisma.service.findMany({
-            where,
-            include: {
-                company: { select: { name: true } }
-            },
-            orderBy: { renewDate: 'asc' }
-        })
-        return services
+        if (search) {
+            where.OR = [
+                { name: { contains: search } },
+                { company: { name: { contains: search } } },
+            ]
+        }
+
+        const [services, total] = await Promise.all([
+            prisma.service.findMany({
+                where,
+                skip,
+                take: limit,
+                include: {
+                    company: { select: { id: true, name: true } }
+                },
+                orderBy: { renewDate: 'asc' }
+            }),
+            prisma.service.count({ where })
+        ])
+
+        return {
+            services,
+            total,
+            pages: Math.ceil(total / limit),
+            currentPage: page,
+        }
     } catch (error) {
         console.error('getServices error:', error)
-        return []
+        return { services: [], total: 0, pages: 0, currentPage: 1 }
     }
 }

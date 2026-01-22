@@ -1,6 +1,7 @@
 'use server'
 
 import { prisma } from '@/lib/prisma'
+import { requireAuth } from '@/lib/auth-guard'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 
@@ -33,6 +34,8 @@ const PaymentSchema = z.object({
 
 export async function createPayment(formData: FormData): Promise<PaymentActionResult> {
     try {
+        await requireAuth()
+
         const rawData = {
             invoiceId: formData.get('invoiceId') as string,
             amount: formData.get('amount') as string,
@@ -105,6 +108,8 @@ export async function createPayment(formData: FormData): Promise<PaymentActionRe
 
 export async function deletePayment(id: string): Promise<PaymentActionResult> {
     try {
+        await requireAuth()
+
         const payment = await prisma.payment.findUnique({
             where: { id },
             include: { invoice: true },

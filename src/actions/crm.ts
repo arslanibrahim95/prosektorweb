@@ -1,6 +1,7 @@
 'use server'
 
 import { prisma } from '@/lib/prisma'
+import { requireAuth } from '@/lib/auth-guard'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 
@@ -25,6 +26,8 @@ const NoteSchema = z.object({
 
 export async function createNote(formData: FormData): Promise<CrmActionResult> {
     try {
+        await requireAuth()
+
         const rawData = {
             companyId: formData.get('companyId') as string,
             content: formData.get('content') as string,
@@ -49,6 +52,8 @@ export async function createNote(formData: FormData): Promise<CrmActionResult> {
 
 export async function deleteNote(id: string, companyId: string): Promise<CrmActionResult> {
     try {
+        await requireAuth()
+
         await prisma.companyNote.delete({ where: { id } })
         revalidatePath(`/admin/companies/${companyId}`)
         return { success: true }
@@ -60,6 +65,8 @@ export async function deleteNote(id: string, companyId: string): Promise<CrmActi
 
 export async function toggleNotePin(id: string, companyId: string): Promise<CrmActionResult> {
     try {
+        await requireAuth()
+
         const note = await prisma.companyNote.findUnique({ where: { id } })
         if (!note) return { success: false, error: 'Not bulunamadı.' }
 
@@ -91,6 +98,8 @@ const ContactSchema = z.object({
 
 export async function createContact(formData: FormData): Promise<CrmActionResult> {
     try {
+        await requireAuth()
+
         const rawData = {
             companyId: formData.get('companyId') as string,
             name: formData.get('name') as string,
@@ -134,6 +143,8 @@ export async function createContact(formData: FormData): Promise<CrmActionResult
 
 export async function deleteContact(id: string, companyId: string): Promise<CrmActionResult> {
     try {
+        await requireAuth()
+
         await prisma.companyContact.delete({ where: { id } })
         revalidatePath(`/admin/companies/${companyId}`)
         return { success: true }
@@ -157,6 +168,8 @@ const ActivitySchema = z.object({
 
 export async function createActivity(formData: FormData): Promise<CrmActionResult> {
     try {
+        await requireAuth()
+
         const rawData = {
             companyId: formData.get('companyId') as string,
             type: formData.get('type') as string,
@@ -190,6 +203,8 @@ export async function createActivity(formData: FormData): Promise<CrmActionResul
 
 export async function toggleActivityComplete(id: string, companyId: string): Promise<CrmActionResult> {
     try {
+        await requireAuth()
+
         const activity = await prisma.companyActivity.findUnique({ where: { id } })
         if (!activity) return { success: false, error: 'Aktivite bulunamadı.' }
 
@@ -208,6 +223,8 @@ export async function toggleActivityComplete(id: string, companyId: string): Pro
 
 export async function deleteActivity(id: string, companyId: string): Promise<CrmActionResult> {
     try {
+        await requireAuth()
+
         await prisma.companyActivity.delete({ where: { id } })
         revalidatePath(`/admin/companies/${companyId}`)
         return { success: true }
@@ -223,6 +240,8 @@ export async function deleteActivity(id: string, companyId: string): Promise<Crm
 
 export async function updateCompanyStatus(id: string, status: string): Promise<CrmActionResult> {
     try {
+        await requireAuth()
+
         await prisma.company.update({
             where: { id },
             data: { status: status as any },

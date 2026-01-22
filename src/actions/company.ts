@@ -1,6 +1,7 @@
 'use server'
 
 import { prisma } from '@/lib/prisma'
+import { requireAuth } from '@/lib/auth-guard'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { z } from 'zod'
@@ -34,6 +35,8 @@ const CompanySchema = z.object({
 
 export async function createCompany(formData: FormData): Promise<CompanyActionResult> {
     try {
+        await requireAuth()
+
         const rawData = {
             name: formData.get('name') as string,
             taxId: formData.get('taxId') as string || undefined,
@@ -163,6 +166,8 @@ export async function getCompanyById(id: string) {
 
 export async function updateCompany(id: string, formData: FormData): Promise<CompanyActionResult> {
     try {
+        await requireAuth()
+
         const rawData = {
             name: formData.get('name') as string,
             taxId: formData.get('taxId') as string || undefined,
@@ -206,6 +211,8 @@ export async function updateCompany(id: string, formData: FormData): Promise<Com
 
 export async function deleteCompany(id: string): Promise<CompanyActionResult> {
     try {
+        await requireAuth()
+
         await prisma.company.delete({
             where: { id },
         })
@@ -224,6 +231,8 @@ export async function deleteCompany(id: string): Promise<CompanyActionResult> {
 
 export async function toggleCompanyStatus(id: string): Promise<CompanyActionResult> {
     try {
+        await requireAuth()
+
         const company = await prisma.company.findUnique({ where: { id } })
         if (!company) {
             return { success: false, error: 'Firma bulunamadı.' }

@@ -1,6 +1,7 @@
 'use server'
 
 import { prisma } from '@/lib/prisma'
+import { requireAuth } from '@/lib/auth-guard'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 
@@ -21,6 +22,8 @@ export type TaskFormState = {
 
 export async function createTask(formData: FormData): Promise<TaskFormState> {
     try {
+        await requireAuth()
+
         const validated = TaskSchema.parse({
             title: formData.get('title'),
             description: formData.get('description'),
@@ -64,6 +67,8 @@ export async function createTask(formData: FormData): Promise<TaskFormState> {
 
 export async function updateTaskStatus(id: string, status: string): Promise<TaskFormState> {
     try {
+        await requireAuth()
+
         const statuses = ['TODO', 'IN_PROGRESS', 'DONE', 'ARCHIVED']
         if (!statuses.includes(status)) {
             return { success: false, error: 'Geçersiz durum' }
@@ -84,6 +89,8 @@ export async function updateTaskStatus(id: string, status: string): Promise<Task
 
 export async function deleteTask(id: string): Promise<TaskFormState> {
     try {
+        await requireAuth()
+
         await prisma.task.delete({ where: { id } })
         revalidatePath('/admin/tasks')
         return { success: true }
@@ -149,6 +156,8 @@ interface SubTaskInput {
 
 export async function createSubTask(input: SubTaskInput): Promise<TaskFormState> {
     try {
+        await requireAuth()
+
         const parent = await prisma.task.findUnique({
             where: { id: input.parentId },
             select: { id: true, webProjectId: true }
@@ -194,6 +203,8 @@ export async function updateTask(id: string, data: {
     actualHours?: number
 }): Promise<TaskFormState> {
     try {
+        await requireAuth()
+
         const updateData: any = {}
 
         if (data.title !== undefined) updateData.title = data.title

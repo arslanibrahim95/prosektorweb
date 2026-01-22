@@ -1,6 +1,7 @@
 'use server'
 
 import { prisma } from '@/lib/prisma'
+import { requireAuth } from '@/lib/auth-guard'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 import { TicketStatus, TicketPriority, TicketCategory } from '@prisma/client'
@@ -34,6 +35,8 @@ export type TicketFormState = {
 
 export async function createTicket(formData: FormData): Promise<TicketFormState> {
     try {
+        await requireAuth()
+
         const rawData = {
             companyId: formData.get('companyId'),
             subject: formData.get('subject'),
@@ -73,6 +76,8 @@ export async function createTicket(formData: FormData): Promise<TicketFormState>
 
 export async function addMessage(ticketId: string, content: string, isStaffReply: boolean = true) {
     try {
+        await requireAuth()
+
         const validated = MessageSchema.parse({ content, isStaffReply })
 
         await prisma.ticketMessage.create({
@@ -96,6 +101,8 @@ export async function addMessage(ticketId: string, content: string, isStaffReply
 
 export async function updateTicketStatus(id: string, status: TicketStatus) {
     try {
+        await requireAuth()
+
         await prisma.ticket.update({
             where: { id },
             data: { status }
@@ -113,23 +120,52 @@ export async function updateTicketStatus(id: string, status: TicketStatus) {
 // QUERIES
 // ==========================================
 
-export async function getTickets(status?: TicketStatus) {
+export async function getTickets(options?: {
+    status?: TicketStatus
+    search?: string
+    page?: number
+    limit?: number
+}) {
+    const { status, search = '', page = 1, limit = 10 } = options || {}
+    const skip = (page - 1) * limit
+
     try {
         const where: any = {}
-        if (status) where.status = status
 
-        const tickets = await prisma.ticket.findMany({
-            where,
-            include: {
-                company: { select: { name: true } },
-                _count: { select: { messages: true } }
-            },
-            orderBy: { createdAt: 'desc' }
-        })
-        return tickets
+        if (status) {
+            where.status = status
+        }
+
+        if (search) {
+            where.OR = [
+                { subject: { contains: search } },
+                { company: { name: { contains: search } } },
+            ]
+        }
+
+        const [tickets, total] = await Promise.all([
+            prisma.ticket.findMany({
+                where,
+                skip,
+                take: limit,
+                include: {
+                    company: { select: { id: true, name: true } },
+                    _count: { select: { messages: true } }
+                },
+                orderBy: { createdAt: 'desc' }
+            }),
+            prisma.ticket.count({ where })
+        ])
+
+        return {
+            tickets,
+            total,
+            pages: Math.ceil(total / limit),
+            currentPage: page,
+        }
     } catch (error) {
         console.error('getTickets error:', error)
-        return []
+        return { tickets: [], total: 0, pages: 0, currentPage: 1 }
     }
 }
 
