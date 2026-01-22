@@ -2,6 +2,7 @@
 
 import { prisma } from '@/lib/prisma'
 import { requireAuth } from '@/lib/auth-guard'
+import { logAudit } from '@/lib/audit'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 
@@ -93,6 +94,13 @@ export async function createInvoice(formData: FormData): Promise<InvoiceActionRe
                 description: validatedData.description || null,
                 notes: validatedData.notes || null,
             },
+        })
+
+        await logAudit({
+            action: 'CREATE',
+            entity: 'Invoice',
+            entityId: invoice.id,
+            details: { invoiceNo: invoice.invoiceNo, total },
         })
 
         revalidatePath('/admin/invoices')
@@ -204,6 +212,13 @@ export async function updateInvoiceStatus(id: string, status: string): Promise<I
             data: { status: status as any },
         })
 
+        await logAudit({
+            action: 'UPDATE',
+            entity: 'Invoice',
+            entityId: id,
+            details: { newStatus: status },
+        })
+
         revalidatePath('/admin/invoices')
         revalidatePath(`/admin/invoices/${id}`)
         return { success: true, data: invoice }
@@ -221,8 +236,20 @@ export async function deleteInvoice(id: string): Promise<InvoiceActionResult> {
     try {
         await requireAuth()
 
+        const invoice = await prisma.invoice.findUnique({
+            where: { id },
+            select: { invoiceNo: true },
+        })
+
         await prisma.invoice.delete({
             where: { id },
+        })
+
+        await logAudit({
+            action: 'DELETE',
+            entity: 'Invoice',
+            entityId: id,
+            details: { invoiceNo: invoice?.invoiceNo },
         })
 
         revalidatePath('/admin/invoices')

@@ -2,6 +2,7 @@
 
 import { prisma } from '@/lib/prisma'
 import { requireAuth } from '@/lib/auth-guard'
+import { logAudit } from '@/lib/audit'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 import { TicketStatus, TicketPriority, TicketCategory } from '@prisma/client'
@@ -63,6 +64,13 @@ export async function createTicket(formData: FormData): Promise<TicketFormState>
             }
         })
 
+        await logAudit({
+            action: 'CREATE',
+            entity: 'Ticket',
+            entityId: ticket.id,
+            details: { subject: validated.subject, priority: validated.priority },
+        })
+
         revalidatePath('/admin/tickets')
         return { success: true, data: ticket }
     } catch (error: any) {
@@ -107,6 +115,14 @@ export async function updateTicketStatus(id: string, status: TicketStatus) {
             where: { id },
             data: { status }
         })
+
+        await logAudit({
+            action: 'UPDATE',
+            entity: 'Ticket',
+            entityId: id,
+            details: { newStatus: status },
+        })
+
         revalidatePath('/admin/tickets')
         revalidatePath(`/admin/tickets/${id}`)
         return { success: true }

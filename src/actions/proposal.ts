@@ -2,6 +2,7 @@
 
 import { prisma } from '@/lib/prisma'
 import { requireAuth } from '@/lib/auth-guard'
+import { logAudit } from '@/lib/audit'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 import { ProposalStatus } from '@prisma/client'
@@ -76,6 +77,13 @@ export async function createProposal(formData: any): Promise<ProposalFormState> 
             }
         })
 
+        await logAudit({
+            action: 'CREATE',
+            entity: 'Proposal',
+            entityId: proposal.id,
+            details: { subject: validated.subject, total },
+        })
+
         revalidatePath('/admin/proposals')
         return { success: true, data: proposal }
     } catch (error: any) {
@@ -95,6 +103,14 @@ export async function updateProposalStatus(id: string, status: ProposalStatus) {
             where: { id },
             data: { status }
         })
+
+        await logAudit({
+            action: 'UPDATE',
+            entity: 'Proposal',
+            entityId: id,
+            details: { newStatus: status },
+        })
+
         revalidatePath('/admin/proposals')
         revalidatePath(`/admin/proposals/${id}`)
         return { success: true }
@@ -108,7 +124,21 @@ export async function deleteProposal(id: string) {
     try {
         await requireAuth()
 
+        // Get proposal info before delete for audit
+        const proposal = await prisma.proposal.findUnique({
+            where: { id },
+            select: { subject: true },
+        })
+
         await prisma.proposal.delete({ where: { id } })
+
+        await logAudit({
+            action: 'DELETE',
+            entity: 'Proposal',
+            entityId: id,
+            details: { subject: proposal?.subject },
+        })
+
         revalidatePath('/admin/proposals')
         return { success: true }
     } catch (error) {

@@ -199,6 +199,13 @@ export async function updateCompany(id: string, formData: FormData): Promise<Com
             },
         })
 
+        await logAudit({
+            action: 'UPDATE',
+            entity: 'Company',
+            entityId: id,
+            details: { name: company.name },
+        })
+
         revalidatePath('/admin/companies')
         revalidatePath(`/admin/companies/${id}`)
         return { success: true, data: company }
@@ -262,6 +269,13 @@ export async function toggleCompanyStatus(id: string): Promise<CompanyActionResu
         const updated = await prisma.company.update({
             where: { id },
             data: { isActive: !company.isActive },
+        })
+
+        await logAudit({
+            action: 'UPDATE',
+            entity: 'Company',
+            entityId: id,
+            details: { isActive: updated.isActive, name: company.name },
         })
 
         revalidatePath('/admin/companies')

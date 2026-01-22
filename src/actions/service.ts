@@ -2,6 +2,7 @@
 
 import { prisma } from '@/lib/prisma'
 import { requireAuth } from '@/lib/auth-guard'
+import { logAudit } from '@/lib/audit'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 import { ServiceType, BillingCycle, ServiceStatus } from '@prisma/client'
@@ -78,6 +79,13 @@ export async function createService(formData: FormData): Promise<ServiceFormStat
             }
         })
 
+        await logAudit({
+            action: 'CREATE',
+            entity: 'Service',
+            entityId: service.id,
+            details: { name: validated.name, price: validated.price },
+        })
+
         revalidatePath('/admin/services')
         return { success: true, data: service }
     } catch (error: any) {
@@ -144,6 +152,14 @@ export async function updateServiceStatus(id: string, status: ServiceStatus) {
         await requireAuth()
 
         await prisma.service.update({ where: { id }, data: { status } })
+
+        await logAudit({
+            action: 'UPDATE',
+            entity: 'Service',
+            entityId: id,
+            details: { newStatus: status },
+        })
+
         revalidatePath('/admin/services')
         return { success: true }
     } catch (error) {
@@ -155,7 +171,20 @@ export async function deleteService(id: string) {
     try {
         await requireAuth()
 
+        const service = await prisma.service.findUnique({
+            where: { id },
+            select: { name: true },
+        })
+
         await prisma.service.delete({ where: { id } })
+
+        await logAudit({
+            action: 'DELETE',
+            entity: 'Service',
+            entityId: id,
+            details: { name: service?.name },
+        })
+
         revalidatePath('/admin/services')
         return { success: true }
     } catch (error) {
