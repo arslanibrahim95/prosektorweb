@@ -2,6 +2,7 @@
 
 import { prisma } from '@/lib/prisma'
 import { auth } from '@/auth'
+import { headers } from 'next/headers'
 import { AuditAction } from '@prisma/client'
 
 // ==========================================
@@ -16,8 +17,31 @@ interface AuditLogParams {
 }
 
 /**
+ * Get client IP address from request headers.
+ * Handles proxies (nginx, cloudflare) via x-forwarded-for.
+ */
+async function getClientInfo(): Promise<{ ipAddress: string; userAgent: string }> {
+    try {
+        const headersList = await headers()
+
+        // Try x-forwarded-for first (for proxies), then x-real-ip, then fallback
+        const forwardedFor = headersList.get('x-forwarded-for')
+        const ipAddress = forwardedFor?.split(',')[0]?.trim() ||
+            headersList.get('x-real-ip') ||
+            'unknown'
+
+        const userAgent = headersList.get('user-agent') || 'unknown'
+
+        return { ipAddress, userAgent }
+    } catch {
+        // headers() might fail in some contexts (e.g., non-request context)
+        return { ipAddress: 'unavailable', userAgent: 'unavailable' }
+    }
+}
+
+/**
  * Kritik işlemleri loglar.
- * Session'dan kullanıcı bilgisi alır.
+ * Session'dan kullanıcı bilgisi, headers'dan IP alır.
  * Hata durumunda sessizce fail olur (işlemi bloklamaz).
  */
 export async function logAudit({
@@ -27,7 +51,10 @@ export async function logAudit({
     details,
 }: AuditLogParams): Promise<void> {
     try {
-        const session = await auth()
+        const [session, clientInfo] = await Promise.all([
+            auth(),
+            getClientInfo(),
+        ])
 
         await prisma.auditLog.create({
             data: {
@@ -37,9 +64,9 @@ export async function logAudit({
                 userId: session?.user?.id || null,
                 userName: session?.user?.name || null,
                 userEmail: session?.user?.email || null,
-                details: details ? JSON.parse(JSON.stringify(details)) : null,
-                // IP ve UserAgent server-side'da headers'dan alınabilir
-                // Şimdilik null bırakıyoruz
+                details: details ? JSON.parse(JSON.stringify(details)) : undefined,
+                ipAddress: clientInfo.ipAddress,
+                userAgent: clientInfo.userAgent,
             },
         })
     } catch (error) {
