@@ -60,7 +60,9 @@ export function ProjectOperations({ project }: Props) {
     return (
         <div className="space-y-6">
             {result && (
-                <div className={`p-4 rounded-xl flex items-center gap-3 ${result.success ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'
+                <div
+                    role={result.success ? 'status' : 'alert'}
+                    className={`p-4 rounded-xl flex items-center gap-3 ${result.success ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'
                     }`}>
                     {result.success ? <CheckCircle2 className="w-5 h-5" /> : <AlertCircle className="w-5 h-5" />}
                     {result.message || result.error}
@@ -87,6 +89,7 @@ export function ProjectOperations({ project }: Props) {
                             <input
                                 type="text"
                                 placeholder="subdomain (örn: musteri1)"
+                                aria-label="Subdomain (örn: musteri1)"
                                 value={previewSubdomain}
                                 onChange={e => setPreviewSubdomain(e.target.value)}
                                 className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl"
@@ -121,6 +124,7 @@ export function ProjectOperations({ project }: Props) {
                         <input
                             type="email"
                             placeholder="Yönlendirilecek Adres (örn: gmail)"
+                            aria-label="Yönlendirilecek E-posta Adresi"
                             value={forwardEmail}
                             onChange={e => setForwardEmail(e.target.value)}
                             className="flex-1 px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl"
