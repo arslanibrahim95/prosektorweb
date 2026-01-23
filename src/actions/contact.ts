@@ -2,6 +2,7 @@
 
 import { prisma } from '@/lib/prisma'
 import { z } from 'zod'
+import { headers } from 'next/headers'
 
 const contactSchema = z.object({
     name: z.string().min(2, 'Ad Soyad en az 2 karakter olmalıdır'),
@@ -18,7 +19,35 @@ export type ContactState = {
 }
 
 export async function submitContact(prevState: ContactState, formData: FormData): Promise<ContactState> {
-    // Validate fields
+    // 1. Get Security Context (IP & User Agent)
+    const headersList = headers()
+    const ip = headersList.get('x-forwarded-for')?.split(',')[0] || '127.0.0.1'
+    const userAgent = headersList.get('user-agent') || 'Unknown'
+
+    // 2. Rate Limiting (Max 5 requests per hour per IP)
+    try {
+        const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000)
+        const requestCount = await prisma.contactMessage.count({
+            where: {
+                ipAddress: ip,
+                createdAt: { gt: oneHourAgo }
+            }
+        })
+
+        if (requestCount >= 5) {
+            console.warn(`[RATE LIMIT] blocked IP: ${ip}`)
+            return {
+                success: false,
+                message: 'Çok fazla istek gönderdiniz. Lütfen bir saat sonra tekrar deneyiniz.', // Security by obscurity: don't reveal exact limit
+            }
+        }
+    } catch (error) {
+        console.error('Rate limit check failed:', error)
+        // Fail open or closed? Closed for security.
+        return { success: false, message: 'Sistem yoğunluğu, lütfen bekleyiniz.' }
+    }
+
+    // 3. Validate Validation
     const validatedFields = contactSchema.safeParse({
         name: formData.get('name'),
         email: formData.get('email'),
@@ -27,7 +56,6 @@ export async function submitContact(prevState: ContactState, formData: FormData)
         kvkk: formData.get('kvkk'),
     })
 
-    // Return errors if validation fails
     if (!validatedFields.success) {
         return {
             success: false,
@@ -36,7 +64,7 @@ export async function submitContact(prevState: ContactState, formData: FormData)
         }
     }
 
-    // Save to database
+    // 4. Save to DB with Legal Evidence
     try {
         await prisma.contactMessage.create({
             data: {
@@ -44,6 +72,9 @@ export async function submitContact(prevState: ContactState, formData: FormData)
                 email: validatedFields.data.email,
                 phone: validatedFields.data.phone || '',
                 message: validatedFields.data.message,
+                ipAddress: ip,
+                userAgent: userAgent,
+                kvkkApprovedAt: new Date(),
             },
         })
 

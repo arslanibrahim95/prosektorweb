@@ -19,11 +19,12 @@ import { sendRenewalReminder } from '@/lib/email'
  * }
  */
 export async function GET(request: Request) {
-    // Verify cron secret (optional security)
+    // Verify cron secret (Mandatory security)
     const authHeader = request.headers.get('authorization')
     const cronSecret = process.env.CRON_SECRET
 
-    if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
+    // Fail safe: If no secret is set in env, deny all requests
+    if (!cronSecret || authHeader !== `Bearer ${cronSecret}`) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 

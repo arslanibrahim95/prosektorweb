@@ -1,8 +1,10 @@
 'use server'
 
 import { prisma } from '@/lib/prisma'
+import { requireAuth } from '@/lib/auth-guard'
 
 export async function getRevenueData() {
+    await requireAuth(['ADMIN'])
     const now = new Date()
     const sixMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 5, 1)
 
@@ -41,6 +43,7 @@ export async function getRevenueData() {
 }
 
 export async function getProjectStats() {
+    await requireAuth(['ADMIN'])
     const [draft, designing, development, review, live, paused] = await Promise.all([
         prisma.webProject.count({ where: { status: 'DRAFT' } }),
         prisma.webProject.count({ where: { status: 'DESIGNING' } }),
@@ -61,6 +64,7 @@ export async function getProjectStats() {
 }
 
 export async function getInvoiceStats() {
+    await requireAuth(['ADMIN'])
     const [total, paid, pending, overdue] = await Promise.all([
         prisma.invoice.aggregate({ _sum: { total: true } }),
         prisma.invoice.aggregate({ where: { status: 'PAID' }, _sum: { total: true } }),
@@ -83,6 +87,7 @@ export async function getInvoiceStats() {
 }
 
 export async function getTicketStats() {
+    await requireAuth(['ADMIN'])
     const thisMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1)
 
     const [open, resolved, thisMonthCount] = await Promise.all([

@@ -2,6 +2,7 @@
 
 import { prisma } from '@/lib/prisma'
 import { requireAuth } from '@/lib/auth-guard'
+import { auth } from '@/auth'
 import { logAudit } from '@/lib/audit'
 import { getErrorMessage, getZodErrorMessage } from '@/lib/action-types'
 import { revalidatePath } from 'next/cache'
@@ -91,8 +92,7 @@ export async function createService(formData: FormData): Promise<ServiceFormStat
         return { success: true, data: service }
     } catch (error: unknown) {
         console.error('createService error:', error)
-        if (error instanceof z.ZodError) { return { success: false, error: getZodErrorMessage(error) } }
-        if (false) {
+        if (error instanceof z.ZodError) {
             return { success: false, error: getZodErrorMessage(error) }
         }
         return { success: false, error: getErrorMessage(error) }
@@ -209,7 +209,20 @@ export async function getServices(options?: {
     const skip = (page - 1) * limit
 
     try {
+        const session = await auth()
+        if (!session?.user) return { services: [], total: 0, pages: 0, currentPage: 1 }
+
         const where: any = {}
+
+        // Tenant isolation for non-admin users
+        if (session.user.role !== 'ADMIN') {
+            const user = await prisma.user.findUnique({
+                where: { id: session.user.id },
+                select: { companyId: true }
+            })
+            if (!user?.companyId) return { services: [], total: 0, pages: 0, currentPage: 1 }
+            where.companyId = user.companyId
+        }
 
         if (status) {
             where.status = status

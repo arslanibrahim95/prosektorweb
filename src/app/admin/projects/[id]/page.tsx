@@ -10,7 +10,8 @@ import {
     DollarSign,
     Clock,
     CheckCircle2,
-    Link as LinkIcon
+    Link as LinkIcon,
+    Sparkles
 } from 'lucide-react'
 import { ProjectStatusManager } from '@/components/admin/project/ProjectStatusManager'
 import { ProjectEditForm } from '@/components/admin/project/ProjectEditForm'
@@ -73,6 +74,13 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
                 </div>
 
                 <div className="flex items-center gap-3">
+                    <Link
+                        href={`/admin/projects/${id}/generate`}
+                        className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-brand-600 to-brand-700 text-white rounded-xl font-medium hover:from-brand-700 hover:to-brand-800 transition-all shadow-lg shadow-brand-600/30"
+                    >
+                        <Sparkles className="w-4 h-4" />
+                        İçerik Üret
+                    </Link>
                     {project.previewUrl && (
                         <a
                             href={project.previewUrl}

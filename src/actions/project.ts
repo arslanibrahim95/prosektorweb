@@ -3,6 +3,7 @@
 import { prisma } from '@/lib/prisma'
 import { getErrorMessage, getZodErrorMessage } from '@/lib/action-types'
 import { requireAuth } from '@/lib/auth-guard'
+import { auth } from '@/auth'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 
@@ -57,8 +58,7 @@ export async function createProject(formData: FormData): Promise<ProjectActionRe
         return { success: true, data: project }
     } catch (error: unknown) {
         console.error('createProject error:', error)
-        if (error instanceof z.ZodError) { return { success: false, error: getZodErrorMessage(error) } }
-        if (false) {
+        if (error instanceof z.ZodError) {
             return { success: false, error: getZodErrorMessage(error) }
         }
         return { success: false, error: 'Proje oluşturulurken hata oluştu.' }
@@ -67,7 +67,20 @@ export async function createProject(formData: FormData): Promise<ProjectActionRe
 
 export async function getProjects(search?: string, status?: string) {
     try {
+        const session = await auth()
+        if (!session?.user) return []
+
         const where: any = {}
+
+        // Tenant isolation for non-admin users
+        if (session.user.role !== 'ADMIN') {
+            const user = await prisma.user.findUnique({
+                where: { id: session.user.id },
+                select: { companyId: true }
+            })
+            if (!user?.companyId) return []
+            where.companyId = user.companyId
+        }
 
         if (search) {
             where.OR = [
@@ -97,6 +110,9 @@ export async function getProjects(search?: string, status?: string) {
 
 export async function getProjectById(id: string) {
     try {
+        const session = await auth()
+        if (!session?.user) return null
+
         const project = await prisma.webProject.findUnique({
             where: { id },
             include: {
@@ -104,6 +120,20 @@ export async function getProjectById(id: string) {
                 domain: { include: { dnsRecords: true } },
             },
         })
+
+        if (!project) return null
+
+        // IDOR Check
+        if (session.user.role !== 'ADMIN') {
+            const user = await prisma.user.findUnique({
+                where: { id: session.user.id },
+                select: { companyId: true }
+            })
+            if (!user?.companyId || project.companyId !== user.companyId) {
+                return null
+            }
+        }
+
         return project
     } catch (error) {
         console.error('getProjectById error:', error)
@@ -218,6 +248,7 @@ export async function deleteProject(id: string): Promise<ProjectActionResult> {
 
 export async function getProjectStats() {
     try {
+        await requireAuth(['ADMIN'])
         const [
             total,
             draft,

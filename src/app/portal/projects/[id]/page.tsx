@@ -1,7 +1,7 @@
 import { getProjectById } from '@/actions/portal'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, ExternalLink, Globe, Calendar, CheckCircle, Clock, AlertCircle } from 'lucide-react'
+import { ArrowLeft, ExternalLink, Globe, Calendar, CheckCircle, Clock, AlertCircle, FileText, Settings } from 'lucide-react'
 
 // Status config with colors and labels
 const statusConfig: Record<string, { label: string; color: string; bgColor: string }> = {
@@ -47,9 +47,18 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
                         {project.company?.name}
                     </p>
                 </div>
-                <span className={`px-4 py-2 rounded-full text-sm font-bold ${statusInfo.bgColor} ${statusInfo.color}`}>
-                    {statusInfo.label}
-                </span>
+                <div className="flex items-center gap-3">
+                    <Link
+                        href={`/portal/projects/${id}/settings`}
+                        className="flex items-center gap-2 px-4 py-2 bg-neutral-100 text-neutral-700 rounded-xl font-medium hover:bg-neutral-200 transition-colors"
+                    >
+                        <Settings className="w-4 h-4" />
+                        Ayarlar
+                    </Link>
+                    <span className={`px-4 py-2 rounded-full text-sm font-bold ${statusInfo.bgColor} ${statusInfo.color}`}>
+                        {statusInfo.label}
+                    </span>
+                </div>
             </div>
 
             {/* Status Timeline */}
@@ -71,10 +80,10 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
                         return (
                             <div key={status} className="relative flex flex-col items-center z-10">
                                 <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${isCompleted
-                                        ? 'bg-brand-600 text-white'
-                                        : isCurrent
-                                            ? 'bg-brand-600 text-white ring-4 ring-brand-100'
-                                            : 'bg-neutral-100 text-neutral-400'
+                                    ? 'bg-brand-600 text-white'
+                                    : isCurrent
+                                        ? 'bg-brand-600 text-white ring-4 ring-brand-100'
+                                        : 'bg-neutral-100 text-neutral-400'
                                     }`}>
                                     {isCompleted ? (
                                         <CheckCircle className="w-5 h-5" />
@@ -206,6 +215,65 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
                     </div>
                 </div>
             </div>
+
+            {/* Site İçerikleri */}
+            {project.generatedContents && project.generatedContents.length > 0 && (
+                <div className="bg-white border border-neutral-200 rounded-2xl overflow-hidden">
+                    <div className="p-6 border-b border-neutral-100">
+                        <h2 className="text-lg font-bold text-neutral-900 flex items-center gap-2">
+                            <FileText className="w-5 h-5 text-brand-600" />
+                            Site İçerikleri
+                        </h2>
+                        <p className="text-sm text-neutral-500 mt-1">
+                            Siteniz için oluşturulan içerikleri inceleyin ve onaylayın
+                        </p>
+                    </div>
+                    <div className="divide-y divide-neutral-100">
+                        {project.generatedContents.map((content: any) => {
+                            const contentLabels: Record<string, string> = {
+                                HOMEPAGE: 'Anasayfa',
+                                ABOUT: 'Hakkımızda',
+                                SERVICES: 'Hizmetler',
+                                CONTACT: 'İletişim',
+                                FAQ: 'SSS',
+                            }
+                            const contentStatus = ({
+                                DRAFT: { label: 'Onay Bekliyor', color: 'bg-yellow-100 text-yellow-700' },
+                                APPROVED: { label: 'Onaylandı', color: 'bg-green-100 text-green-700' },
+                                REJECTED: { label: 'Reddedildi', color: 'bg-red-100 text-red-700' },
+                                PUBLISHED: { label: 'Yayında', color: 'bg-blue-100 text-blue-700' },
+                            } as Record<string, { label: string; color: string }>)[content.status] || { label: 'Bekliyor', color: 'bg-neutral-100 text-neutral-600' }
+
+                            return (
+                                <Link
+                                    key={content.id}
+                                    href={`/portal/projects/${id}/content/${content.id}`}
+                                    className="flex items-center justify-between p-4 hover:bg-neutral-50 transition-colors"
+                                >
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-10 h-10 bg-brand-100 rounded-lg flex items-center justify-center">
+                                            <FileText className="w-5 h-5 text-brand-600" />
+                                        </div>
+                                        <div>
+                                            <h3 className="font-medium text-neutral-900">
+                                                {contentLabels[content.contentType] || content.contentType}
+                                            </h3>
+                                            {content.metaTitle && (
+                                                <p className="text-sm text-neutral-500 truncate max-w-sm">
+                                                    {content.metaTitle}
+                                                </p>
+                                            )}
+                                        </div>
+                                    </div>
+                                    <span className={`px-3 py-1 rounded-full text-xs font-bold ${contentStatus.color}`}>
+                                        {contentStatus.label}
+                                    </span>
+                                </Link>
+                            )
+                        })}
+                    </div>
+                </div>
+            )}
 
             {/* Notes */}
             {project.notes && (

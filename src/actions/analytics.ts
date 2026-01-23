@@ -2,10 +2,12 @@
 
 import { prisma } from '@/lib/prisma'
 import { auth } from '@/auth'
+import { requireAuth } from '@/lib/auth-guard'
+import '@/types/next-auth'
 
-async function getClientCompanyId() {
+async function getClientCompanyId(): Promise<string | null> {
     const session = await auth()
-    return (session?.user as any)?.companyId || null
+    return session?.user?.companyId || null
 }
 
 // Get analytics for all client's projects
@@ -110,8 +112,10 @@ export async function getClientAnalyticsSummary() {
     return summary
 }
 
-// Generate mock analytics for demo purposes
+// Generate mock analytics for demo purposes (Admin only)
 export async function generateMockAnalytics(projectId: string) {
+    await requireAuth(['ADMIN'])
+
     // Check if analytics already exist
     const existing = await prisma.siteAnalytics.findUnique({
         where: { projectId }

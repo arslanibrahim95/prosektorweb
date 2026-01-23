@@ -3,15 +3,16 @@
 import { prisma } from '@/lib/prisma'
 import { getErrorMessage, getZodErrorMessage } from '@/lib/action-types'
 import { requireAuth } from '@/lib/auth-guard'
+import { auth } from '@/auth'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
-import { Prisma } from '@prisma/client'
+import { Prisma, TaskStatus, TaskPriority } from '@prisma/client'
 
 const TaskSchema = z.object({
     title: z.string().min(1, 'Başlık zorunludur'),
     description: z.string().optional(),
-    status: z.enum(['TODO', 'IN_PROGRESS', 'DONE', 'ARCHIVED']).optional(),
-    priority: z.enum(['LOW', 'NORMAL', 'HIGH', 'URGENT']).optional(),
+    status: z.nativeEnum(TaskStatus).optional(),
+    priority: z.nativeEnum(TaskPriority).optional(),
     dueDate: z.string().optional(), // Form data sends string
     webProjectId: z.string().optional(),
 })
@@ -60,8 +61,7 @@ export async function createTask(formData: FormData): Promise<TaskFormState> {
         return { success: true, data: task }
     } catch (error: unknown) {
         console.error('createTask error:', error)
-        if (error instanceof z.ZodError) { return { success: false, error: getZodErrorMessage(error) } }
-        if (false) {
+        if (error instanceof z.ZodError) {
             return { success: false, error: getZodErrorMessage(error) }
         }
         return { success: false, error: 'Görev oluşturulurken hata oluştu.' }
@@ -105,6 +105,14 @@ export async function deleteTask(id: string): Promise<TaskFormState> {
 
 export async function getTasks(webProjectId?: string) {
     try {
+        const session = await auth()
+        if (!session?.user) return { success: false, data: [] }
+
+        // Tasks are admin-only feature for now
+        if (session.user.role !== 'ADMIN') {
+            return { success: false, data: [] }
+        }
+
         const where: Prisma.TaskWhereInput = { parentId: null } // Only get top-level tasks
         if (webProjectId) where.webProjectId = webProjectId
 
@@ -212,8 +220,22 @@ export async function updateTask(id: string, data: {
 
         if (data.title !== undefined) updateData.title = data.title
         if (data.description !== undefined) updateData.description = data.description
-        if (data.status !== undefined) updateData.status = data.status
-        if (data.priority !== undefined) updateData.priority = data.priority
+
+        // Validation for Enums
+        if (data.status !== undefined) {
+            const StatusSchema = z.enum(['TODO', 'IN_PROGRESS', 'DONE', 'ARCHIVED'])
+            const result = StatusSchema.safeParse(data.status)
+            if (!result.success) throw new Error('Geçersiz görev durumu')
+            updateData.status = data.status
+        }
+
+        if (data.priority !== undefined) {
+            const PrioritySchema = z.enum(['LOW', 'NORMAL', 'HIGH', 'URGENT'])
+            const result = PrioritySchema.safeParse(data.priority)
+            if (!result.success) throw new Error('Geçersiz görev önceliği')
+            updateData.priority = data.priority
+        }
+
         if (data.assignedTo !== undefined) updateData.assignedTo = data.assignedTo
         if (data.estimatedHours !== undefined) updateData.estimatedHours = data.estimatedHours
         if (data.actualHours !== undefined) updateData.actualHours = data.actualHours

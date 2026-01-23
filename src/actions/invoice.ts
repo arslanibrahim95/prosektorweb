@@ -2,6 +2,7 @@
 
 import { prisma } from '@/lib/prisma'
 import { requireAuth } from '@/lib/auth-guard'
+import { auth } from '@/auth'
 import { logAudit } from '@/lib/audit'
 import { getErrorMessage, getZodErrorMessage, isPrismaUniqueConstraintError } from '@/lib/action-types'
 import { revalidatePath } from 'next/cache'
@@ -109,8 +110,7 @@ export async function createInvoice(formData: FormData): Promise<InvoiceActionRe
     } catch (error: unknown) {
         console.error('createInvoice error:', error)
 
-        if (error instanceof z.ZodError) { return { success: false, error: getZodErrorMessage(error) } }
-        if (false) {
+        if (error instanceof z.ZodError) {
             return { success: false, error: getZodErrorMessage(error) }
         }
 
@@ -136,7 +136,29 @@ export async function getInvoices(options?: {
     const skip = (page - 1) * limit
 
     try {
+        const session = await auth()
+        if (!session?.user) {
+            return { invoices: [], total: 0, pages: 0, currentPage: 1 }
+        }
+
         const where: any = {}
+
+        // Tenant Isolation: Clients can only see their own invoices
+        if (session.user.role !== 'ADMIN') {
+            // Client must have a companyId to see invoices
+            // We need to fetch user's companyId from DB to be sure (session might be stale)
+            const user = await prisma.user.findUnique({
+                where: { id: session.user.id },
+                select: { companyId: true }
+            })
+
+            if (!user?.companyId) {
+                return { invoices: [], total: 0, pages: 0, currentPage: 1 }
+            }
+
+            where.companyId = user.companyId
+        }
+
 
         if (search) {
             where.OR = [
@@ -185,6 +207,9 @@ export async function getInvoices(options?: {
 
 export async function getInvoiceById(id: string) {
     try {
+        const session = await auth()
+        if (!session?.user) return null
+
         const invoice = await prisma.invoice.findUnique({
             where: { id },
             include: {
@@ -194,6 +219,21 @@ export async function getInvoiceById(id: string) {
                 },
             },
         })
+
+        if (!invoice) return null
+
+        // IDOR Check
+        if (session.user.role !== 'ADMIN') {
+            const user = await prisma.user.findUnique({
+                where: { id: session.user.id },
+                select: { companyId: true }
+            })
+
+            if (!user?.companyId || invoice.companyId !== user.companyId) {
+                return null // Unauthorized access to another company's invoice
+            }
+        }
+
         return invoice
     } catch (error) {
         console.error('getInvoiceById error:', error)

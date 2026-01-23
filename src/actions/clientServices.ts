@@ -5,10 +5,11 @@ import { auth } from '@/auth'
 import { revalidatePath } from 'next/cache'
 import bcrypt from 'bcryptjs'
 import { z } from 'zod'
+import '@/types/next-auth'
 
-async function getClientCompanyId() {
+async function getClientCompanyId(): Promise<string | null> {
     const session = await auth()
-    return (session?.user as any)?.companyId || null
+    return session?.user?.companyId || null
 }
 
 // Helper to get current user ID

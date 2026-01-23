@@ -3,6 +3,7 @@
 import { getCloudflareService, getDefaultServerIp } from '@/lib/cloudflare'
 import { prisma } from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
+import { auth } from '@/auth'
 
 // ==========================================
 // TYPES
@@ -26,6 +27,16 @@ export interface RegistrationResult {
 }
 
 // ==========================================
+// HELPERS
+// ==========================================
+async function requireAdmin() {
+    const session = await auth()
+    if (!session || session.user?.role !== 'ADMIN') {
+        throw new Error('Unauthorized: Admin access required')
+    }
+}
+
+// ==========================================
 // DOMAIN AVAILABILITY CHECK WITH PRICING
 // ==========================================
 
@@ -35,6 +46,12 @@ export async function searchDomainsWithPricing(query: string): Promise<{
     error?: string
 }> {
     try {
+        // Search public access? Let's limit it to authenticated users at least
+        const session = await auth()
+        if (!session) {
+            return { success: false, results: [], error: 'Oturum açmanız gerekiyor' }
+        }
+
         const cf = await getCloudflareService()
         if (!cf) {
             return { success: false, results: [], error: 'Cloudflare yapılandırılmamış' }
@@ -113,6 +130,8 @@ export async function purchaseDomain(
     companyId?: string
 ): Promise<RegistrationResult> {
     try {
+        await requireAdmin()
+
         const cf = await getCloudflareService()
         if (!cf) {
             return { success: false, error: 'Cloudflare yapılandırılmamış' }
@@ -174,6 +193,11 @@ export async function getAllTldPricing(): Promise<{
     error?: string
 }> {
     try {
+        const session = await auth()
+        if (!session) {
+            return { success: false, pricing: [], error: 'Oturum açmanız gerekiyor' }
+        }
+
         const cf = await getCloudflareService()
         if (!cf) {
             return { success: false, pricing: [], error: 'Cloudflare yapılandırılmamış' }

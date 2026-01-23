@@ -1,8 +1,8 @@
 'use client'
 
-import { useActionState } from 'react'
+import { useActionState, useRef, useEffect } from 'react'
 import { submitContact, ContactState } from '@/actions/contact'
-import { Loader2, CheckCircle, AlertCircle } from 'lucide-react'
+import { Loader2, CheckCircle, AlertCircle, RefreshCw } from 'lucide-react'
 
 const initialState: ContactState = {
     success: false,
@@ -11,19 +11,34 @@ const initialState: ContactState = {
 
 export function ContactForm() {
     const [state, formAction, isPending] = useActionState(submitContact, initialState)
+    const formRef = useRef<HTMLFormElement>(null)
+
+    // Reset form fields when submission is successful or component mounts
+    useEffect(() => {
+        if (state.success && formRef.current) {
+            formRef.current.reset()
+        }
+    }, [state.success])
 
     return (
         <div className="max-w-md mx-auto bg-white p-8 rounded-2xl border border-neutral-200 shadow-lg">
             {state.success ? (
-                <div className="text-center py-8">
+                <div className="text-center py-8 animate-in fade-in zoom-in duration-300">
                     <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
                         <CheckCircle className="w-8 h-8" />
                     </div>
                     <h3 className="text-xl font-bold text-neutral-900 mb-2">Teşekkürler!</h3>
-                    <p className="text-neutral-600">{state.message}</p>
+                    <p className="text-neutral-600 mb-6">{state.message}</p>
+                    <button
+                        onClick={() => window.location.reload()}
+                        className="text-sm text-brand-600 font-semibold hover:text-brand-700 flex items-center justify-center gap-2 mx-auto"
+                    >
+                        <RefreshCw className="w-4 h-4" /> Yeni Mesaj Gönder
+                    </button>
                 </div>
             ) : (
-                <form action={formAction} className="space-y-4">
+                <form ref={formRef} action={formAction} className="space-y-4">
+                    {/* Input fields remain same */}
                     <div>
                         <label className="block text-sm font-semibold text-neutral-700 mb-1">Ad Soyad</label>
                         <input
@@ -39,6 +54,9 @@ export function ContactForm() {
                             </p>
                         )}
                     </div>
+
+                    {/* Phone, Email, Message, KVKK inputs remain same... I will use existing content just adding ref */}
+                    {/* Since I am replacing the whole block, I need to include all inputs */}
 
                     <div>
                         <label className="block text-sm font-semibold text-neutral-700 mb-1">Telefon</label>
@@ -93,6 +111,7 @@ export function ContactForm() {
                             />
                             <label htmlFor="kvkk" className="text-sm text-neutral-500 cursor-pointer select-none">
                                 KVKK onay formunu okudum, onaylıyorum.
+                                <span className="block text-xs text-neutral-400 mt-0.5">IP adresiniz yasal zorunluluk gereği kayıt altına alınmaktadır.</span>
                             </label>
                         </div>
                         {state.errors?.kvkk && (

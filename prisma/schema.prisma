@@ -336,6 +336,7 @@ model BlogPost {
 // CONTACT / LEADS
 // ===============================
 
+
 model ContactMessage {
   id        String   @id @default(uuid())
   name      String
@@ -344,10 +345,17 @@ model ContactMessage {
   company   String?
   message   String   @db.Text
   read      Boolean  @default(false)
+  
+  // Legal & Security
+  ipAddress      String?
+  userAgent      String?
+  kvkkApprovedAt DateTime? @default(now()) // Onay zamani
+
   createdAt DateTime @default(now())
 
   @@index([read])
   @@index([createdAt])
+  @@index([ipAddress]) // For rate limiting
 }
 
 // ===============================
@@ -553,6 +561,7 @@ model WebProject {
   tasks       Task[]
   portfolio   Portfolio?
   analytics   SiteAnalytics?
+  generatedContents GeneratedContent[]
   
   // Proje durumu
   status      ProjectStatus @default(DRAFT)
@@ -579,6 +588,58 @@ model WebProject {
 
   @@index([companyId])
   @@index([domainId])
+  @@index([status])
+}
+
+// ===============================
+// AI GENERATED CONTENT
+// ===============================
+
+enum ContentType {
+  HOMEPAGE
+  ABOUT
+  SERVICES
+  CONTACT
+  BLOG
+  FAQ
+}
+
+enum ContentStatus {
+  DRAFT
+  APPROVED
+  REJECTED
+  PUBLISHED
+}
+
+model GeneratedContent {
+  id            String        @id @default(uuid())
+  
+  // Project relation
+  webProjectId  String
+  webProject    WebProject    @relation(fields: [webProjectId], references: [id], onDelete: Cascade)
+  
+  // Content
+  contentType   ContentType
+  title         String?
+  content       String        @db.MediumText
+  metaTitle     String?       @db.VarChar(100)
+  metaDescription String?     @db.VarChar(200)
+  
+  // Generation metadata
+  modelUsed     String        // gpt-4, gpt-4-turbo, etc.
+  tokensUsed    Int?
+  generatedAt   DateTime      @default(now())
+  
+  // Status & Approval
+  status        ContentStatus @default(DRAFT)
+  approvedAt    DateTime?
+  approvedBy    String?       // Admin user email
+  
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  @@index([webProjectId])
+  @@index([contentType])
   @@index([status])
 }
 

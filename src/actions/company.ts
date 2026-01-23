@@ -2,6 +2,7 @@
 
 import { prisma } from '@/lib/prisma'
 import { requireAuth } from '@/lib/auth-guard'
+import { auth } from '@/auth'
 import { logAudit } from '@/lib/audit'
 import { getErrorMessage, getZodErrorMessage } from '@/lib/action-types'
 import { revalidatePath } from 'next/cache'
@@ -73,8 +74,7 @@ export async function createCompany(formData: FormData): Promise<CompanyActionRe
     } catch (error: unknown) {
         console.error('createCompany error:', error)
 
-        if (error instanceof z.ZodError) { return { success: false, error: getZodErrorMessage(error) } }
-        if (false) {
+        if (error instanceof z.ZodError) {
             return { success: false, error: getZodErrorMessage(error) }
         }
 
@@ -95,6 +95,12 @@ export async function getCompanies(options?: {
     const skip = (page - 1) * limit
 
     try {
+        const session = await auth()
+        if (!session?.user || session.user.role !== 'ADMIN') {
+            // Only admins can list companies
+            return { companies: [], total: 0, pages: 0, currentPage: 1 }
+        }
+
         const where = search
             ? {
                 OR: [
@@ -138,6 +144,21 @@ export async function getCompanies(options?: {
 
 export async function getCompanyById(id: string) {
     try {
+        const session = await auth()
+        if (!session?.user) return null
+
+        // IDOR Check
+        if (session.user.role !== 'ADMIN') {
+            const user = await prisma.user.findUnique({
+                where: { id: session.user.id },
+                select: { companyId: true }
+            })
+
+            if (!user?.companyId || user.companyId !== id) {
+                return null // Unauthorized
+            }
+        }
+
         const company = await prisma.company.findUnique({
             where: { id },
             include: {
@@ -214,8 +235,7 @@ export async function updateCompany(id: string, formData: FormData): Promise<Com
     } catch (error: unknown) {
         console.error('updateCompany error:', error)
 
-        if (error instanceof z.ZodError) { return { success: false, error: getZodErrorMessage(error) } }
-        if (false) {
+        if (error instanceof z.ZodError) {
             return { success: false, error: getZodErrorMessage(error) }
         }
 

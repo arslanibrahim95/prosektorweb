@@ -100,6 +100,18 @@ export default async function CompanyDetailPage({ params }: CompanyDetailPagePro
                         <Receipt className="w-4 h-4" />
                         Fatura Kes
                     </Link>
+
+                    {/* View As Button */}
+                    <form action={async () => {
+                        'use server'
+                        const { impersonateCompany } = await import('@/actions/admin-ops')
+                        await impersonateCompany(company.id)
+                    }}>
+                        <button className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-xl font-medium hover:bg-purple-700 transition-colors">
+                            <Layers className="w-4 h-4" />
+                            Portal'a Git
+                        </button>
+                    </form>
                 </div>
             </div>
 
@@ -208,7 +220,7 @@ export default async function CompanyDetailPage({ params }: CompanyDetailPagePro
                             <div key={workplace.id} className="p-4 bg-neutral-50 rounded-xl flex items-center justify-between">
                                 <div className="flex items-center gap-4">
                                     <div className={`w-3 h-3 rounded-full ${workplace.dangerClass === 'VERY_DANGEROUS' ? 'bg-red-500' :
-                                            workplace.dangerClass === 'DANGEROUS' ? 'bg-yellow-500' : 'bg-green-500'
+                                        workplace.dangerClass === 'DANGEROUS' ? 'bg-yellow-500' : 'bg-green-500'
                                         }`} />
                                     <div>
                                         <div className="font-bold text-neutral-900">{workplace.title}</div>

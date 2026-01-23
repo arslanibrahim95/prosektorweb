@@ -3,6 +3,7 @@
 import { prisma } from '@/lib/prisma'
 import { getErrorMessage, getZodErrorMessage, isPrismaUniqueConstraintError } from '@/lib/action-types'
 import { requireAuth } from '@/lib/auth-guard'
+import { auth } from '@/auth'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 
@@ -70,8 +71,7 @@ export async function createDomain(formData: FormData): Promise<DomainActionResu
         if (isPrismaUniqueConstraintError(error)) {
             return { success: false, error: 'Bu domain zaten kayıtlı.' }
         }
-        if (error instanceof z.ZodError) { return { success: false, error: getZodErrorMessage(error) } }
-        if (false) {
+        if (error instanceof z.ZodError) {
             return { success: false, error: getZodErrorMessage(error) }
         }
         return { success: false, error: 'Domain eklenirken hata oluştu.' }
@@ -80,9 +80,22 @@ export async function createDomain(formData: FormData): Promise<DomainActionResu
 
 export async function getDomains(search?: string) {
     try {
-        const where = search
+        const session = await auth()
+        if (!session?.user) return []
+
+        const where: any = search
             ? { name: { contains: search } }
             : {}
+
+        // Tenant isolation for non-admin users
+        if (session.user.role !== 'ADMIN') {
+            const user = await prisma.user.findUnique({
+                where: { id: session.user.id },
+                select: { companyId: true }
+            })
+            if (!user?.companyId) return []
+            where.companyId = user.companyId
+        }
 
         const domains = await prisma.domain.findMany({
             where,
@@ -101,6 +114,9 @@ export async function getDomains(search?: string) {
 
 export async function getDomainById(id: string) {
     try {
+        const session = await auth()
+        if (!session?.user) return null
+
         const domain = await prisma.domain.findUnique({
             where: { id },
             include: {
@@ -108,6 +124,20 @@ export async function getDomainById(id: string) {
                 dnsRecords: { orderBy: { type: 'asc' } },
             },
         })
+
+        if (!domain) return null
+
+        // IDOR Check
+        if (session.user.role !== 'ADMIN' && domain.companyId) {
+            const user = await prisma.user.findUnique({
+                where: { id: session.user.id },
+                select: { companyId: true }
+            })
+            if (!user?.companyId || domain.companyId !== user.companyId) {
+                return null
+            }
+        }
+
         return domain
     } catch (error) {
         console.error('getDomainById error:', error)
@@ -204,8 +234,7 @@ export async function createDnsRecord(formData: FormData): Promise<DomainActionR
         return { success: true, data: record }
     } catch (error: unknown) {
         console.error('createDnsRecord error:', error)
-        if (error instanceof z.ZodError) { return { success: false, error: getZodErrorMessage(error) } }
-        if (false) {
+        if (error instanceof z.ZodError) {
             return { success: false, error: getZodErrorMessage(error) }
         }
         return { success: false, error: 'DNS kaydı eklenirken hata oluştu.' }
@@ -231,6 +260,7 @@ export async function deleteDnsRecord(id: string, domainId: string): Promise<Dom
 
 export async function getApiConfigs() {
     try {
+        await requireAuth(['ADMIN'])
         return await prisma.apiConfig.findMany({
             orderBy: { name: 'asc' },
         })
@@ -359,6 +389,7 @@ export async function searchDomains(query: string): Promise<DomainSearchResult> 
 
 export async function getDomainStats() {
     try {
+        await requireAuth(['ADMIN'])
         const [total, active, pending, expiringSoon] = await Promise.all([
             prisma.domain.count(),
             prisma.domain.count({ where: { status: 'ACTIVE' } }),

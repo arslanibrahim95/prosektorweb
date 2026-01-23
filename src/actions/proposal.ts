@@ -89,8 +89,7 @@ export async function createProposal(formData: any): Promise<ProposalFormState> 
         return { success: true, data: proposal }
     } catch (error: unknown) {
         console.error('createProposal error:', error)
-        if (error instanceof z.ZodError) { return { success: false, error: getZodErrorMessage(error) } }
-        if (false) {
+        if (error instanceof z.ZodError) {
             return { success: false, error: getZodErrorMessage(error) }
         }
         return { success: false, error: getErrorMessage(error) }

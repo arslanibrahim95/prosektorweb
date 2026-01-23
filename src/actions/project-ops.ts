@@ -3,6 +3,7 @@
 import { getCloudflareService, getDefaultServerIp } from '@/lib/cloudflare'
 import { prisma } from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
+import { auth } from '@/auth'
 
 export interface OpsResult {
     success: boolean
@@ -12,11 +13,23 @@ export interface OpsResult {
 }
 
 // ==========================================
+// HELPERS
+// ==========================================
+async function requireAdmin() {
+    const session = await auth()
+    if (!session || session.user?.role !== 'ADMIN') {
+        throw new Error('Unauthorized: Admin access required')
+    }
+}
+
+// ==========================================
 // PREVIEW SYSTEM
 // ==========================================
 
 export async function createPreview(projectId: string, subdomain: string, rootDomain: string = 'prosektorweb.com'): Promise<OpsResult> {
     try {
+        await requireAdmin()
+
         const cf = await getCloudflareService()
         if (!cf) {
             return { success: false, error: 'Cloudflare yapılandırılmamış' }
@@ -44,7 +57,7 @@ export async function createPreview(projectId: string, subdomain: string, rootDo
         return { success: true, message: 'Önizleme oluşturuldu', data: { url: result.url } }
     } catch (error) {
         console.error('createPreview error:', error)
-        return { success: false, error: 'Önizleme oluşturma hatası' }
+        return { success: false, error: error instanceof Error ? error.message : 'Önizleme oluşturma hatası' }
     }
 }
 
@@ -54,6 +67,8 @@ export async function createPreview(projectId: string, subdomain: string, rootDo
 
 export async function setupDomainEmail(projectId: string, forwardTo: string): Promise<OpsResult> {
     try {
+        await requireAdmin()
+
         const project = await prisma.webProject.findUnique({
             where: { id: projectId },
             include: { domain: true }
@@ -103,7 +118,7 @@ export async function setupDomainEmail(projectId: string, forwardTo: string): Pr
         }
     } catch (error) {
         console.error('setupDomainEmail error:', error)
-        return { success: false, error: 'E-posta kurulum hatası' }
+        return { success: false, error: error instanceof Error ? error.message : 'E-posta kurulum hatası' }
     }
 }
 
@@ -113,6 +128,7 @@ export async function setupDomainEmail(projectId: string, forwardTo: string): Pr
 
 export async function triggerDeploy(projectId: string): Promise<OpsResult> {
     try {
+        await requireAdmin()
         // In a real scenario, this would SSH into the server or trigger a CI/CD pipeline
         // For now, we simulate the process
 
@@ -130,6 +146,6 @@ export async function triggerDeploy(projectId: string): Promise<OpsResult> {
         return { success: true, message: 'Deploy işlemi başlatıldı' }
     } catch (error) {
         console.error('triggerDeploy error:', error)
-        return { success: false, error: 'Deploy başlatılamadı' }
+        return { success: false, error: error instanceof Error ? error.message : 'Deploy başlatılamadı' }
     }
 }

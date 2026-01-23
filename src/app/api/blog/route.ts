@@ -46,10 +46,10 @@ export async function GET(request: Request) {
             prisma.blogPost.count({ where })
         ])
 
-        // Parse tags from JSON string
-        const formattedPosts = posts.map((post: any) => ({
+        // Parse tags from JSON string and fix type safety
+        const formattedPosts = posts.map((post) => ({
             ...post,
-            tags: typeof post.tags === 'string' ? JSON.parse(post.tags) : post.tags
+            tags: typeof post.tags === 'string' ? JSON.parse(post.tags) : (post.tags || [])
         }))
 
         return NextResponse.json({

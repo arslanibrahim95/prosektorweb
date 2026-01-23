@@ -44,8 +44,7 @@ export async function createNote(formData: FormData): Promise<CrmActionResult> {
         return { success: true, data: note }
     } catch (error: unknown) {
         console.error('createNote error:', error)
-        if (error instanceof z.ZodError) { return { success: false, error: getZodErrorMessage(error) } }
-        if (false) {
+        if (error instanceof z.ZodError) {
             return { success: false, error: getZodErrorMessage(error) }
         }
         return { success: false, error: 'Not eklenirken hata oluştu.' }
@@ -136,8 +135,7 @@ export async function createContact(formData: FormData): Promise<CrmActionResult
         return { success: true, data: contact }
     } catch (error: unknown) {
         console.error('createContact error:', error)
-        if (error instanceof z.ZodError) { return { success: false, error: getZodErrorMessage(error) } }
-        if (false) {
+        if (error instanceof z.ZodError) {
             return { success: false, error: getZodErrorMessage(error) }
         }
         return { success: false, error: 'Kişi eklenirken hata oluştu.' }
@@ -197,8 +195,7 @@ export async function createActivity(formData: FormData): Promise<CrmActionResul
         return { success: true, data: activity }
     } catch (error: unknown) {
         console.error('createActivity error:', error)
-        if (error instanceof z.ZodError) { return { success: false, error: getZodErrorMessage(error) } }
-        if (false) {
+        if (error instanceof z.ZodError) {
             return { success: false, error: getZodErrorMessage(error) }
         }
         return { success: false, error: 'Aktivite eklenirken hata oluştu.' }
@@ -266,6 +263,7 @@ export async function updateCompanyStatus(id: string, status: string): Promise<C
 
 export async function getCrmStats() {
     try {
+        await requireAuth(['ADMIN'])
         const [lead, prospect, negotiation, customer, churned, pendingActivities] = await Promise.all([
             prisma.company.count({ where: { status: 'LEAD' } }),
             prisma.company.count({ where: { status: 'PROSPECT' } }),

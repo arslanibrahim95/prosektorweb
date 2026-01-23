@@ -3,9 +3,49 @@
 import { prisma } from '@/lib/prisma'
 import { getErrorMessage, getZodErrorMessage, isPrismaUniqueConstraintError } from '@/lib/action-types'
 import { requireAuth } from '@/lib/auth-guard'
+import { auth } from '@/auth'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 import { EmployeeGender } from '@prisma/client'
+
+// ==========================================
+// TC KIMLIK VALIDATION
+// ==========================================
+
+/**
+ * Validates a Turkish National ID number (TC Kimlik No) using the official algorithm.
+ * Rules:
+ * 1. Must be exactly 11 digits
+ * 2. First digit cannot be 0
+ * 3. All characters must be digits
+ * 4. Checksum validation for 10th digit: ((sum of odd positions * 7) - (sum of even positions)) mod 10
+ * 5. Checksum validation for 11th digit: sum of first 10 digits mod 10
+ */
+function isValidTcNo(tcNo: string): boolean {
+    // Must be exactly 11 digits
+    if (!/^\d{11}$/.test(tcNo)) return false
+
+    // First digit cannot be 0
+    if (tcNo[0] === '0') return false
+
+    const digits = tcNo.split('').map(Number)
+
+    // Sum of odd positions (1st, 3rd, 5th, 7th, 9th) - index 0, 2, 4, 6, 8
+    const oddSum = digits[0] + digits[2] + digits[4] + digits[6] + digits[8]
+
+    // Sum of even positions (2nd, 4th, 6th, 8th) - index 1, 3, 5, 7
+    const evenSum = digits[1] + digits[3] + digits[5] + digits[7]
+
+    // 10th digit validation
+    const tenthDigit = ((oddSum * 7) - evenSum) % 10
+    if (tenthDigit < 0 ? tenthDigit + 10 : tenthDigit !== digits[9]) return false
+
+    // 11th digit validation
+    const sumOfFirst10 = digits.slice(0, 10).reduce((a, b) => a + b, 0)
+    if (sumOfFirst10 % 10 !== digits[10]) return false
+
+    return true
+}
 
 // ==========================================
 // TYPES & SCHEMAS
@@ -14,7 +54,11 @@ import { EmployeeGender } from '@prisma/client'
 const EmployeeSchema = z.object({
     firstName: z.string().min(2, 'Ad en az 2 karakter olmalı'),
     lastName: z.string().min(2, 'Soyad en az 2 karakter olmalı'),
-    tcNo: z.string().length(11, 'TCKN 11 haneli olmalı').optional().or(z.literal('')),
+    tcNo: z.string()
+        .length(11, 'TCKN 11 haneli olmalı')
+        .refine((val) => isValidTcNo(val), { message: 'Geçersiz TC Kimlik Numarası' })
+        .optional()
+        .or(z.literal('')),
     workplaceId: z.string().min(1, 'İşyeri seçimi zorunlu'),
     position: z.string().optional(),
     gender: z.nativeEnum(EmployeeGender).optional(),
@@ -51,6 +95,26 @@ export async function createEmployee(formData: FormData): Promise<EmployeeAction
 
         const validated = EmployeeSchema.parse(rawData)
 
+        // Ownership Validation
+        const session = await auth()
+        if (session?.user?.role !== 'ADMIN') {
+            const user = await prisma.user.findUnique({
+                where: { id: session?.user?.id },
+                select: { companyId: true }
+            })
+
+            if (!user?.companyId) throw new Error('Şirket kaydınız bulunamadı.')
+
+            const workplace = await prisma.workplace.findUnique({
+                where: { id: validated.workplaceId },
+                select: { companyId: true }
+            })
+
+            if (!workplace || workplace.companyId !== user.companyId) {
+                throw new Error('Yetkisiz işlem: Bu işyeri size ait değil.')
+            }
+        }
+
         const employee = await prisma.employee.create({
             data: {
                 ...validated,
@@ -63,8 +127,7 @@ export async function createEmployee(formData: FormData): Promise<EmployeeAction
         return { success: true, data: employee }
     } catch (error: unknown) {
         console.error('createEmployee error:', error)
-        if (error instanceof z.ZodError) { return { success: false, error: getZodErrorMessage(error) } }
-        if (false) {
+        if (error instanceof z.ZodError) {
             return { success: false, error: getZodErrorMessage(error) }
         }
         // Handle unique constraint violation (TC No)
@@ -133,7 +196,25 @@ export async function deleteEmployee(id: string): Promise<EmployeeActionResult> 
 
 export async function getEmployees(search?: string, workplaceId?: string) {
     try {
+        const session = await auth()
+        if (!session?.user) return []
+
         const where: any = {}
+
+        // Tenant Isolation
+        if (session.user.role !== 'ADMIN') {
+            const user = await prisma.user.findUnique({
+                where: { id: session.user.id },
+                select: { companyId: true }
+            })
+
+            if (!user?.companyId) return []
+
+            // Filter employees by workplaces belonging to the user's company
+            where.workplace = {
+                companyId: user.companyId
+            }
+        }
 
         if (search) {
             where.OR = [
@@ -168,6 +249,9 @@ export async function getEmployees(search?: string, workplaceId?: string) {
 
 export async function getEmployeeById(id: string) {
     try {
+        const session = await auth()
+        if (!session?.user) return null
+
         const employee = await prisma.employee.findUnique({
             where: { id },
             include: {
@@ -178,6 +262,21 @@ export async function getEmployeeById(id: string) {
                 }
             },
         })
+
+        if (!employee) return null
+
+        // IDOR Check
+        if (session.user.role !== 'ADMIN') {
+            const user = await prisma.user.findUnique({
+                where: { id: session.user.id },
+                select: { companyId: true }
+            })
+
+            if (!user?.companyId || employee.workplace.companyId !== user.companyId) {
+                return null // Unauthorized
+            }
+        }
+
         return employee
     } catch (error) {
         console.error('getEmployeeById error:', error)

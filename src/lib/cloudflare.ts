@@ -50,6 +50,16 @@ export class CloudflareService {
             body: body ? JSON.stringify(body) : undefined,
         })
 
+        if (!response.ok) {
+            const text = await response.text()
+            try {
+                const data = JSON.parse(text)
+                return data as CloudflareResponse<T>
+            } catch {
+                throw new Error(`Cloudflare API Error (${response.status}): ${text.slice(0, 100)}...`)
+            }
+        }
+
         const data = await response.json()
         return data as CloudflareResponse<T>
     }

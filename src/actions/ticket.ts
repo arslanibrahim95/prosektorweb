@@ -2,6 +2,7 @@
 
 import { prisma } from '@/lib/prisma'
 import { requireAuth } from '@/lib/auth-guard'
+import { auth } from '@/auth'
 import { logAudit } from '@/lib/audit'
 import { getErrorMessage, getZodErrorMessage } from '@/lib/action-types'
 import { revalidatePath } from 'next/cache'
@@ -49,9 +50,22 @@ export async function createTicket(formData: FormData): Promise<TicketFormState>
 
         const validated = TicketSchema.parse(rawData)
 
+        const session = await auth()
+        const isAdmin = session?.user?.role === 'ADMIN'
+        let targetCompanyId = validated.companyId
+
+        if (!isAdmin) {
+            const user = await prisma.user.findUnique({
+                where: { id: session?.user?.id },
+                select: { companyId: true }
+            })
+            if (!user?.companyId) throw new Error('Şirket kaydınız bulunamadı.')
+            targetCompanyId = user.companyId // Force user's own company
+        }
+
         const ticket = await prisma.ticket.create({
             data: {
-                companyId: validated.companyId,
+                companyId: targetCompanyId,
                 subject: validated.subject,
                 priority: validated.priority,
                 category: validated.category,
@@ -59,7 +73,7 @@ export async function createTicket(formData: FormData): Promise<TicketFormState>
                 messages: {
                     create: {
                         content: validated.message,
-                        isStaffReply: true // Admin panelinden açıldığı için varsayılan true
+                        isStaffReply: isAdmin // If created by admin, it is staff reply. If client, no.
                     }
                 }
             }
@@ -76,8 +90,7 @@ export async function createTicket(formData: FormData): Promise<TicketFormState>
         return { success: true, data: ticket }
     } catch (error: unknown) {
         console.error('createTicket error:', error)
-        if (error instanceof z.ZodError) { return { success: false, error: getZodErrorMessage(error) } }
-        if (false) {
+        if (error instanceof z.ZodError) {
             return { success: false, error: getZodErrorMessage(error) }
         }
         return { success: false, error: getErrorMessage(error) }
@@ -86,15 +99,37 @@ export async function createTicket(formData: FormData): Promise<TicketFormState>
 
 export async function addMessage(ticketId: string, content: string, isStaffReply: boolean = true) {
     try {
-        await requireAuth()
+        const session = await auth()
+        if (!session?.user) return { success: false, error: 'Oturum açmalısınız.' }
 
-        const validated = MessageSchema.parse({ content, isStaffReply })
+        const isAdmin = session.user.role === 'ADMIN'
+
+        // Check ticket ownership
+        const ticket = await prisma.ticket.findUnique({
+            where: { id: ticketId },
+            select: { companyId: true }
+        })
+
+        if (!ticket) return { success: false, error: 'Talep bulunamadı' }
+
+        if (!isAdmin) {
+            const user = await prisma.user.findUnique({
+                where: { id: session.user.id },
+                select: { companyId: true }
+            })
+            if (!user?.companyId || user.companyId !== ticket.companyId) {
+                return { success: false, error: 'Yetkisiz işlem: Bu talep size ait değil.' }
+            }
+        }
+
+        // Force false if not admin, preventing horizontal privilege escalation
+        const finalIsStaffReply = isAdmin ? isStaffReply : false
 
         await prisma.ticketMessage.create({
             data: {
                 ticketId,
-                content: validated.content,
-                isStaffReply: validated.isStaffReply
+                content: content,
+                isStaffReply: finalIsStaffReply
             }
         })
 
@@ -148,7 +183,20 @@ export async function getTickets(options?: {
     const skip = (page - 1) * limit
 
     try {
+        const session = await auth()
+        if (!session?.user) return { tickets: [], total: 0, pages: 0, currentPage: 1 }
+
         const where: any = {}
+
+        // Tenant Isolation
+        if (session.user.role !== 'ADMIN') {
+            const user = await prisma.user.findUnique({
+                where: { id: session.user.id },
+                select: { companyId: true }
+            })
+            if (!user?.companyId) return { tickets: [], total: 0, pages: 0, currentPage: 1 }
+            where.companyId = user.companyId
+        }
 
         if (status) {
             where.status = status
@@ -189,6 +237,9 @@ export async function getTickets(options?: {
 
 export async function getTicketById(id: string) {
     try {
+        const session = await auth()
+        if (!session?.user) return null
+
         const ticket = await prisma.ticket.findUnique({
             where: { id },
             include: {
@@ -198,6 +249,21 @@ export async function getTicketById(id: string) {
                 }
             }
         })
+
+        if (!ticket) return null
+
+        // IDOR Check
+        if (session.user.role !== 'ADMIN') {
+            const user = await prisma.user.findUnique({
+                where: { id: session.user.id },
+                select: { companyId: true }
+            })
+
+            if (!user?.companyId || ticket.companyId !== user.companyId) {
+                return null // Unauthorized
+            }
+        }
+
         return ticket
     } catch (error) {
         console.error('getTicketById error:', error)

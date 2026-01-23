@@ -1,30 +1,41 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
-import { X, Check, Timer, ArrowLeft, Lock, AlertCircle, CreditCard, Clock } from 'lucide-react'
+import React, { useState, useEffect, useTransition } from 'react'
+import { X, Check, ArrowLeft, Lock, AlertCircle, CreditCard } from 'lucide-react'
+import { verifyClientAccess } from '@/actions/client-auth'
 
-export type ModalState =
-    | 'A1' | 'A2' // Initial / Login
-    | 'B1' | 'B2' | 'B3' // Request Flow
-    | 'C1' | 'C2' // Dashboard / Preview
-    | 'D1' | 'D2' // Expired / Reactivate
-    | 'E1' | 'E2' | 'E3' // Purchase Flow
+// Enum for better state management
+export enum ModalStep {
+    INITIAL_CHOICE = 'A1',
+    LOGIN = 'A2',
+    REQUEST_INTRO = 'B1',
+    REQUEST_FORM = 'B2',
+    REQUEST_SUCCESS = 'B3',
+    DASHBOARD = 'C1',
+    PREVIEW_DETAIL = 'C2',
+    EXPIRED = 'D1',
+    REACTIVATE_OFFER = 'D2',
+    READY_TO_PUBLISH = 'E1',
+    PAYMENT = 'E2',
+    PURCHASE_SUCCESS = 'E3'
+}
 
 interface ModalSystemProps {
     isOpen: boolean
     onClose: () => void
-    initialState?: ModalState
+    initialState?: ModalStep
 }
 
-export function ModalSystem({ isOpen, onClose, initialState = 'A1' }: ModalSystemProps) {
-    const [step, setStep] = useState<ModalState>(initialState)
+export function ModalSystem({ isOpen, onClose, initialState = ModalStep.INITIAL_CHOICE }: ModalSystemProps) {
+    const [step, setStep] = useState<ModalStep>(initialState)
     const [osgbName, setOsgbName] = useState('Evren Ada OSGB')
     const [selectedDesign, setSelectedDesign] = useState<'Aksiyon' | 'Vizyon' | null>(null)
+    const [isPending, startTransition] = useTransition()
 
     // Login Inputs
     const [loginInputName, setLoginInputName] = useState('')
     const [loginInputCode, setLoginInputCode] = useState('')
-    const [loginError, setLoginError] = useState(false)
+    const [loginError, setLoginError] = useState<string | null>(null)
 
     // Timer
     const [timeLeft, setTimeLeft] = useState('')
@@ -35,44 +46,64 @@ export function ModalSystem({ isOpen, onClose, initialState = 'A1' }: ModalSyste
         }
     }, [isOpen, initialState])
 
-    // Timer Logic
+    // Real Timer Logic
     useEffect(() => {
-        if (step === 'C1' || step === 'C2' || step === 'D2') {
+        if ([ModalStep.DASHBOARD, ModalStep.PREVIEW_DETAIL, ModalStep.REACTIVATE_OFFER].includes(step)) {
+            // 7 days from now (Demo purpose: Reset timer on mount)
+            const targetDate = new Date()
+            targetDate.setDate(targetDate.getDate() + 7)
+
             const interval = setInterval(() => {
-                // Mock countdown
                 const now = new Date()
-                // Just a static-ish countdown for demo
-                setTimeLeft("06:23:59:54")
+                const distance = targetDate.getTime() - now.getTime()
+
+                if (distance < 0) {
+                    clearInterval(interval)
+                    setStep(ModalStep.EXPIRED)
+                    return
+                }
+
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24))
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60))
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000)
+
+                setTimeLeft(`${days.toString().padStart(2, '0')}:${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`)
             }, 1000)
             return () => clearInterval(interval)
         }
     }, [step])
 
     const handleLogin = () => {
-        if (loginInputName === "Evren Ada OSGB" && loginInputCode === "PSW-1234") {
-            setOsgbName(loginInputName)
-            setLoginError(false)
-            setStep('C1')
-        } else {
-            setLoginError(true)
-        }
+        setLoginError(null)
+        startTransition(async () => {
+            const result = await verifyClientAccess(loginInputName, loginInputCode)
+            if (result.success) {
+                setOsgbName(loginInputName)
+                setStep(ModalStep.DASHBOARD)
+            } else {
+                setLoginError(result.error || 'Giriş başarısız')
+            }
+        })
     }
 
     const handlePreviewRequest = () => {
-        // Mock API call
+        // Mock API call - in real app connect to Server Action
         setTimeout(() => {
-            setStep('B3')
+            setStep(ModalStep.REQUEST_SUCCESS)
         }, 500)
     }
 
     const handlePayment = () => {
-        setStep('E3')
+        // Mock Payment
+        alert("DEMO MODU: Ödeme işlemi başarılı kabul edildi.")
+        setStep(ModalStep.PURCHASE_SUCCESS)
     }
 
     if (!isOpen) return null
 
     // --- RENDER HELPERS ---
-    const BackButton = ({ to }: { to: ModalState }) => (
+    const BackButton = ({ to }: { to: ModalStep }) => (
         <button
             onClick={() => setStep(to)}
             className="mt-4 flex items-center justify-center gap-2 w-full text-neutral-500 hover:text-neutral-900 text-sm font-medium transition-colors"
@@ -90,7 +121,7 @@ export function ModalSystem({ isOpen, onClose, initialState = 'A1' }: ModalSyste
             />
 
             {/* Modal Content */}
-            <div className="relative bg-white w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            <div className="relative bg-white w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200 h-auto max-h-[90vh] overflow-y-auto">
                 <button
                     onClick={onClose}
                     className="absolute top-4 right-4 p-2 text-neutral-400 hover:text-neutral-900 hover:bg-neutral-100 rounded-full transition-all z-10"
@@ -100,8 +131,8 @@ export function ModalSystem({ isOpen, onClose, initialState = 'A1' }: ModalSyste
 
                 <div className="p-8 md:p-10">
 
-                    {/* A1: Initial Choice */}
-                    {step === 'A1' && (
+                    {/* Initial Choice */}
+                    {step === ModalStep.INITIAL_CHOICE && (
                         <div className="text-center">
                             <div className="bg-brand-50 text-brand-700 text-sm font-bold py-2 px-4 rounded-full inline-block mb-6">
                                 Önizleme alanı yalnızca adına özel çalışma yapılan OSGB’lere açılır.
@@ -111,18 +142,18 @@ export function ModalSystem({ isOpen, onClose, initialState = 'A1' }: ModalSyste
                                 Eğer firmanız için bir web sitesi hazırlandıysa, önizleme erişim kodu size WhatsApp veya e-posta ile gönderilmiştir.
                             </p>
                             <div className="space-y-3">
-                                <button onClick={() => setStep('A2')} className="w-full py-4 bg-brand-600 text-white rounded-xl font-bold hover:bg-brand-700 transition-colors shadow-lg shadow-brand-200">
+                                <button onClick={() => setStep(ModalStep.LOGIN)} className="w-full py-4 bg-brand-600 text-white rounded-xl font-bold hover:bg-brand-700 transition-colors shadow-lg shadow-brand-200">
                                     Kodum Var
                                 </button>
-                                <button onClick={() => setStep('B1')} className="w-full py-4 bg-white text-neutral-700 border border-neutral-200 rounded-xl font-bold hover:bg-neutral-50 transition-colors">
+                                <button onClick={() => setStep(ModalStep.REQUEST_INTRO)} className="w-full py-4 bg-white text-neutral-700 border border-neutral-200 rounded-xl font-bold hover:bg-neutral-50 transition-colors">
                                     Kodum Yok
                                 </button>
                             </div>
                         </div>
                     )}
 
-                    {/* A2: Login */}
-                    {step === 'A2' && (
+                    {/* Login */}
+                    {step === ModalStep.LOGIN && (
                         <div>
                             <h2 className="text-2xl font-bold mb-6 text-neutral-900">Giriş Yap</h2>
                             <div className="space-y-4 mb-6">
@@ -149,32 +180,36 @@ export function ModalSystem({ isOpen, onClose, initialState = 'A1' }: ModalSyste
                             </div>
                             {loginError && (
                                 <div className="bg-red-50 text-red-600 p-3 rounded-lg mb-6 text-sm font-semibold flex items-center gap-2">
-                                    <AlertCircle className="w-4 h-4" /> Hatalı OSGB adı veya kod!
+                                    <AlertCircle className="w-4 h-4" /> {loginError}
                                 </div>
                             )}
-                            <button onClick={handleLogin} className="w-full py-4 bg-brand-600 text-white rounded-xl font-bold hover:bg-brand-700 transition-colors">
-                                Giriş Yap
+                            <button
+                                onClick={handleLogin}
+                                disabled={isPending}
+                                className="w-full py-4 bg-brand-600 text-white rounded-xl font-bold hover:bg-brand-700 transition-colors disabled:opacity-70"
+                            >
+                                {isPending ? 'Kontrol Ediliyor...' : 'Giriş Yap'}
                             </button>
-                            <BackButton to="A1" />
+                            <BackButton to={ModalStep.INITIAL_CHOICE} />
                         </div>
                     )}
 
-                    {/* B1: No Code Intro */}
-                    {step === 'B1' && (
+                    {/* Request Intro */}
+                    {step === ModalStep.REQUEST_INTRO && (
                         <div className="text-center">
                             <h2 className="text-2xl font-bold mb-4 text-neutral-900">Kodunuz Yok mu?</h2>
                             <p className="text-neutral-500 mb-8">
                                 Web siteniz için önizleme hazırlayalım, erişim kodunuzu size iletelim. En geç 24–72 saat içinde erişim kodunuz gönderilir.
                             </p>
-                            <button onClick={() => setStep('B2')} className="w-full py-4 bg-brand-600 text-white rounded-xl font-bold hover:bg-brand-700 transition-colors">
+                            <button onClick={() => setStep(ModalStep.REQUEST_FORM)} className="w-full py-4 bg-brand-600 text-white rounded-xl font-bold hover:bg-brand-700 transition-colors">
                                 Önizleme Talebi Bırak
                             </button>
-                            <BackButton to="A1" />
+                            <BackButton to={ModalStep.INITIAL_CHOICE} />
                         </div>
                     )}
 
-                    {/* B2: Request Form */}
-                    {step === 'B2' && (
+                    {/* Request Form */}
+                    {step === ModalStep.REQUEST_FORM && (
                         <div>
                             <h2 className="text-2xl font-bold mb-2 text-neutral-900">Önizleme Talebi</h2>
                             <p className="text-sm text-neutral-500 mb-6">Erişim yalnızca OSGB yetkililerine açılır.</p>
@@ -191,12 +226,12 @@ export function ModalSystem({ isOpen, onClose, initialState = 'A1' }: ModalSyste
                             <button onClick={handlePreviewRequest} className="w-full py-4 bg-brand-600 text-white rounded-xl font-bold hover:bg-brand-700 transition-colors">
                                 Talebi Gönder
                             </button>
-                            <BackButton to="B1" />
+                            <BackButton to={ModalStep.REQUEST_INTRO} />
                         </div>
                     )}
 
-                    {/* B3: Success */}
-                    {step === 'B3' && (
+                    {/* Success */}
+                    {step === ModalStep.REQUEST_SUCCESS && (
                         <div className="text-center py-8">
                             <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
                                 <Check className="w-8 h-8" />
@@ -211,22 +246,22 @@ export function ModalSystem({ isOpen, onClose, initialState = 'A1' }: ModalSyste
                         </div>
                     )}
 
-                    {/* C1: Dashboard */}
-                    {step === 'C1' && (
+                    {/* Dashboard */}
+                    {step === ModalStep.DASHBOARD && (
                         <div>
                             <h2 className="text-2xl font-bold mb-2 text-neutral-900">Hoş geldiniz, <span className="text-brand-600">{osgbName}</span></h2>
                             <p className="text-neutral-500 mb-8">Firmanız için hazırlanan 2 farklı dijital kimliği inceleyebilirsiniz.</p>
 
                             <div className="grid grid-cols-2 gap-6 mb-8">
                                 <button
-                                    onClick={() => { setSelectedDesign('Aksiyon'); setStep('C2') }}
+                                    onClick={() => { setSelectedDesign('Aksiyon'); setStep(ModalStep.PREVIEW_DETAIL) }}
                                     className="p-6 bg-white border-2 border-neutral-100 rounded-2xl hover:border-brand-500 hover:shadow-xl transition-all group"
                                 >
                                     <h3 className="text-xl font-bold text-neutral-800 mb-2 group-hover:text-brand-600">Aksiyon</h3>
                                     <span className="text-xs font-bold bg-brand-50 text-brand-700 px-3 py-1 rounded-full group-hover:bg-brand-600 group-hover:text-white transition-colors">ÖNİZLEME</span>
                                 </button>
                                 <button
-                                    onClick={() => { setSelectedDesign('Vizyon'); setStep('C2') }}
+                                    onClick={() => { setSelectedDesign('Vizyon'); setStep(ModalStep.PREVIEW_DETAIL) }}
                                     className="p-6 bg-white border-2 border-neutral-100 rounded-2xl hover:border-brand-500 hover:shadow-xl transition-all group"
                                 >
                                     <h3 className="text-xl font-bold text-neutral-800 mb-2 group-hover:text-brand-600">Vizyon</h3>
@@ -241,8 +276,8 @@ export function ModalSystem({ isOpen, onClose, initialState = 'A1' }: ModalSyste
                         </div>
                     )}
 
-                    {/* C2: Preview Detail */}
-                    {step === 'C2' && (
+                    {/* Preview Detail */}
+                    {step === ModalStep.PREVIEW_DETAIL && (
                         <div>
                             <div className="flex items-center justify-between mb-6">
                                 <h2 className="text-2xl font-bold text-neutral-900">{selectedDesign} Önizleme</h2>
@@ -253,16 +288,16 @@ export function ModalSystem({ isOpen, onClose, initialState = 'A1' }: ModalSyste
                             </div>
 
                             <div className="flex flex-col gap-3">
-                                <button onClick={() => setStep('E1')} className="w-full py-4 bg-brand-600 text-white rounded-xl font-bold hover:bg-brand-700 transition-colors shadow-lg">
+                                <button onClick={() => setStep(ModalStep.READY_TO_PUBLISH)} className="w-full py-4 bg-brand-600 text-white rounded-xl font-bold hover:bg-brand-700 transition-colors shadow-lg">
                                     Bu tasarımı yayına al (7.000 TL)
                                 </button>
-                                <BackButton to="C1" />
+                                <BackButton to={ModalStep.DASHBOARD} />
                             </div>
                         </div>
                     )}
 
-                    {/* E1: Ready */}
-                    {step === 'E1' && (
+                    {/* Ready */}
+                    {step === ModalStep.READY_TO_PUBLISH && (
                         <div>
                             <h2 className="text-2xl font-bold mb-4 text-neutral-900">Yayına Hazır</h2>
                             <p className="text-neutral-500 mb-6">
@@ -271,15 +306,15 @@ export function ModalSystem({ isOpen, onClose, initialState = 'A1' }: ModalSyste
                             <div className="bg-brand-50 border-l-4 border-brand-600 p-4 rounded-r-lg mb-8">
                                 <p className="text-sm text-brand-900">Yayına alma sonrasında talep edilen yeni sayfa veya yapısal değişiklikler ek hizmet kapsamında değerlendirilir.</p>
                             </div>
-                            <button onClick={() => setStep('E2')} className="w-full py-4 bg-brand-600 text-white rounded-xl font-bold hover:bg-brand-700 transition-colors">
+                            <button onClick={() => setStep(ModalStep.PAYMENT)} className="w-full py-4 bg-brand-600 text-white rounded-xl font-bold hover:bg-brand-700 transition-colors">
                                 Ödeme Sayfasına Git
                             </button>
-                            <BackButton to="C2" />
+                            <BackButton to={ModalStep.PREVIEW_DETAIL} />
                         </div>
                     )}
 
-                    {/* E2: Payment */}
-                    {step === 'E2' && (
+                    {/* Payment */}
+                    {step === ModalStep.PAYMENT && (
                         <div>
                             <h2 className="text-2xl font-bold mb-6 text-neutral-900">Ödeme</h2>
                             <div className="bg-neutral-50 p-6 rounded-2xl border border-neutral-200 mb-8">
@@ -302,14 +337,19 @@ export function ModalSystem({ isOpen, onClose, initialState = 'A1' }: ModalSyste
                                 ))}
                             </div>
 
+                            <div className="bg-amber-100 border border-amber-300 text-amber-700 px-4 py-3 rounded-lg mb-4 text-sm font-semibold">
+                                <AlertCircle className="w-4 h-4 inline mr-2" />
+                                Demo Modu: Herhangi bir kart bilgisi girmenize gerek yoktur.
+                            </div>
+
                             <button onClick={handlePayment} className="w-full py-4 bg-green-600 text-white rounded-xl font-bold hover:bg-green-700 transition-colors flex items-center justify-center gap-2">
                                 <CreditCard className="w-5 h-5" /> Ödemeyi Tamamla
                             </button>
                         </div>
                     )}
 
-                    {/* E3: Purchase Success */}
-                    {step === 'E3' && (
+                    {/* Purchase Success */}
+                    {step === ModalStep.PURCHASE_SUCCESS && (
                         <div className="text-center py-8">
                             <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
                                 <Check className="w-8 h-8" />
@@ -324,8 +364,8 @@ export function ModalSystem({ isOpen, onClose, initialState = 'A1' }: ModalSyste
                         </div>
                     )}
 
-                    {/* D1: Expired */}
-                    {step === 'D1' && (
+                    {/* Expired */}
+                    {step === ModalStep.EXPIRED && (
                         <div className="text-center py-8">
                             <div className="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-6">
                                 <Lock className="w-8 h-8" />
@@ -339,7 +379,7 @@ export function ModalSystem({ isOpen, onClose, initialState = 'A1' }: ModalSyste
                                 <div className="text-2xl font-bold text-brand-600">Yeni Fiyat: 12.500 TL</div>
                                 <div className="text-xs text-neutral-400">Yeniden Aktifleştirme Bedeli</div>
                             </div>
-                            <button onClick={() => setStep('D2')} className="w-full py-4 bg-brand-600 text-white rounded-xl font-bold hover:bg-brand-700 transition-colors">
+                            <button onClick={() => setStep(ModalStep.REACTIVATE_OFFER)} className="w-full py-4 bg-brand-600 text-white rounded-xl font-bold hover:bg-brand-700 transition-colors">
                                 Önizlemeyi Tekrar Aktifleştir
                             </button>
                         </div>
@@ -350,3 +390,4 @@ export function ModalSystem({ isOpen, onClose, initialState = 'A1' }: ModalSyste
         </div>
     )
 }
+

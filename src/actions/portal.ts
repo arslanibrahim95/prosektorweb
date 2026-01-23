@@ -3,20 +3,35 @@
 import { prisma } from '@/lib/prisma'
 import { auth } from '@/auth'
 import { redirect } from 'next/navigation'
+import { TicketPriority, TicketCategory } from '@prisma/client'
+import '@/types/next-auth'
 
-async function getClientCompanyId() {
+async function getClientCompanyId(): Promise<string | null> {
     const session = await auth()
-    const companyId = (session?.user as any)?.companyId
+    const user = session?.user
 
-    // Only allow CLIENT role or if we want to allow admins to view portal (for testing)
-    // But strictly speaking, portal data fetch should be scoped to companyId.
+    // 1. If user is CLIENT, strict check
+    if (user?.role === 'CLIENT') {
+        return user.companyId
+    }
 
-    if (!companyId) {
-        // If it's an ADMIN viewing, maybe they don't have a companyId.
-        // For now, strict check.
+    // 2. If user is ADMIN, check for impersonation cookie
+    if (user?.role === 'ADMIN') {
+        const { cookies } = await import('next/headers')
+        const cookieStore = await cookies()
+        const impersonatingId = cookieStore.get('admin_view_company_id')?.value
+
+        // If admin selected a company to view
+        if (impersonatingId) {
+            return impersonatingId
+        }
+
+        // If admin just went to /portal without selecting (shouldn't happen ideally, but return null or handle)
         return null
     }
-    return companyId
+
+    // Default
+    return null
 }
 
 export async function getClientDashboardStats() {
@@ -98,8 +113,19 @@ export async function createClientTicket(formData: FormData) {
     try {
         const subject = formData.get('subject') as string
         const message = formData.get('message') as string
-        const priority = (formData.get('priority') || 'NORMAL') as any
-        const category = (formData.get('category') || 'OTHER') as any
+        const priorityStr = (formData.get('priority') as string) || 'NORMAL'
+        const categoryStr = (formData.get('category') as string) || 'OTHER'
+
+        // Validate enum values
+        const validPriorities: TicketPriority[] = ['LOW', 'NORMAL', 'HIGH', 'URGENT']
+        const validCategories: TicketCategory[] = ['WEB_DESIGN', 'SEO', 'ADS', 'HOSTING', 'OTHER']
+
+        const priority: TicketPriority = validPriorities.includes(priorityStr as TicketPriority)
+            ? (priorityStr as TicketPriority)
+            : 'NORMAL'
+        const category: TicketCategory = validCategories.includes(categoryStr as TicketCategory)
+            ? (categoryStr as TicketCategory)
+            : 'OTHER'
 
         if (!subject || !message) {
             return { success: false, error: 'Konu ve mesaj alanları zorunludur.' }
@@ -142,6 +168,9 @@ export async function getProjectById(projectId: string) {
             domain: true,
             company: {
                 select: { name: true }
+            },
+            generatedContents: {
+                orderBy: { contentType: 'asc' }
             }
         }
     })
