@@ -7,6 +7,7 @@ import {
 } from 'lucide-react'
 import { logoutAction } from '@/actions/auth'
 import { prisma } from '@/lib/prisma'
+import Particles from '@/components/ui/Particles'
 
 async function getCompanyName(companyId: string | null) {
     if (!companyId) return null
@@ -27,7 +28,21 @@ export default async function PortalLayout({
     const companyName = await getCompanyName(companyId)
 
     return (
-        <div className="min-h-screen bg-neutral-50 flex flex-col">
+        <div className="min-h-screen bg-neutral-50 flex flex-col relative overflow-hidden">
+            {/* Background Particles */}
+            <div className="absolute inset-0 z-0 pointer-events-none opacity-40">
+                <Particles
+                    particleColors={['#ef4444', '#dc2626', '#b91c1c']}
+                    particleCount={100}
+                    particleSpread={10}
+                    speed={0.05}
+                    particleBaseSize={100}
+                    moveParticlesOnHover={false}
+                    alphaParticles={false}
+                    disableRotation={false}
+                />
+            </div>
+
             {/* Admin Impersonation Banner */}
             {session?.user?.role === 'ADMIN' && (
                 <div className="bg-purple-600 text-white px-4 py-2 text-sm font-bold flex items-center justify-between z-50 sticky top-0">
@@ -47,9 +62,9 @@ export default async function PortalLayout({
                 </div>
             )}
 
-            <div className="flex flex-1">
+            <div className="flex flex-1 z-10">
                 {/* Sidebar */}
-                <aside className="w-64 bg-slate-900 text-white fixed h-full z-10 hidden md:flex flex-col mt-0 md:mt-0" style={{ marginTop: session?.user?.role === 'ADMIN' ? '0' : '0' }}>
+                <aside className="w-64 bg-slate-900/90 backdrop-blur-xl text-white fixed h-full z-20 hidden md:flex flex-col mt-0 md:mt-0 border-r border-white/10" style={{ marginTop: session?.user?.role === 'ADMIN' ? '0' : '0' }}>
                     <div className="p-6 border-b border-white/10">
                         <div className="flex items-center gap-3">
                             <span className="w-10 h-10 rounded-xl bg-brand-500 flex items-center justify-center text-white">

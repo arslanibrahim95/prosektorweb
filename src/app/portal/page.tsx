@@ -7,6 +7,7 @@ import {
     Sparkles, ChevronRight, AlertCircle, CheckCircle,
     Phone, Mail, Headphones
 } from 'lucide-react'
+import SpotlightCard from '@/components/ui/SpotlightCard'
 
 // Status config for projects
 const statusConfig: Record<string, { label: string; color: string; bgColor: string }> = {
@@ -61,14 +62,14 @@ export default async function PortalDashboard() {
                 <div className="flex gap-3">
                     <Link
                         href="/portal/tickets/new"
-                        className="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-neutral-200 rounded-xl text-neutral-700 font-medium hover:bg-neutral-50 transition-colors"
+                        className="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-neutral-200 rounded-xl text-neutral-700 font-medium hover:bg-neutral-50 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-sm"
                     >
                         <Plus className="w-4 h-4" />
                         Destek Talebi
                     </Link>
                     <Link
                         href="tel:+905551234567"
-                        className="inline-flex items-center gap-2 px-4 py-2.5 bg-brand-600 text-white rounded-xl font-medium hover:bg-brand-700 transition-colors"
+                        className="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-brand-600 to-brand-500 text-white rounded-xl font-medium shadow-lg shadow-brand-600/30 hover:shadow-brand-600/50 hover:scale-[1.02] active:scale-[0.98] transition-all"
                     >
                         <Phone className="w-4 h-4" />
                         Hemen Ara
@@ -127,45 +128,51 @@ export default async function PortalDashboard() {
 
             {/* Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <Link href="/portal/projects" className="group bg-white p-6 rounded-2xl border border-neutral-200 shadow-sm hover:shadow-md hover:border-brand-200 transition-all">
-                    <div className="flex items-center justify-between mb-4">
-                        <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 group-hover:bg-blue-100 transition-colors">
-                            <Layers className="w-6 h-6" />
+                <Link href="/portal/projects" className="group">
+                    <SpotlightCard className="shadow-sm hover:shadow-md transition-all border-neutral-200" spotlightColor="rgba(59, 130, 246, 0.1)">
+                        <div className="flex items-center justify-between mb-4">
+                            <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 group-hover:bg-blue-100 transition-colors">
+                                <Layers className="w-6 h-6" />
+                            </div>
+                            <span className="text-2xl font-bold text-neutral-900">{displayStats.activeProjects}</span>
                         </div>
-                        <span className="text-2xl font-bold text-neutral-900">{displayStats.activeProjects}</span>
-                    </div>
-                    <h3 className="text-sm font-medium text-neutral-600 flex items-center justify-between">
-                        Aktif Projeler
-                        <ChevronRight className="w-4 h-4 text-neutral-400 group-hover:text-brand-600 transition-colors" />
-                    </h3>
+                        <h3 className="text-sm font-medium text-neutral-600 flex items-center justify-between">
+                            Aktif Projeler
+                            <ChevronRight className="w-4 h-4 text-neutral-400 group-hover:text-brand-600 transition-colors" />
+                        </h3>
+                    </SpotlightCard>
                 </Link>
 
-                <Link href="/portal/tickets" className="group bg-white p-6 rounded-2xl border border-neutral-200 shadow-sm hover:shadow-md hover:border-brand-200 transition-all">
-                    <div className="flex items-center justify-between mb-4">
-                        <div className="w-12 h-12 rounded-xl bg-purple-50 flex items-center justify-center text-purple-600 group-hover:bg-purple-100 transition-colors">
-                            <Ticket className="w-6 h-6" />
+                <Link href="/portal/tickets" className="group">
+                    <SpotlightCard className="shadow-sm hover:shadow-md transition-all border-neutral-200" spotlightColor="rgba(168, 85, 247, 0.1)">
+                        <div className="flex items-center justify-between mb-4">
+                            <div className="w-12 h-12 rounded-xl bg-purple-50 flex items-center justify-center text-purple-600 group-hover:bg-purple-100 transition-colors">
+                                <Ticket className="w-6 h-6" />
+                            </div>
+                            <span className="text-2xl font-bold text-neutral-900">{displayStats.openTickets}</span>
                         </div>
-                        <span className="text-2xl font-bold text-neutral-900">{displayStats.openTickets}</span>
-                    </div>
-                    <h3 className="text-sm font-medium text-neutral-600 flex items-center justify-between">
-                        Açık Destek Talepleri
-                        <ChevronRight className="w-4 h-4 text-neutral-400 group-hover:text-brand-600 transition-colors" />
-                    </h3>
+                        <h3 className="text-sm font-medium text-neutral-600 flex items-center justify-between">
+                            Açık Destek Talepleri
+                            <ChevronRight className="w-4 h-4 text-neutral-400 group-hover:text-brand-600 transition-colors" />
+                        </h3>
+                    </SpotlightCard>
                 </Link>
 
-                <Link href="/portal/invoices" className="group bg-white p-6 rounded-2xl border border-neutral-200 shadow-sm hover:shadow-md hover:border-brand-200 transition-all">
-                    <div className="flex items-center justify-between mb-4">
-                        <div className="w-12 h-12 rounded-xl bg-green-50 flex items-center justify-center text-green-600 group-hover:bg-green-100 transition-colors">
-                            <Receipt className="w-6 h-6" />
+                <Link href="/portal/invoices" className="group">
+                    <SpotlightCard className="shadow-sm hover:shadow-md transition-all border-neutral-200" spotlightColor="rgba(34, 197, 94, 0.1)">
+                        <div className="flex items-center justify-between mb-4">
+                            <div className="w-12 h-12 rounded-xl bg-green-50 flex items-center justify-center text-green-600 group-hover:bg-green-100 transition-colors">
+                                <Receipt className="w-6 h-6" />
+                            </div>
+                            <span className="text-2xl font-bold text-neutral-900">
+                                {Number(displayStats.unpaidAmount).toLocaleString('tr-TR', { style: 'currency', currency: 'TRY' })}
+                            </span>
                         </div>
-                        <span className="text-2xl font-bold text-neutral-900">
-                            {Number(displayStats.unpaidAmount).toLocaleString('tr-TR', { style: 'currency', currency: 'TRY' })}
-                        </span>
-                    </div>
-                    <h3 className="text-sm font-medium text-neutral-600 flex items-center justify-between">
-                        Ödenecek Tutar
-                        <ChevronRight className="w-4 h-4 text-neutral-400 group-hover:text-brand-600 transition-colors" />
-                    </h3>
+                        <h3 className="text-sm font-medium text-neutral-600 flex items-center justify-between">
+                            Ödenecek Tutar
+                            <ChevronRight className="w-4 h-4 text-neutral-400 group-hover:text-brand-600 transition-colors" />
+                        </h3>
+                    </SpotlightCard>
                 </Link>
             </div>
 
@@ -252,8 +259,8 @@ export default async function PortalDashboard() {
                                             <div className="flex items-center justify-between mb-2">
                                                 <h4 className="font-bold text-neutral-800 text-sm">{service.name}</h4>
                                                 <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${service.status === 'ACTIVE'
-                                                        ? 'bg-green-100 text-green-700'
-                                                        : 'bg-neutral-200 text-neutral-600'
+                                                    ? 'bg-green-100 text-green-700'
+                                                    : 'bg-neutral-200 text-neutral-600'
                                                     }`}>
                                                     {service.status === 'ACTIVE' ? 'Aktif' : 'Bitti'}
                                                 </span>

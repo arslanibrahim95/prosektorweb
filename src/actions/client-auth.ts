@@ -1,6 +1,7 @@
 'use server'
 
 import { z } from 'zod'
+import { constantTimeCompare } from '@/lib/auth/crypto'
 
 const verifySchema = z.object({
     osgbName: z.string().min(1, 'OSGB adı zorunludur'),
@@ -20,9 +21,6 @@ const AUTHORIZED_CLIENTS = [
 ]
 
 export async function verifyClientAccess(osgbName: string, code: string): Promise<VerifyResult> {
-    // Artificial delay to prevent timing attacks
-    await new Promise(resolve => setTimeout(resolve, 500))
-
     const validation = verifySchema.safeParse({ osgbName, code })
 
     if (!validation.success) {
@@ -31,17 +29,22 @@ export async function verifyClientAccess(osgbName: string, code: string): Promis
 
     const { osgbName: name, code: accessCode } = validation.data
 
-    // Find matching client
-    // In a real app, this would check against a Database table (AuthorizedClients)
-    const isValid = AUTHORIZED_CLIENTS.some(
-        client =>
-            client.name.toLowerCase() === name.toLowerCase().trim() &&
-            client.code === accessCode.trim()
+    // Find matching client - but DON'T compare yet
+    const authorizedClient = AUTHORIZED_CLIENTS.find(
+        client => client.name.toLowerCase() === name.toLowerCase().trim()
     )
 
-    if (isValid) {
-        return { success: true }
+    if (!authorizedClient) {
+        // Use constant-time compare even for non-existent clients
+        constantTimeCompare(accessCode.trim(), AUTHORIZED_CLIENTS[0].code)
+        return { success: false, error: 'Hatalı OSGB Adı veya Erişim Kodu' }
     }
 
-    return { success: false, error: 'Hatalı OSGB Adı veya Erişim Kodu' }
+    // Constant-time comparison
+    const isValid = constantTimeCompare(
+        accessCode.trim(),
+        authorizedClient.code
+    )
+
+    return isValid ? { success: true } : { success: false, error: 'Hatalı OSGB Adı veya Erişim Kodu' }
 }

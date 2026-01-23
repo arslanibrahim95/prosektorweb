@@ -758,13 +758,13 @@ model User {
   id          String    @id @default(uuid())
   name        String?
   email       String    @unique
-  password    String
+  password    String    @db.Text // Hashed Password (bcrypt)
   role        Role      @default(CLIENT)
   companyId   String?
   company     Company?  @relation(fields: [companyId], references: [id], onDelete: Cascade)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
-
+  
   @@index([companyId])
 }
 

@@ -25,25 +25,8 @@ export const authConfig = {
             }
             return session
         },
-        // Authorization check for protected routes
-        authorized({ auth, request: { nextUrl } }) {
-            const isLoggedIn = !!auth?.user;
-            const userRole = auth?.user?.role;
-
-            const isOnAdmin = nextUrl.pathname.startsWith('/admin');
-            const isOnPortal = nextUrl.pathname.startsWith('/portal');
-
-            if (isOnAdmin) {
-                if (isLoggedIn && userRole === 'ADMIN') return true;
-                // Redirect to secret admin login if not admin
-                return Response.redirect(new URL('/yonetim-girisi', nextUrl));
-            }
-
-            if (isOnPortal) {
-                if (isLoggedIn && (userRole === 'CLIENT' || userRole === 'ADMIN')) return true;
-                return Response.redirect(new URL('/login', nextUrl));
-            }
-
+        // Authorization check for protected routes - moved to middleware
+        authorized() {
             return true;
         },
     },

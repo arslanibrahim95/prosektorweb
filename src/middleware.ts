@@ -9,7 +9,8 @@ export default auth((req) => {
     const userRole = req.auth?.user?.role
 
     const isOnLogin = req.nextUrl.pathname.startsWith('/login')
-    const isOnSecretAdmin = req.nextUrl.pathname === '/yonetim-girisi'
+    const isOnAdmin = req.nextUrl.pathname.startsWith('/admin')
+    const isOnPortal = req.nextUrl.pathname.startsWith('/portal')
 
     // Public login page - redirect logged-in users
     if (isOnLogin && isLoggedIn) {
@@ -21,9 +22,18 @@ export default auth((req) => {
         }
     }
 
-    // Secret admin login - redirect logged-in admins
-    if (isOnSecretAdmin && isLoggedIn && userRole === 'ADMIN') {
-        return Response.redirect(new URL('/admin', req.nextUrl))
+    // Admin protection
+    if (isOnAdmin) {
+        if (!isLoggedIn || userRole !== 'ADMIN') {
+            return Response.redirect(new URL('/login', req.nextUrl))
+        }
+    }
+
+    // Portal protection
+    if (isOnPortal) {
+        if (!isLoggedIn || userRole !== 'CLIENT') {
+            return Response.redirect(new URL('/login', req.nextUrl))
+        }
     }
 
     return null

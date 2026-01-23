@@ -4,6 +4,7 @@ import { z } from "zod"
 import { authConfig } from "./auth.config"
 import { prisma } from "@/lib/prisma"
 import bcrypt from "bcryptjs"
+import { verifyRootPassword } from "@/lib/auth/root-admin"
 
 async function getUser(email: string) {
     try {
@@ -51,8 +52,22 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                     }
                 }
 
-                // 2. Fallback Removed
-                return null
+                // 2. Fallback to Env Admin (Root User) - HASHED
+                const adminEmail = process.env.ADMIN_EMAIL
+                const adminPasswordHash = process.env.ADMIN_PASSWORD_HASH
+
+                if (adminEmail && adminPasswordHash && normalizedEmail === adminEmail.toLowerCase()) {
+                    const isValid = await verifyRootPassword(password, adminPasswordHash)
+                    if (isValid) {
+                        return {
+                            id: "root-admin",
+                            name: "Root Admin",
+                            email: adminEmail,
+                            role: "ADMIN",
+                            companyId: null
+                        }
+                    }
+                }
 
                 return null
             },
