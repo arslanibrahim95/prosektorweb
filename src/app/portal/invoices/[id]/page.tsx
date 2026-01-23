@@ -1,7 +1,10 @@
 import { getInvoiceById } from '@/actions/portal'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, Receipt, CreditCard, Calendar, CheckCircle, Clock, AlertCircle, Download } from 'lucide-react'
+import { ArrowLeft, Receipt, CreditCard, Calendar, CheckCircle, Clock, AlertCircle } from 'lucide-react'
+import { DownloadButton } from '@/components/pdf/DownloadButton'
+import { InvoiceDocument } from '@/components/pdf/InvoiceDocument'
+import { PaymentButton } from '@/components/portal/PaymentButton'
 
 // Status config
 const statusConfig: Record<string, { label: string; color: string; bgColor: string }> = {
@@ -49,9 +52,15 @@ export default async function InvoiceDetailPage({ params }: { params: Promise<{ 
                         {invoice.company?.name}
                     </p>
                 </div>
-                <span className={`px-4 py-2 rounded-full text-sm font-bold ${statusInfo.bgColor} ${statusInfo.color}`}>
-                    {statusInfo.label}
-                </span>
+                <div className="flex items-center gap-3">
+                    <DownloadButton
+                        document={<InvoiceDocument data={JSON.parse(JSON.stringify(invoice))} />}
+                        fileName={`fatura-${invoice.invoiceNo}.pdf`}
+                    />
+                    <span className={`px-4 py-2 rounded-full text-sm font-bold ${statusInfo.bgColor} ${statusInfo.color}`}>
+                        {statusInfo.label}
+                    </span>
+                </div>
             </div>
 
             {/* Overdue Warning */}
@@ -211,9 +220,7 @@ export default async function InvoiceDetailPage({ params }: { params: Promise<{ 
                             </p>
                         </div>
                     </div>
-                    <button className="w-full sm:w-auto px-6 py-3 bg-brand-600 text-white rounded-xl font-bold hover:bg-brand-700 transition-colors">
-                        Online Ödeme Yap
-                    </button>
+                    <PaymentButton amount={remainingAmount} invoiceNo={invoice.invoiceNo} />
                 </div>
             )}
         </div>
