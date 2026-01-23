@@ -20,7 +20,15 @@ const AUTHORIZED_CLIENTS = [
     }
 ]
 
+import { checkRateLimit, getClientIp } from '@/lib/rate-limit'
+
 export async function verifyClientAccess(osgbName: string, code: string): Promise<VerifyResult> {
+    const ip = await getClientIp()
+    const limit = await checkRateLimit(`auth:${ip}`, 5, 15 * 60) // 5 attempts per 15 min
+
+    if (!limit.success) {
+        return { success: false, error: 'Çok fazla deneme yaptınız. Lütfen 15 dakika bekleyin.' }
+    }
     const validation = verifySchema.safeParse({ osgbName, code })
 
     if (!validation.success) {

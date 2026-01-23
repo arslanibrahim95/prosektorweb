@@ -1002,3 +1002,19 @@ model LeadCapture {
   @@index([type])
   @@index([createdAt])
 }
+
+// ===============================
+// SECURITY & SYSTEM
+// ===============================
+
+model RateLimit {
+  id          String   @id @default(uuid())
+  key         String   // IP or User ID + Action
+  points      Int      @default(0)
+  expiresAt   DateTime
+  
+  createdAt   DateTime @default(now())
+  
+  @@unique([key])
+  @@index([expiresAt])
+}

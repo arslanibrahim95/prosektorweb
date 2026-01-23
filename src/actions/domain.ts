@@ -333,17 +333,30 @@ async function checkDomainAvailability(domain: string): Promise<boolean> {
         const existing = await prisma.domain.findUnique({ where: { name: domain } })
         if (existing) return false
 
+        const fetchWithTimeout = async (url: string, timeoutMs: number) => {
+            const controller = new AbortController()
+            const timeout = setTimeout(() => controller.abort(), timeoutMs)
+            try {
+                return await fetch(url, { signal: controller.signal })
+            } finally {
+                clearTimeout(timeout)
+            }
+        }
+
         // RDAP check for .com
         if (domain.endsWith('.com') && !domain.endsWith('.com.tr')) {
-            const response = await fetch(`https://rdap.verisign.com/com/v1/domain/${domain}`, {
-                method: 'GET',
-                headers: { 'Accept': 'application/rdap+json' },
-            })
+            const response = await fetchWithTimeout(
+                `https://rdap.verisign.com/com/v1/domain/${domain}`,
+                5000
+            )
             return response.status === 404
         }
 
         // DNS check for .com.tr and others
-        const dnsResponse = await fetch(`https://dns.google/resolve?name=${domain}&type=NS`)
+        const dnsResponse = await fetchWithTimeout(
+            `https://dns.google/resolve?name=${domain}&type=NS`,
+            5000
+        )
         const data = await dnsResponse.json()
         return data.Status === 3 || !data.Answer
 
@@ -352,11 +365,38 @@ async function checkDomainAvailability(domain: string): Promise<boolean> {
     }
 }
 
+const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000
+const RATE_LIMIT_MAX = 30
+const rateLimitStore: Map<string, number[]> =
+    (globalThis as any).__domainRateLimitStore ?? new Map()
+;(globalThis as any).__domainRateLimitStore = rateLimitStore
+
+function isRateLimited(key: string): boolean {
+    const now = Date.now()
+    const windowStart = now - RATE_LIMIT_WINDOW_MS
+    const timestamps = rateLimitStore.get(key) || []
+    const recent = timestamps.filter((t) => t >= windowStart)
+    recent.push(now)
+    rateLimitStore.set(key, recent)
+    return recent.length > RATE_LIMIT_MAX
+}
+
+function isValidLabel(label: string): boolean {
+    if (label.length < 1 || label.length > 63) return false
+    if (label.startsWith('-') || label.endsWith('-')) return false
+    return true
+}
+
 export async function searchDomains(query: string): Promise<DomainSearchResult> {
     try {
         const session = await auth()
         if (!session) {
             return { success: false, results: [], error: 'Arama yapmak için giriş yapmalısınız.' }
+        }
+
+        const rateKey = session.user?.id || session.user?.email || 'unknown'
+        if (isRateLimited(rateKey)) {
+            return { success: false, results: [], error: 'Çok fazla istek gönderdiniz. Lütfen daha sonra tekrar deneyiniz.' }
         }
 
         let cleanQuery = query.toLowerCase().trim()
@@ -372,11 +412,22 @@ export async function searchDomains(query: string): Promise<DomainSearchResult> 
             return { success: false, results: [], error: 'En az 2 karakter giriniz.' }
         }
 
+        if (cleanQuery.length > 63) {
+            return { success: false, results: [], error: 'Domain adı çok uzun. (max 63 karakter)' }
+        }
+
+        if (!isValidLabel(cleanQuery)) {
+            return { success: false, results: [], error: 'Domain etiketi geçersiz. Başta/sonda tire olamaz.' }
+        }
+
         const extensions = ['.com', '.com.tr']
 
         const results = await Promise.all(
             extensions.map(async (ext): Promise<DomainCheckResult> => {
                 const fullDomain = `${cleanQuery}${ext}`
+                if (fullDomain.length > 253) {
+                    return { domain: fullDomain, extension: ext, available: false, error: 'Domain adı çok uzun.' }
+                }
                 try {
                     const available = await checkDomainAvailability(fullDomain)
                     return { domain: fullDomain, extension: ext, available }

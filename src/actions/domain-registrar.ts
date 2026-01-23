@@ -40,11 +40,19 @@ async function requireAdmin() {
 // DOMAIN AVAILABILITY CHECK WITH PRICING
 // ==========================================
 
+import { checkRateLimit, getClientIp } from '@/lib/rate-limit'
+
 export async function searchDomainsWithPricing(query: string): Promise<{
     success: boolean
     results: DomainSearchResult[]
     error?: string
 }> {
+    const ip = await getClientIp()
+    const limit = await checkRateLimit(`domain_search:${ip}`, 20, 3600) // 20 attempts per hour
+
+    if (!limit.success) {
+        return { success: false, results: [], error: 'Saatlik arama limitine ulaştınız.' }
+    }
     try {
         // Search public access? Let's limit it to authenticated users at least
         const session = await auth()
