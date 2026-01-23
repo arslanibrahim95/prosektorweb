@@ -40,6 +40,10 @@ model Company {
   status      CompanyStatus @default(LEAD)
   source      String?       // Nereden geldi (Web, Referans, vb.)
   
+  // Sector Info (Migrated from Workplace)
+  naceCode    String?
+  dangerClass DangerClass?
+  
   // Relations
   workplaces  Workplace[]
   invoices    Invoice[]

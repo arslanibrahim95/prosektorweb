@@ -104,8 +104,10 @@ async function getCompanyInfoFromProject(projectId: string): Promise<CompanyInfo
         address: company.address || undefined,
         phone: company.phone || undefined,
         email: company.email || undefined,
-        naceCode: workplace?.naceCode || undefined,
-        dangerClass: workplace?.dangerClass as CompanyInfo['dangerClass'],
+        // Architecture Cleanup: Prefer Company fields, fallback to Workplace (Legacy)
+        // TODO: Remove workplace dependency after data migration
+        naceCode: company.naceCode || workplace?.naceCode || undefined,
+        dangerClass: (company.dangerClass || workplace?.dangerClass) as CompanyInfo['dangerClass'],
     };
 }
 
