@@ -130,7 +130,13 @@ async function generateWithPythonPipeline(
             if (companyInfo.email) args.push('--email', companyInfo.email);
 
             const pythonProcess = spawn('python3', args, {
-                env: { ...process.env },
+                // Security: Only pass necessary environment variables, do not leak all secrets
+                env: {
+                    PATH: process.env.PATH,
+                    ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY,
+                    OPENAI_API_KEY: process.env.OPENAI_API_KEY,
+                    // Add other specific keys if the python script needs them
+                },
                 cwd: process.cwd(),
             });
 

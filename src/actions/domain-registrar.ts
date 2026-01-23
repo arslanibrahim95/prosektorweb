@@ -137,6 +137,18 @@ export async function purchaseDomain(
             return { success: false, error: 'Cloudflare yapılandırılmamış' }
         }
 
+        // Pre-flight Check: Verify availability and Premium status again
+        // "Fail Closed": If we can't verify price/status, do NOT proceed.
+        const availability = await cf.checkDomainAvailability(domain)
+        if (!availability.available) {
+            return { success: false, error: 'Alan adı artık müsait değil.' }
+        }
+
+        // Block Premium domains for safety unless we implement specific premium flow
+        if (availability.premium) {
+            return { success: false, error: 'Premium alan adları şu an otomatik satın alınamaz. Lütfen destek ile iletişime geçin.' }
+        }
+
         // Register domain via Cloudflare
         const result = await cf.registerDomain(domain, 1, contactInfo)
 
