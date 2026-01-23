@@ -56,14 +56,20 @@ export function Navbar({ variant = 'landing', onOpenLogin }: NavbarProps) {
                 <button
                     className="md:hidden p-2 text-neutral-600"
                     onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                    aria-label={mobileMenuOpen ? "Menüyü kapat" : "Menüyü aç"}
+                    aria-expanded={mobileMenuOpen}
+                    aria-controls="mobile-menu"
                 >
-                    {mobileMenuOpen ? <X /> : <Menu />}
+                    {mobileMenuOpen ? <X aria-hidden="true" /> : <Menu aria-hidden="true" />}
                 </button>
             </div>
 
             {/* Mobile Menu Dropdown */}
             {mobileMenuOpen && (
-                <div className="md:hidden bg-white border-b border-neutral-200 px-6 py-4 space-y-4">
+                <div
+                    id="mobile-menu"
+                    className="md:hidden bg-white border-b border-neutral-200 px-6 py-4 space-y-4"
+                >
                     <Link href={getLink('#neden-biz')} className="block text-neutral-600 font-medium" onClick={() => setMobileMenuOpen(false)}>Neden Biz?</Link>
                     <Link href={getLink('#nasil-calisiriz')} className="block text-neutral-600 font-medium" onClick={() => setMobileMenuOpen(false)}>Nasıl Çalışırız?</Link>
                     <Link href={getLink('#fiyatlandirma')} className="block text-neutral-600 font-medium" onClick={() => setMobileMenuOpen(false)}>Fiyatlandırma</Link>
