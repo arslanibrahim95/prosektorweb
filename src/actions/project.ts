@@ -1,11 +1,13 @@
 'use server'
 
 import { prisma } from '@/lib/prisma'
-import { getErrorMessage, getZodErrorMessage } from '@/lib/action-types'
 import { requireAuth } from '@/lib/auth-guard'
 import { auth } from '@/auth'
+import { logAudit } from '@/lib/audit'
+import { getErrorMessage, getZodErrorMessage } from '@/lib/action-types'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
+import { getUserCompanyId } from '@/lib/guards/tenant-guard'
 
 // ==========================================
 // TYPES
@@ -113,26 +115,22 @@ export async function getProjectById(id: string) {
         const session = await auth()
         if (!session?.user) return null
 
-        const project = await prisma.webProject.findUnique({
-            where: { id },
+        const userCompanyId = await getUserCompanyId(session.user.id, session.user.role as 'ADMIN' | 'CLIENT')
+        if (!userCompanyId && session.user.role !== 'ADMIN') return null
+
+        const project = await prisma.webProject.findFirst({
+            where: {
+                id,
+                companyId: session.user.role === 'ADMIN' ? undefined : userCompanyId,
+            },
             include: {
                 company: true,
                 domain: { include: { dnsRecords: true } },
+                generatedContents: {
+                    where: { status: 'APPROVED' },
+                },
             },
         })
-
-        if (!project) return null
-
-        // IDOR Check
-        if (session.user.role !== 'ADMIN') {
-            const user = await prisma.user.findUnique({
-                where: { id: session.user.id },
-                select: { companyId: true }
-            })
-            if (!user?.companyId || project.companyId !== user.companyId) {
-                return null
-            }
-        }
 
         return project
     } catch (error) {

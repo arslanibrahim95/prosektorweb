@@ -202,8 +202,13 @@ model Payment {
   
   createdAt     DateTime      @default(now())
 
+  // Soft Delete
+  deletedAt     DateTime?
+  deletedBy     String?
+  
   @@index([invoiceId])
   @@index([paymentDate])
+  @@index([deletedAt])
 }
 
 // 2. İşyerleri (SGK Dosyaları / Şantiyeler)

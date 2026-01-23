@@ -48,6 +48,69 @@ export async function createPayment(formData: FormData): Promise<PaymentActionRe
 
         const validatedData = PaymentSchema.parse(rawData)
 
+        // ATOMIC transaction with row-level lock
+        const result = await prisma.$transaction(async (tx) => {
+            const invoice = await tx.invoice.findUniqueOrThrow({
+                where: { id: validatedData.invoiceId },
+            })
+
+            const currentPaidAmount = Number(invoice.paidAmount)
+            const newPaidAmount = currentPaidAmount + validatedData.amount
+            const total = Number(invoice.total)
+
+            if (newPaidAmount > total) {
+                throw new Error('Ödeme tutarı fatura toplamını aşamaz')
+            }
+
+            let newStatus = invoice.status
+            if (newPaidAmount >= total) {
+                newStatus = 'PAID'
+            } else if (newPaidAmount > 0) {
+                newStatus = 'PARTIAL'
+            }
+
+            const payment = await tx.payment.create({
+                data: {
+                    invoiceId: validatedData.invoiceId,
+                    amount: validatedData.amount,
+                    paymentDate: new Date(validatedData.paymentDate),
+                    method: validatedData.method as any,
+                    reference: validatedData.reference || null,
+                    notes: validatedData.notes || null,
+                },
+            })
+
+            await tx.invoice.update({
+                where: { id: validatedData.invoiceId },
+                data: {
+                    paidAmount: newPaidAmount,
+                    status: newStatus,
+                },
+            })
+
+            return payment
+        })
+
+        revalidatePath('/admin/invoices')
+        revalidatePath(`/admin/invoices/${validatedData.invoiceId}`)
+        return { success: true, data: result }
+    } catch (error: unknown) {
+        console.error('createPayment error:', error)
+
+        if (error instanceof z.ZodError) {
+            return { success: false, error: getZodErrorMessage(error) }
+        }
+
+        if (error instanceof Error && error.message.includes('Ödeme tutarı')) {
+            return { success: false, error: error.message }
+        }
+
+        return { success: false, error: 'Ödeme kaydedilirken bir hata oluştu.' }
+    }
+}
+
+        const validatedData = PaymentSchema.parse(rawData)
+
         // Get invoice to update paid amount
         const invoice = await prisma.invoice.findUnique({
             where: { id: validatedData.invoiceId },

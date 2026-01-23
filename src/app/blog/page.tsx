@@ -4,6 +4,8 @@ import { Navbar } from '@/components/layout/Navbar'
 import { Footer } from '@/components/layout/Footer'
 import { prisma } from '@/lib/prisma'
 import { Prisma } from '@prisma/client'
+import Particles from '@/components/ui/Particles'
+import SpotlightCard from '@/components/ui/SpotlightCard'
 
 // Helper to format date
 const formatDate = (date: Date) => {
@@ -59,8 +61,22 @@ export default async function BlogPage({
 
             {/* Header */}
             <section className="pt-32 pb-16 px-6 bg-white border-b border-neutral-200 relative overflow-hidden">
-                {/* Aurora Background (Subtle) */}
-                <div className="absolute top-[-50%] left-[-20%] w-[60%] h-[150%] bg-brand-50/60 blur-[100px] rounded-full -z-10 pointer-events-none mix-blend-multiply" />
+                {/* Particles Background */}
+                <div className="absolute inset-0 z-0 pointer-events-none opacity-60">
+                    <Particles
+                        particleColors={['#dc2626', '#ef4444', '#f87171']}
+                        particleCount={120}
+                        particleSpread={15}
+                        speed={0.08}
+                        particleBaseSize={100}
+                        moveParticlesOnHover={true}
+                        alphaParticles={false}
+                        disableRotation={false}
+                    />
+                </div>
+                {/* Gradient Overlay for Text Readability */}
+                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/50 to-white z-0 pointer-events-none" />
+
 
                 <div className="max-w-6xl mx-auto text-center relative z-10">
                     <span className="inline-block px-4 py-1.5 bg-brand-100 text-brand-700 rounded-full text-sm font-bold mb-6">
@@ -78,7 +94,7 @@ export default async function BlogPage({
             {/* Search & Filters */}
             <section className="px-6 -mt-8 mb-16 relative z-10">
                 <div className="max-w-6xl mx-auto">
-                    <div className="bg-white/80 backdrop-blur-xl p-6 rounded-2xl shadow-xl border border-white/50 flex flex-col md:flex-row gap-4 items-center justify-between">
+                    <div className="bg-white/90 backdrop-blur-2xl p-6 rounded-3xl shadow-2xl border border-white/50 flex flex-col md:flex-row gap-4 items-center justify-between ring-1 ring-neutral-900/5">
                         {/* Search */}
                         <div className="relative w-full md:w-96 group">
                             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400 group-focus-within:text-brand-600 transition-colors" />
@@ -116,57 +132,60 @@ export default async function BlogPage({
                             <Link
                                 key={post.slug}
                                 href={`/blog/${post.slug}`}
-                                className="group bg-white rounded-2xl overflow-hidden border border-neutral-200 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full"
+                                className="group h-full block"
                             >
-                                {/* Image */}
-                                <div className="aspect-[4/3] relative overflow-hidden bg-neutral-100">
-                                    {post.coverImage && (
-                                        <img
-                                            src={post.coverImage}
-                                            alt={post.title}
-                                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                                        />
-                                    )}
-                                    <div className="absolute top-4 left-4">
-                                        <span className="px-3 py-1 bg-white/90 backdrop-blur-md text-brand-700 text-xs font-bold rounded-full shadow-sm">
-                                            {post.category?.name || 'Genel'}
-                                        </span>
-                                    </div>
-                                </div>
-
-                                {/* Content */}
-                                <div className="p-6 flex flex-col flex-grow">
-                                    <div className="flex items-center gap-3 text-xs text-neutral-500 font-medium mb-4">
-                                        <span className="flex items-center gap-1.5">
-                                            <Calendar className="w-3.5 h-3.5" />
-                                            {formatDate(post.publishedAt)}
-                                        </span>
-                                        <span className="flex items-center gap-1.5">
-                                            <Clock className="w-3.5 h-3.5" />
-                                            {post.readingTime} dk okuma
-                                        </span>
-                                    </div>
-
-                                    <h2 className="text-xl font-bold font-serif mb-3 text-neutral-900 leading-tight group-hover:text-brand-600 transition-colors">
-                                        {post.title}
-                                    </h2>
-
-                                    <p className="text-neutral-600 text-sm leading-relaxed line-clamp-3 mb-6 flex-grow">
-                                        {post.excerpt}
-                                    </p>
-
-                                    <div className="pt-6 border-t border-neutral-100 flex items-center justify-between">
-                                        <div className="flex items-center gap-2">
-                                            <div className="w-8 h-8 rounded-full bg-brand-50 flex items-center justify-center text-brand-600">
-                                                <User className="w-4 h-4" />
-                                            </div>
-                                            <span className="text-xs font-semibold text-neutral-700">{post.authorName}</span>
+                                <SpotlightCard className="h-full border-neutral-200 p-0 overflow-hidden hover:shadow-xl transition-all duration-500" spotlightColor="rgba(220, 38, 38, 0.15)">
+                                    {/* Image */}
+                                    <div className="aspect-[16/10] relative overflow-hidden bg-neutral-100">
+                                        {post.coverImage && (
+                                            <img
+                                                src={post.coverImage}
+                                                alt={post.title}
+                                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                                            />
+                                        )}
+                                        <div className="absolute top-4 left-4">
+                                            <span className="px-3 py-1 bg-white/95 backdrop-blur-md text-brand-700 text-xs font-bold rounded-full shadow-sm ring-1 ring-black/5">
+                                                {post.category?.name || 'Genel'}
+                                            </span>
                                         </div>
-                                        <span className="text-sm font-bold text-brand-600 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity -translate-x-2 group-hover:translate-x-0 duration-300">
-                                            Oku <ChevronRight className="w-4 h-4" />
-                                        </span>
                                     </div>
-                                </div>
+
+                                    {/* Content */}
+                                    <div className="p-8 flex flex-col flex-grow">
+                                        <div className="flex items-center gap-3 text-xs text-neutral-500 font-medium mb-4 uppercase tracking-wider">
+                                            <span className="flex items-center gap-1.5">
+                                                <Calendar className="w-3.5 h-3.5" />
+                                                {formatDate(post.publishedAt)}
+                                            </span>
+                                            <span className="w-1 h-1 rounded-full bg-neutral-300"></span>
+                                            <span className="flex items-center gap-1.5">
+                                                <Clock className="w-3.5 h-3.5" />
+                                                {post.readingTime} dk
+                                            </span>
+                                        </div>
+
+                                        <h2 className="text-2xl font-bold font-serif mb-3 text-neutral-900 leading-tight group-hover:text-brand-600 transition-colors">
+                                            {post.title}
+                                        </h2>
+
+                                        <p className="text-neutral-600 text-sm leading-relaxed line-clamp-3 mb-6 flex-grow">
+                                            {post.excerpt}
+                                        </p>
+
+                                        <div className="pt-6 border-t border-neutral-100 flex items-center justify-between mt-auto">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-8 h-8 rounded-full bg-brand-50 flex items-center justify-center text-brand-600 ring-2 ring-white">
+                                                    <User className="w-4 h-4" />
+                                                </div>
+                                                <span className="text-xs font-bold text-neutral-700">{post.authorName}</span>
+                                            </div>
+                                            <span className="text-sm font-bold text-brand-600 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-[-10px] group-hover:translate-x-0">
+                                                Devamını Oku <ChevronRight className="w-4 h-4" />
+                                            </span>
+                                        </div>
+                                    </div>
+                                </SpotlightCard>
                             </Link>
                         ))}
                     </div>

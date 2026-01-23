@@ -8,6 +8,7 @@ import { getErrorMessage, getZodErrorMessage } from '@/lib/action-types'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { z } from 'zod'
+import { getUserCompanyId } from '@/lib/guards/tenant-guard'
 
 // ==========================================
 // TYPES
@@ -147,20 +148,13 @@ export async function getCompanyById(id: string) {
         const session = await auth()
         if (!session?.user) return null
 
-        // IDOR Check
-        if (session.user.role !== 'ADMIN') {
-            const user = await prisma.user.findUnique({
-                where: { id: session.user.id },
-                select: { companyId: true }
-            })
+        const userCompanyId = await getUserCompanyId(session.user.id, session.user.role as 'ADMIN' | 'CLIENT')
 
-            if (!user?.companyId || user.companyId !== id) {
-                return null // Unauthorized
-            }
-        }
-
-        const company = await prisma.company.findUnique({
-            where: { id },
+        const company = await prisma.company.findFirst({
+            where: {
+                id,
+                ...(session.user.role === 'ADMIN' ? {} : { id: userCompanyId }),
+            },
             include: {
                 workplaces: {
                     include: {

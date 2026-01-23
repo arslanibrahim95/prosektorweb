@@ -7,6 +7,7 @@ import { logAudit } from '@/lib/audit'
 import { getErrorMessage, getZodErrorMessage, isPrismaUniqueConstraintError } from '@/lib/action-types'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
+import { getUserCompanyId } from '@/lib/guards/tenant-guard'
 
 // ==========================================
 // TYPES
@@ -210,8 +211,14 @@ export async function getInvoiceById(id: string) {
         const session = await auth()
         if (!session?.user) return null
 
-        const invoice = await prisma.invoice.findUnique({
-            where: { id },
+        const userCompanyId = await getUserCompanyId(session.user.id, session.user.role as 'ADMIN' | 'CLIENT')
+        if (!userCompanyId && session.user.role !== 'ADMIN') return null
+
+        const invoice = await prisma.invoice.findFirst({
+            where: {
+                id,
+                companyId: session.user.role === 'ADMIN' ? undefined : userCompanyId,
+            },
             include: {
                 company: true,
                 payments: {
@@ -219,20 +226,6 @@ export async function getInvoiceById(id: string) {
                 },
             },
         })
-
-        if (!invoice) return null
-
-        // IDOR Check
-        if (session.user.role !== 'ADMIN') {
-            const user = await prisma.user.findUnique({
-                where: { id: session.user.id },
-                select: { companyId: true }
-            })
-
-            if (!user?.companyId || invoice.companyId !== user.companyId) {
-                return null // Unauthorized access to another company's invoice
-            }
-        }
 
         return invoice
     } catch (error) {

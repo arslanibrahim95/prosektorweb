@@ -8,6 +8,7 @@ import { getErrorMessage, getZodErrorMessage } from '@/lib/action-types'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 import { TicketStatus, TicketPriority, TicketCategory } from '@prisma/client'
+import { getUserCompanyId } from '@/lib/guards/tenant-guard'
 
 // ==========================================
 // TYPES & SCHEMAS
@@ -240,8 +241,14 @@ export async function getTicketById(id: string) {
         const session = await auth()
         if (!session?.user) return null
 
-        const ticket = await prisma.ticket.findUnique({
-            where: { id },
+        const userCompanyId = await getUserCompanyId(session.user.id, session.user.role as 'ADMIN' | 'CLIENT')
+        if (!userCompanyId && session.user.role !== 'ADMIN') return null
+
+        const ticket = await prisma.ticket.findFirst({
+            where: {
+                id,
+                companyId: session.user.role === 'ADMIN' ? undefined : userCompanyId,
+            },
             include: {
                 company: true,
                 messages: {
@@ -249,20 +256,6 @@ export async function getTicketById(id: string) {
                 }
             }
         })
-
-        if (!ticket) return null
-
-        // IDOR Check
-        if (session.user.role !== 'ADMIN') {
-            const user = await prisma.user.findUnique({
-                where: { id: session.user.id },
-                select: { companyId: true }
-            })
-
-            if (!user?.companyId || ticket.companyId !== user.companyId) {
-                return null // Unauthorized
-            }
-        }
 
         return ticket
     } catch (error) {
