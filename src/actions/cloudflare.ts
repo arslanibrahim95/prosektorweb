@@ -3,6 +3,7 @@
 import { prisma } from '@/lib/prisma'
 import { getCloudflareService } from '@/lib/cloudflare'
 import { revalidatePath } from 'next/cache'
+import { requireAuth } from '@/lib/auth-guard'
 
 // ==========================================
 // TYPES
@@ -20,6 +21,7 @@ export interface CloudflareActionResult {
 
 export async function verifyCloudflareToken(): Promise<CloudflareActionResult> {
     try {
+        await requireAuth() // Admin only
         const cf = await getCloudflareService()
         if (!cf) {
             return { success: false, error: 'Cloudflare API anahtarı yapılandırılmamış' }
@@ -39,6 +41,7 @@ export async function verifyCloudflareToken(): Promise<CloudflareActionResult> {
 
 export async function listCloudflareZones(): Promise<CloudflareActionResult> {
     try {
+        await requireAuth() // Admin only
         const cf = await getCloudflareService()
         if (!cf) {
             return { success: false, error: 'Cloudflare yapılandırılmamış' }
@@ -54,6 +57,7 @@ export async function listCloudflareZones(): Promise<CloudflareActionResult> {
 
 export async function addDomainToCloudflare(domainId: string): Promise<CloudflareActionResult> {
     try {
+        await requireAuth() // Admin only
         const cf = await getCloudflareService()
         if (!cf) {
             return { success: false, error: 'Cloudflare yapılandırılmamış' }
@@ -121,6 +125,7 @@ export async function addDomainToCloudflare(domainId: string): Promise<Cloudflar
 
 export async function syncDnsToCloudflare(domainId: string): Promise<CloudflareActionResult> {
     try {
+        await requireAuth() // Admin only
         const cf = await getCloudflareService()
         if (!cf) {
             return { success: false, error: 'Cloudflare yapılandırılmamış' }
@@ -174,6 +179,7 @@ export async function syncDnsToCloudflare(domainId: string): Promise<CloudflareA
 
 export async function setupStandardDns(domainId: string): Promise<CloudflareActionResult> {
     try {
+        await requireAuth() // Admin only
         const cf = await getCloudflareService()
         if (!cf) {
             return { success: false, error: 'Cloudflare yapılandırılmamış' }
@@ -243,6 +249,7 @@ export async function setupStandardDns(domainId: string): Promise<CloudflareActi
 
 export async function getCloudflareStatus(): Promise<CloudflareActionResult> {
     try {
+        await requireAuth() // Admin only
         const config = await prisma.apiConfig.findUnique({
             where: { provider: 'CLOUDFLARE' },
         })

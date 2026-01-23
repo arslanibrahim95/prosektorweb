@@ -354,9 +354,19 @@ async function checkDomainAvailability(domain: string): Promise<boolean> {
 
 export async function searchDomains(query: string): Promise<DomainSearchResult> {
     try {
+        const session = await auth()
+        if (!session) {
+            return { success: false, results: [], error: 'Arama yapmak için giriş yapmalısınız.' }
+        }
+
         let cleanQuery = query.toLowerCase().trim()
         cleanQuery = cleanQuery.replace(/\.(com|net|org|tr|com\.tr)$/i, '')
         cleanQuery = cleanQuery.replace(/^www\./i, '')
+
+        // STRICT VALIDATION: Allow only a-z, 0-9, and hyphens. Block SSRF chars.
+        if (!/^[a-z0-9-]+$/.test(cleanQuery)) {
+            return { success: false, results: [], error: 'Geçersiz karakterler içeriyor. Sadece harf, rakam ve tire kullanınız.' }
+        }
 
         if (cleanQuery.length < 2) {
             return { success: false, results: [], error: 'En az 2 karakter giriniz.' }

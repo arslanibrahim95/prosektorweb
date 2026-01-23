@@ -2,6 +2,7 @@
 
 import { prisma } from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
+import { requireAuth } from '@/lib/auth-guard'
 
 function generateSlug(title: string): string {
     return title
@@ -68,6 +69,7 @@ interface CreatePortfolioInput {
 
 export async function createPortfolio(input: CreatePortfolioInput) {
     try {
+        await requireAuth() // Admin only
         // Check if project already has portfolio
         const existing = await prisma.portfolio.findUnique({
             where: { webProjectId: input.webProjectId }
@@ -115,6 +117,7 @@ export async function updatePortfolio(id: string, data: Partial<{
     displayOrder: number
 }>) {
     try {
+        await requireAuth() // Admin only
         const updateData: any = { ...data }
 
         // Update publishedAt when publishing
@@ -141,6 +144,7 @@ export async function updatePortfolio(id: string, data: Partial<{
 
 export async function deletePortfolio(id: string) {
     try {
+        await requireAuth() // Admin only
         await prisma.portfolio.delete({ where: { id } })
         revalidatePath('/admin/portfolio')
         revalidatePath('/portfolio')
