@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation'
 import { Navbar } from '@/components/layout/Navbar'
 import { Footer } from '@/components/layout/Footer'
 import { prisma } from '@/lib/prisma'
+import TrustBadges from '@/components/ui/TrustBadges'
 
 // Helper to format date
 const formatDate = (date: Date) => {
@@ -100,12 +101,25 @@ export default async function BlogDetailPage({
               prose-strong:text-neutral-900 prose-strong:font-bold
               prose-a:text-brand-600 prose-a:font-semibold prose-a:no-underline hover:prose-a:underline
               prose-li:text-neutral-600
+              prose-table:w-full prose-table:border-collapse prose-table:my-8
+              prose-th:bg-neutral-100 prose-th:p-4 prose-th:text-left prose-th:font-bold prose-th:border prose-th:border-neutral-200
+              prose-td:p-4 prose-td:border prose-td:border-neutral-200
             "
                     dangerouslySetInnerHTML={{ __html: post.content }}
                 />
 
+                {/* Dynamic Components Injection (For GEO Content) */}
+                {post.tags?.toString().includes('Kurumsal Kimlik') && (
+                    <div className="my-12 p-6 bg-brand-50/50 rounded-2xl border border-brand-100">
+                        <h3 className="text-lg font-bold text-brand-900 mb-4 font-serif">Örnek: Güven Rozetleri Uygulaması</h3>
+                        <p className="text-neutral-600 mb-6 text-sm">Yazımızda bahsettiğimiz "Güven Veren Tasarım" ilkelerine uygun olarak, web sitenizde bu tür rozetlere yer vermelisiniz:</p>
+                        <TrustBadges />
+                    </div>
+                )}
+
                 {/* Tags */}
                 <div className="mt-16 pt-8 border-t border-neutral-200">
+
                     <div className="flex flex-wrap gap-2">
                         {tags.map((tag: any) => (
                             <span
