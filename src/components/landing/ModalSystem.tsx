@@ -40,17 +40,12 @@ export function ModalSystem({ isOpen, onClose, initialState = ModalStep.INITIAL_
     // Timer (Refactored for Security)
     const [timeLeft, setTimeLeft] = useState('')
 
-    // In a real app, 'expirationDate' would come from server props or API
-    // We simulate a server-verified expiration date that doesn't reset on refresh if persisted
-    const [expirationDate] = useState(() => {
-        // TODO: Replace with server-side prop: new Date(serverExpirationDate)
-        const date = new Date()
-        date.setDate(date.getDate() + 7)
-        return date
-    })
+    // Timer state populated from Server Action
+    const [expirationDate, setExpirationDate] = useState<Date | null>(null)
 
     useEffect(() => {
         if (!isOpen) return
+        if (!expirationDate) return // Wait for login
 
         if ([ModalStep.DASHBOARD, ModalStep.PREVIEW_DETAIL, ModalStep.REACTIVATE_OFFER].includes(step)) {
             const interval = setInterval(() => {
@@ -80,6 +75,9 @@ export function ModalSystem({ isOpen, onClose, initialState = ModalStep.INITIAL_
             const result = await verifyClientAccess(loginInputName, loginInputCode)
             if (result.success) {
                 setOsgbName(loginInputName)
+                if (result.previewEndsAt) {
+                    setExpirationDate(new Date(result.previewEndsAt))
+                }
                 setStep(ModalStep.DASHBOARD)
             } else {
                 setLoginError(result.error || 'Giriş başarısız')

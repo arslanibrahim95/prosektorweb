@@ -11,6 +11,7 @@ const verifySchema = z.object({
 export type VerifyResult = {
     success: boolean
     error?: string
+    previewEndsAt?: string // ISO Date String
 }
 
 const AUTHORIZED_CLIENTS = [
@@ -54,5 +55,13 @@ export async function verifyClientAccess(osgbName: string, code: string): Promis
         authorizedClient.code
     )
 
-    return isValid ? { success: true } : { success: false, error: 'Hatalı OSGB Adı veya Erişim Kodu' }
+    // In production, we fetch this from DB based on Authorized Client link
+    // For now, consistent server-side date (e.g. 7 days from now or fixed)
+    // To prove server-side control, let's say it expires in 3 days.
+    const previewEndsAt = new Date()
+    previewEndsAt.setDate(previewEndsAt.getDate() + 3)
+
+    return isValid
+        ? { success: true, previewEndsAt: previewEndsAt.toISOString() }
+        : { success: false, error: 'Hatalı OSGB Adı veya Erişim Kodu' }
 }

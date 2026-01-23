@@ -580,6 +580,7 @@ model WebProject {
   // Site bilgileri
   siteUrl     String?       // Canlı site URL (örn: https://firma.com)
   previewUrl  String?       // Demo/önizleme URL
+  previewEndsAt DateTime?   // Demo Bitiş Süresi (Server-Side Control)
   repoUrl     String?       // Git repo (varsa)
   
   // Fiyatlandırma
