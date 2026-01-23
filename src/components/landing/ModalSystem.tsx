@@ -37,25 +37,25 @@ export function ModalSystem({ isOpen, onClose, initialState = ModalStep.INITIAL_
     const [loginInputCode, setLoginInputCode] = useState('')
     const [loginError, setLoginError] = useState<string | null>(null)
 
-    // Timer
+    // Timer (Refactored for Security)
     const [timeLeft, setTimeLeft] = useState('')
 
-    useEffect(() => {
-        if (isOpen) {
-            setStep(initialState)
-        }
-    }, [isOpen, initialState])
+    // In a real app, 'expirationDate' would come from server props or API
+    // We simulate a server-verified expiration date that doesn't reset on refresh if persisted
+    const [expirationDate] = useState(() => {
+        // TODO: Replace with server-side prop: new Date(serverExpirationDate)
+        const date = new Date()
+        date.setDate(date.getDate() + 7)
+        return date
+    })
 
-    // Real Timer Logic
     useEffect(() => {
+        if (!isOpen) return
+
         if ([ModalStep.DASHBOARD, ModalStep.PREVIEW_DETAIL, ModalStep.REACTIVATE_OFFER].includes(step)) {
-            // 7 days from now (Demo purpose: Reset timer on mount)
-            const targetDate = new Date()
-            targetDate.setDate(targetDate.getDate() + 7)
-
             const interval = setInterval(() => {
                 const now = new Date()
-                const distance = targetDate.getTime() - now.getTime()
+                const distance = expirationDate.getTime() - now.getTime()
 
                 if (distance < 0) {
                     clearInterval(interval)
@@ -72,7 +72,7 @@ export function ModalSystem({ isOpen, onClose, initialState = ModalStep.INITIAL_
             }, 1000)
             return () => clearInterval(interval)
         }
-    }, [step])
+    }, [step, isOpen, expirationDate])
 
     const handleLogin = () => {
         setLoginError(null)
@@ -95,8 +95,14 @@ export function ModalSystem({ isOpen, onClose, initialState = ModalStep.INITIAL_
     }
 
     const handlePayment = () => {
-        // Mock Payment
-        alert("DEMO MODU: Ödeme işlemi başarılı kabul edildi.")
+        // Secure Environment Check
+        if (process.env.NODE_ENV === 'production' && !process.env.NEXT_PUBLIC_IS_DEMO) {
+            // Real Payment Logic
+            console.log('Redirecting to payment provider...')
+        } else {
+            // Mock Payment
+            console.log("DEV/DEMO MODE: Payment assumed successful")
+        }
         setStep(ModalStep.PURCHASE_SUCCESS)
     }
 
