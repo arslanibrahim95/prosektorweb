@@ -365,21 +365,7 @@ async function checkDomainAvailability(domain: string): Promise<boolean> {
     }
 }
 
-const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000
-const RATE_LIMIT_MAX = 30
-const rateLimitStore: Map<string, number[]> =
-    (globalThis as any).__domainRateLimitStore ?? new Map()
-;(globalThis as any).__domainRateLimitStore = rateLimitStore
-
-function isRateLimited(key: string): boolean {
-    const now = Date.now()
-    const windowStart = now - RATE_LIMIT_WINDOW_MS
-    const timestamps = rateLimitStore.get(key) || []
-    const recent = timestamps.filter((t) => t >= windowStart)
-    recent.push(now)
-    rateLimitStore.set(key, recent)
-    return recent.length > RATE_LIMIT_MAX
-}
+import { checkRateLimit, getClientIp } from '@/lib/rate-limit'
 
 function isValidLabel(label: string): boolean {
     if (label.length < 1 || label.length > 63) return false
@@ -394,8 +380,14 @@ export async function searchDomains(query: string): Promise<DomainSearchResult> 
             return { success: false, results: [], error: 'Arama yapmak için giriş yapmalısınız.' }
         }
 
-        const rateKey = session.user?.id || session.user?.email || 'unknown'
-        if (isRateLimited(rateKey)) {
+        // DB-based Rate Limiting (Production Safe)
+        const ip = await getClientIp()
+        const rateKey = session.user?.id || ip
+
+        // 30 requests per hour per user/IP
+        const limit = await checkRateLimit(`domain_search:${rateKey}`, 30, 3600)
+
+        if (!limit.success) {
             return { success: false, results: [], error: 'Çok fazla istek gönderdiniz. Lütfen daha sonra tekrar deneyiniz.' }
         }
 
