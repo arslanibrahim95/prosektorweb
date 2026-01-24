@@ -3,7 +3,7 @@
 import { prisma } from '@/lib/prisma'
 import { auth } from '@/auth'
 import { requireAuth } from '@/lib/auth-guard'
-import '@/types/next-auth'
+import { PAGINATION } from '@/lib/action-types'
 
 async function getClientCompanyId(): Promise<string | null> {
     const session = await auth()
@@ -72,6 +72,9 @@ export async function getProjectLeads(projectId: string, limit = 20) {
     const companyId = await getClientCompanyId()
     if (!companyId) return []
 
+    // Validate limit (max 100)
+    const validLimit = Math.min(Math.max(limit, PAGINATION.MIN_LIMIT), PAGINATION.MAX_LIMIT)
+
     // Verify project belongs to client
     const project = await prisma.webProject.findFirst({
         where: { id: projectId, companyId }
@@ -81,7 +84,7 @@ export async function getProjectLeads(projectId: string, limit = 20) {
     const leads = await prisma.leadCapture.findMany({
         where: { projectId },
         orderBy: { createdAt: 'desc' },
-        take: limit
+        take: validLimit
     })
 
     return leads

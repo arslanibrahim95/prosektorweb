@@ -13,6 +13,12 @@ export async function PUT(
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
         }
 
+        // CSRF Check
+        const { checkOrigin } = await import('@/lib/csrf')
+        if (!(await checkOrigin())) {
+            return NextResponse.json({ error: 'Invalid Origin' }, { status: 403 })
+        }
+
         const { contentId } = await params
         const body = await request.json()
         const { content: newContent } = body

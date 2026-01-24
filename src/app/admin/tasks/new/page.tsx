@@ -26,7 +26,7 @@ export default async function NewTaskPage() {
                 </div>
             </div>
 
-            <form action={createTask as any} className="bg-white p-8 rounded-2xl border border-neutral-200 shadow-sm space-y-6">
+            <form action={async (formData: FormData) => { 'use server'; await createTask(formData) }} className="bg-white p-8 rounded-2xl border border-neutral-200 shadow-sm space-y-6">
                 <div className="space-y-2">
                     <label className="text-sm font-semibold text-neutral-700">Başlık <span className="text-red-500">*</span></label>
                     <input

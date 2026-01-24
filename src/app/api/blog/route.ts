@@ -1,15 +1,16 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { validatePagination } from '@/lib/action-types'
 
 export async function GET(request: Request) {
     try {
         const { searchParams } = new URL(request.url)
-        const page = parseInt(searchParams.get('page') || '1')
-        const limit = parseInt(searchParams.get('limit') || '12')
+        const { page, limit, skip } = validatePagination(
+            searchParams.get('page'),
+            searchParams.get('limit') || '12'
+        )
         const category = searchParams.get('category')
         const search = searchParams.get('search')
-
-        const skip = (page - 1) * limit
 
         // Build where clause
         const where: Record<string, unknown> = {

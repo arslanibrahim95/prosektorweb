@@ -20,6 +20,7 @@ import {
 import { GenerateButton } from './GenerateButton';
 import { ContentCard } from './ContentCard';
 import { DeployButtons } from './DeployButtons';
+import { ContentType } from '@prisma/client';
 
 interface GeneratePageProps {
     params: Promise<{ id: string }>;
@@ -158,7 +159,7 @@ export default async function GeneratePage({ params }: GeneratePageProps) {
                 <h2 className="text-lg font-bold text-neutral-900">Sayfa İçerikleri</h2>
                 <div className="grid gap-4">
                     {CONTENT_TYPES.map(({ type, label, icon: Icon, description }) => {
-                        const content = contentMap.get(type as any);
+                        const content = contentMap.get(type as ContentType);
                         return (
                             <ContentCard
                                 key={type}

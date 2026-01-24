@@ -3,10 +3,11 @@
 import { prisma } from '@/lib/prisma'
 import { requireAuth } from '@/lib/auth-guard'
 import { logAudit } from '@/lib/audit'
-import { getErrorMessage, getZodErrorMessage } from '@/lib/action-types'
+import { getErrorMessage, getZodErrorMessage, validatePagination } from '@/lib/action-types'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 import { ProposalStatus } from '@prisma/client'
+import { checkRateLimit, getClientIp } from '@/lib/rate-limit'
 
 // ==========================================
 // TYPES & SCHEMAS
@@ -158,8 +159,8 @@ export async function getProposals(options?: {
     page?: number
     limit?: number
 }) {
-    const { status, search = '', page = 1, limit = 10 } = options || {}
-    const skip = (page - 1) * limit
+    const { status, search = '' } = options || {}
+    const { page, limit, skip } = validatePagination(options?.page, options?.limit)
 
     try {
         const where: any = {}
@@ -206,7 +207,17 @@ export async function getProposalById(id: string) {
         const proposal = await prisma.proposal.findUnique({
             where: { id },
             include: {
-                company: true,
+                company: {
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true,
+                        phone: true,
+                        address: true,
+                        taxNo: true,
+                        taxOffice: true
+                    }
+                },
                 items: true
             }
         })
@@ -249,10 +260,82 @@ export async function generateApprovalToken(proposalId: string) {
 }
 
 /**
+ * Get proposal by approval token (for viewing before approval)
+ * Does NOT approve the proposal - only retrieves it for display
+ */
+export async function getProposalByToken(token: string) {
+    try {
+        const ip = await getClientIp()
+        const limit = await checkRateLimit(`proposal:view:${ip}`, { limit: 10, windowSeconds: 60 * 60 }) // 10 attempts per hour
+
+        if (!limit.success) {
+            return { success: false as const, error: 'Çok fazla deneme yaptınız. Lütfen daha sonra tekrar deneyin.' }
+        }
+
+        const proposal = await prisma.proposal.findUnique({
+            where: { approvalToken: token },
+            include: {
+                company: { select: { name: true } },
+                items: true
+            }
+        })
+
+        if (!proposal) {
+            return { success: false as const, error: 'Geçersiz veya süresi dolmuş onay linki.' }
+        }
+
+        if (proposal.status === ProposalStatus.ACCEPTED) {
+            return { success: false as const, error: 'Bu teklif zaten onaylanmış.' }
+        }
+
+        // Check validity date
+        if (proposal.validUntil && new Date() > proposal.validUntil) {
+            await prisma.proposal.update({
+                where: { id: proposal.id },
+                data: { status: ProposalStatus.EXPIRED }
+            })
+            return { success: false as const, error: 'Teklifin geçerlilik süresi dolmuş.' }
+        }
+
+        return {
+            success: true as const,
+            data: {
+                id: proposal.id,
+                subject: proposal.subject,
+                companyName: proposal.company.name,
+                items: proposal.items.map(item => ({
+                    description: item.description,
+                    quantity: item.quantity,
+                    unitPrice: Number(item.unitPrice),
+                    totalPrice: Number(item.totalPrice),
+                })),
+                subtotal: Number(proposal.subtotal),
+                taxRate: Number(proposal.taxRate),
+                taxAmount: Number(proposal.taxAmount),
+                total: Number(proposal.total),
+                currency: proposal.currency,
+                validUntil: proposal.validUntil,
+                notes: proposal.notes,
+            }
+        }
+    } catch (error) {
+        console.error('getProposalByToken error:', error)
+        return { success: false as const, error: 'Teklif bilgileri alınamadı.' }
+    }
+}
+
+/**
  * Approve proposal via token (for client-side digital signature)
  */
 export async function approveProposalByToken(token: string) {
     try {
+        const ip = await getClientIp()
+        const limit = await checkRateLimit(`proposal:approve:${ip}`, { limit: 5, windowSeconds: 60 * 60 }) // 5 attempts per hour
+
+        if (!limit.success) {
+            return { success: false, error: 'Çok fazla deneme yaptınız. Lütfen daha sonra tekrar deneyin.' }
+        }
+
         const proposal = await prisma.proposal.findUnique({
             where: { approvalToken: token }
         })

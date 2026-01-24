@@ -381,6 +381,7 @@ model SiteSetting {
   updatedAt DateTime @updatedAt
 }
 
+
 // ===============================
 // DOMAIN & DNS YÖNETİMİ
 // ===============================
@@ -578,6 +579,7 @@ model WebProject {
   status      ProjectStatus @default(DRAFT)
   
   // Site bilgileri
+  slug        String?       @unique // Demo access slug
   siteUrl     String?       // Canlı site URL (örn: https://firma.com)
   previewUrl  String?       // Demo/önizleme URL
   previewEndsAt DateTime?   // Demo Bitiş Süresi (Server-Side Control)
@@ -1012,14 +1014,4 @@ model LeadCapture {
 // SECURITY & SYSTEM
 // ===============================
 
-model RateLimit {
-  id          String   @id @default(uuid())
-  key         String   // IP or User ID + Action
-  points      Int      @default(0)
-  expiresAt   DateTime
-  
-  createdAt   DateTime @default(now())
-  
-  @@unique([key])
-  @@index([expiresAt])
-}
+// RateLimit model removed in favor of Redis (Phase 4)

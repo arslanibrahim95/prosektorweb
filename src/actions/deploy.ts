@@ -22,6 +22,7 @@ interface DeployResult {
     success: boolean;
     previewUrl?: string;
     siteUrl?: string;
+    pagesGenerated?: number;
     error?: string;
 }
 

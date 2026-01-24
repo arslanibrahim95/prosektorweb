@@ -111,8 +111,30 @@ const styles = StyleSheet.create({
     },
 })
 
+interface InvoiceData {
+    invoiceNo: string
+    issueDate: Date | string
+    dueDate: Date | string
+    status: string
+    company?: {
+        name: string
+        address?: string | null
+        email?: string | null
+        phone?: string | null
+        taxNo?: string | null
+        taxOffice?: string | null
+    } | null
+    description: string
+    notes?: string | null
+    subtotal: number
+    taxRate: number
+    taxAmount: number
+    total: number
+    paidAmount: number
+}
+
 interface InvoiceDocumentProps {
-    data: any
+    data: InvoiceData
 }
 
 export const InvoiceDocument: React.FC<InvoiceDocumentProps> = ({ data }) => {

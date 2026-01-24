@@ -3,8 +3,10 @@
 import { prisma } from '@/lib/prisma'
 import { getErrorMessage, getZodErrorMessage } from '@/lib/action-types'
 import { requireAuth } from '@/lib/auth-guard'
+import { logAudit } from '@/lib/audit'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
+import { PaymentMethod } from '@prisma/client'
 
 // ==========================================
 // TYPES
@@ -24,7 +26,7 @@ const PaymentSchema = z.object({
     invoiceId: z.string().min(1, 'Fatura ID gerekli'),
     amount: z.coerce.number().min(0.01, 'Tutar 0\'dan büyük olmalı'),
     paymentDate: z.string().min(1, 'Ödeme tarihi gerekli'),
-    method: z.enum(['CASH', 'BANK', 'CREDIT_CARD', 'OTHER']),
+    method: z.nativeEnum(PaymentMethod),
     reference: z.string().optional(),
     notes: z.string().optional(),
 })
@@ -32,6 +34,8 @@ const PaymentSchema = z.object({
 // ==========================================
 // CREATE PAYMENT
 // ==========================================
+
+const MAX_PAYMENT_RETRIES = 3
 
 export async function createPayment(formData: FormData): Promise<PaymentActionResult> {
     try {
@@ -48,62 +52,97 @@ export async function createPayment(formData: FormData): Promise<PaymentActionRe
 
         const validatedData = PaymentSchema.parse(rawData)
 
-        // ATOMIC transaction with row-level lock
-        const result = await prisma.$transaction(async (tx) => {
-            const invoice = await tx.invoice.findUniqueOrThrow({
-                where: { id: validatedData.invoiceId },
-            })
+        // Retry loop for optimistic locking
+        let lastError: unknown
+        for (let attempt = 0; attempt < MAX_PAYMENT_RETRIES; attempt++) {
+            try {
+                const result = await prisma.$transaction(async (tx) => {
+                    // Read current invoice state
+                    const invoice = await tx.invoice.findUniqueOrThrow({
+                        where: { id: validatedData.invoiceId },
+                    })
 
-            const currentPaidAmount = Number(invoice.paidAmount)
-            const newPaidAmount = currentPaidAmount + validatedData.amount
-            const total = Number(invoice.total)
+                    const currentPaidAmount = Number(invoice.paidAmount)
+                    const total = Number(invoice.total)
+                    const newPaidAmount = currentPaidAmount + validatedData.amount
 
-            if (newPaidAmount > total) {
-                throw new Error('Ödeme tutarı fatura toplamını aşamaz')
+                    // Validate payment doesn't exceed total
+                    if (newPaidAmount > total) {
+                        throw new Error('PAYMENT_EXCEEDS_TOTAL')
+                    }
+
+                    // Determine new status
+                    let newStatus: 'PENDING' | 'PARTIAL' | 'PAID' = 'PENDING'
+                    if (newPaidAmount >= total) {
+                        newStatus = 'PAID'
+                    } else if (newPaidAmount > 0) {
+                        newStatus = 'PARTIAL'
+                    }
+
+                    // Create payment first
+                    const payment = await tx.payment.create({
+                        data: {
+                            invoiceId: validatedData.invoiceId,
+                            amount: validatedData.amount,
+                            paymentDate: new Date(validatedData.paymentDate),
+                            method: validatedData.method,
+                            reference: validatedData.reference || null,
+                            notes: validatedData.notes || null,
+                        },
+                    })
+
+                    // Optimistic lock: Update only if paidAmount hasn't changed
+                    // This prevents lost updates from concurrent payments
+                    const updateResult = await tx.invoice.updateMany({
+                        where: {
+                            id: validatedData.invoiceId,
+                            paidAmount: currentPaidAmount, // Optimistic lock condition
+                        },
+                        data: {
+                            paidAmount: newPaidAmount,
+                            status: newStatus,
+                        },
+                    })
+
+                    // If no rows updated, another transaction modified the invoice
+                    if (updateResult.count === 0) {
+                        throw new Error('CONCURRENT_MODIFICATION')
+                    }
+
+                    return { payment, newPaidAmount, newStatus }
+                })
+
+                // Success - log and return
+                await logAudit({
+                    action: 'CREATE',
+                    entity: 'Payment',
+                    entityId: result.payment.id,
+                    details: {
+                        invoiceId: validatedData.invoiceId,
+                        amount: validatedData.amount,
+                        method: validatedData.method,
+                        newPaidAmount: result.newPaidAmount,
+                        newStatus: result.newStatus,
+                    },
+                })
+
+                revalidatePath('/admin/invoices')
+                revalidatePath(`/admin/invoices/${validatedData.invoiceId}`)
+                return { success: true, data: result.payment }
+            } catch (error) {
+                lastError = error
+                // Retry on concurrent modification
+                if (error instanceof Error && error.message === 'CONCURRENT_MODIFICATION') {
+                    continue
+                }
+                // Don't retry on other errors
+                throw error
             }
+        }
 
-            let newStatus = invoice.status
-            if (newPaidAmount >= total) {
-                newStatus = 'PAID'
-            } else if (newPaidAmount > 0) {
-                newStatus = 'PARTIAL'
-            }
-
-            const payment = await tx.payment.create({
-                data: {
-                    invoiceId: validatedData.invoiceId,
-                    amount: validatedData.amount,
-                    paymentDate: new Date(validatedData.paymentDate),
-                    method: validatedData.method as any,
-                    reference: validatedData.reference || null,
-                    notes: validatedData.notes || null,
-                },
-            })
-
-            await tx.invoice.update({
-                where: { id: validatedData.invoiceId },
-                data: {
-                    paidAmount: newPaidAmount,
-                    status: newStatus,
-                },
-            })
-
-            return payment
-        })
-
-        // Optimistic Concurrency Check: Update only if paidAmount equals what we read or use strict condition
-        // Since we don't have a version field, we rely on the transaction.
-        // To be safer (as per Code Review), we can update conditionally.
-
-        // However, Prisma doesn't support 'update where generic condition' easily for numerical constraints without raw query or finding by same state.
-        // Let's stick to the transaction but add a final check or rely on `tx` isolation if DB supports it.
-        // For this patch, I will just clean the syntax error as PRIMARY GOAL.
-
-        // ... (Code is inside the function)
-
-        revalidatePath('/admin/invoices')
-        revalidatePath(`/admin/invoices/${validatedData.invoiceId}`)
-        return { success: true, data: result }
+        // All retries exhausted
+        console.error('createPayment: max retries exceeded', lastError)
+        return { success: false, error: 'Eşzamanlı işlem hatası, lütfen tekrar deneyin.' }
     } catch (error: unknown) {
         console.error('createPayment error:', error)
 
@@ -111,8 +150,8 @@ export async function createPayment(formData: FormData): Promise<PaymentActionRe
             return { success: false, error: getZodErrorMessage(error) }
         }
 
-        if (error instanceof Error && error.message.includes('Ödeme tutarı')) {
-            return { success: false, error: error.message }
+        if (error instanceof Error && error.message === 'PAYMENT_EXCEEDS_TOTAL') {
+            return { success: false, error: 'Ödeme tutarı fatura toplamını aşamaz.' }
         }
 
         return { success: false, error: 'Ödeme kaydedilirken bir hata oluştu.' }
@@ -127,41 +166,95 @@ export async function deletePayment(id: string): Promise<PaymentActionResult> {
     try {
         await requireAuth()
 
-        const payment = await prisma.payment.findUnique({
-            where: { id },
-            include: { invoice: true },
-        })
+        // Retry loop for optimistic locking
+        let lastError: unknown
+        for (let attempt = 0; attempt < MAX_PAYMENT_RETRIES; attempt++) {
+            try {
+                const result = await prisma.$transaction(async (tx) => {
+                    const payment = await tx.payment.findUnique({
+                        where: { id },
+                        include: { invoice: true },
+                    })
 
-        if (!payment) {
+                    if (!payment) {
+                        throw new Error('PAYMENT_NOT_FOUND')
+                    }
+
+                    // Read current state for optimistic lock
+                    const currentPaidAmount = Number(payment.invoice.paidAmount)
+                    const paymentAmount = Number(payment.amount)
+                    const invoiceTotal = Number(payment.invoice.total)
+                    const newPaidAmount = Math.max(0, currentPaidAmount - paymentAmount)
+
+                    // Determine new status
+                    let newStatus: 'PENDING' | 'PARTIAL' | 'PAID' = 'PENDING'
+                    if (newPaidAmount >= invoiceTotal) {
+                        newStatus = 'PAID'
+                    } else if (newPaidAmount > 0) {
+                        newStatus = 'PARTIAL'
+                    }
+
+                    // Delete payment first
+                    await tx.payment.delete({ where: { id } })
+
+                    // Optimistic lock: Update only if paidAmount hasn't changed
+                    const updateResult = await tx.invoice.updateMany({
+                        where: {
+                            id: payment.invoiceId,
+                            paidAmount: currentPaidAmount, // Optimistic lock condition
+                        },
+                        data: {
+                            paidAmount: newPaidAmount,
+                            status: newStatus,
+                        },
+                    })
+
+                    if (updateResult.count === 0) {
+                        throw new Error('CONCURRENT_MODIFICATION')
+                    }
+
+                    return {
+                        invoiceId: payment.invoiceId,
+                        amount: paymentAmount,
+                        newPaidAmount,
+                        newStatus,
+                    }
+                })
+
+                // Log deletion
+                await logAudit({
+                    action: 'DELETE',
+                    entity: 'Payment',
+                    entityId: id,
+                    details: {
+                        invoiceId: result.invoiceId,
+                        amount: result.amount,
+                        newPaidAmount: result.newPaidAmount,
+                        newStatus: result.newStatus,
+                    },
+                })
+
+                revalidatePath('/admin/invoices')
+                revalidatePath(`/admin/invoices/${result.invoiceId}`)
+                return { success: true }
+            } catch (error) {
+                lastError = error
+                if (error instanceof Error && error.message === 'CONCURRENT_MODIFICATION') {
+                    continue
+                }
+                throw error
+            }
+        }
+
+        console.error('deletePayment: max retries exceeded', lastError)
+        return { success: false, error: 'Eşzamanlı işlem hatası, lütfen tekrar deneyin.' }
+    } catch (error) {
+        console.error('deletePayment error:', error)
+
+        if (error instanceof Error && error.message === 'PAYMENT_NOT_FOUND') {
             return { success: false, error: 'Ödeme bulunamadı.' }
         }
 
-        const newPaidAmount = Number(payment.invoice.paidAmount) - Number(payment.amount)
-
-        // Determine new status
-        let newStatus = payment.invoice.status
-        if (newPaidAmount <= 0) {
-            newStatus = 'PENDING'
-        } else if (newPaidAmount < Number(payment.invoice.total)) {
-            newStatus = 'PARTIAL'
-        }
-
-        await prisma.$transaction([
-            prisma.payment.delete({ where: { id } }),
-            prisma.invoice.update({
-                where: { id: payment.invoiceId },
-                data: {
-                    paidAmount: Math.max(0, newPaidAmount),
-                    status: newStatus,
-                },
-            }),
-        ])
-
-        revalidatePath('/admin/invoices')
-        revalidatePath(`/admin/invoices/${payment.invoiceId}`)
-        return { success: true }
-    } catch (error) {
-        console.error('deletePayment error:', error)
         return { success: false, error: 'Ödeme silinirken bir hata oluştu.' }
     }
 }

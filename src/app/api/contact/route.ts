@@ -1,9 +1,11 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import DOMPurify from 'isomorphic-dompurify'
+import { getClientIp } from '@/lib/rate-limit'
 
 export async function POST(request: Request) {
     try {
-        const ip = request.headers.get('x-forwarded-for')?.split(',')[0] || '127.0.0.1'
+        const ip = await getClientIp()
 
         // 1. Rate Limiting (10 requests per hour)
         const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000)
@@ -32,14 +34,18 @@ export async function POST(request: Request) {
             )
         }
 
+        // 2.5 Sanitize inputs
+        const cleanMessage = DOMPurify.sanitize(message)
+        const cleanName = DOMPurify.sanitize(name)
+
         // 3. Create contact message (with Legal Logs)
         const contact = await prisma.contactMessage.create({
             data: {
-                name,
+                name: cleanName,
                 email,
                 phone: phone || null,
                 company: company || null,
-                message,
+                message: cleanMessage,
                 ipAddress: ip,
                 userAgent: request.headers.get('user-agent') || 'API',
                 kvkkApprovedAt: new Date() // API via implies consent

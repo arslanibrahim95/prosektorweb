@@ -1,6 +1,5 @@
 import NextAuth from "next-auth"
 import { authConfig } from "./auth.config"
-import '@/types/next-auth'
 
 const { auth } = NextAuth(authConfig)
 
@@ -36,9 +35,31 @@ export default auth((req) => {
         }
     }
 
+    // API protection
+    if (req.nextUrl.pathname.startsWith('/api')) {
+        // Allow public API routes
+        if (
+            req.nextUrl.pathname.startsWith('/api/auth') ||
+            req.nextUrl.pathname.startsWith('/api/contact') ||
+            req.nextUrl.pathname.startsWith('/api/webhooks')
+        ) {
+            return null
+        }
+
+        // Require auth for all other API routes
+        if (!isLoggedIn) {
+            return Response.json({ error: 'Unauthorized' }, { status: 401 })
+        }
+
+        // Admin-only API routes
+        if (req.nextUrl.pathname.startsWith('/api/admin') && userRole !== 'ADMIN') {
+            return Response.json({ error: 'Forbidden' }, { status: 403 })
+        }
+    }
+
     return null
 })
 
 export const config = {
-    matcher: ['/((?!api|_next/static|_next/image|.*\\.png$|.*\\.ico$).*)'],
+    matcher: ['/((?!_next/static|_next/image|.*\\.png$|.*\\.ico$).*)'],
 }

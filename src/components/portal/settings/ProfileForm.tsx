@@ -27,7 +27,7 @@ export function ProfileForm({ user }: Props) {
             } else {
                 toast.error(result.error || 'Bir hata oluştu.')
             }
-        } catch (error) {
+        } catch {
             toast.error('Beklenmedik bir hata oluştu.')
         } finally {
             setLoading(false)

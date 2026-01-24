@@ -1,116 +1,87 @@
-'use server'
-
 import { prisma } from '@/lib/prisma'
-import { auth } from '@/auth'
-import { headers } from 'next/headers'
-import { AuditAction } from '@prisma/client'
+import { AuditAction as PrismaAuditAction, Prisma } from '@prisma/client'
 
-// ==========================================
-// AUDIT LOG HELPER
-// ==========================================
+// Re-export for those who want strict enum
+export { PrismaAuditAction as AuditAction }
 
-interface AuditLogParams {
-    action: AuditAction
+// Flexible string type for callers
+export type AuditLogAction =
+    | 'LOGIN_SUCCESS'
+    | 'LOGIN_FAILED'
+    | 'PAYMENT_SUCCESS'
+    | 'PAYMENT_FAILED'
+    | 'DOMAIN_SEARCH'
+    | 'DOMAIN_PURCHASE'
+    | 'SYSTEM_ERROR'
+    | 'CREATE'
+    | 'UPDATE'
+    | 'DELETE'
+    | PrismaAuditAction
+
+export async function createAuditLog(data: {
+    action: AuditLogAction | string // Allow string for flexibility
     entity: string
     entityId?: string
+    userId?: string
     details?: Record<string, unknown>
-}
-
-/**
- * Get client IP address from request headers.
- * Handles proxies (nginx, cloudflare) via x-forwarded-for.
- */
-async function getClientInfo(): Promise<{ ipAddress: string; userAgent: string }> {
+    ipAddress?: string
+    userAgent?: string
+}) {
     try {
-        const headersList = await headers()
-
-        // Try x-forwarded-for first (for proxies), then x-real-ip, then fallback
-        const forwardedFor = headersList.get('x-forwarded-for')
-        const ipAddress = forwardedFor?.split(',')[0]?.trim() ||
-            headersList.get('x-real-ip') ||
-            'unknown'
-
-        const userAgent = headersList.get('user-agent') || 'unknown'
-
-        return { ipAddress, userAgent }
-    } catch {
-        // headers() might fail in some contexts (e.g., non-request context)
-        return { ipAddress: 'unavailable', userAgent: 'unavailable' }
-    }
-}
-
-/**
- * Kritik işlemleri loglar.
- * Session'dan kullanıcı bilgisi, headers'dan IP alır.
- * Hata durumunda sessizce fail olur (işlemi bloklamaz).
- */
-export async function logAudit({
-    action,
-    entity,
-    entityId,
-    details,
-}: AuditLogParams): Promise<void> {
-    try {
-        const [session, clientInfo] = await Promise.all([
-            auth(),
-            getClientInfo(),
-        ])
+        // Serialize details to ensure it's valid JSON
+        const safeDetails = data.details ? JSON.parse(JSON.stringify(data.details)) : {}
 
         await prisma.auditLog.create({
             data: {
-                action,
-                entity,
-                entityId,
-                userId: session?.user?.id || null,
-                userName: session?.user?.name || null,
-                userEmail: session?.user?.email || null,
-                details: details ? JSON.parse(JSON.stringify(details)) : undefined,
-                ipAddress: clientInfo.ipAddress,
-                userAgent: clientInfo.userAgent,
-            },
+                // Force cast to Prisma Enum - assumes caller passes valid string
+                action: data.action as PrismaAuditAction,
+                entity: data.entity,
+                entityId: data.entityId,
+                userId: data.userId,
+                details: safeDetails,
+                ipAddress: data.ipAddress,
+                userAgent: data.userAgent
+            }
         })
     } catch (error) {
-        // Audit log hatası ana işlemi bloklamasın
-        console.error('Audit log error:', error)
+        // Fail-safe: Don't crash the app if logging fails, but log to console
+        console.error('Failed to create audit log:', error)
     }
 }
 
-// ==========================================
-// QUERIES
-// ==========================================
+export const logAudit = createAuditLog
 
+// Read logs for Admin Panel with Pagination
 export async function getAuditLogs(options?: {
-    entity?: string
-    action?: AuditAction
-    userId?: string
     page?: number
     limit?: number
+    entity?: string
+    action?: string
 }) {
-    const { entity, action, userId, page = 1, limit = 20 } = options || {}
+    const page = options?.page || 1
+    const limit = options?.limit || 25
     const skip = (page - 1) * limit
 
+    const where: Prisma.AuditLogWhereInput = {}
+    if (options?.entity) where.entity = options.entity
+    if (options?.action) where.action = options.action as PrismaAuditAction
+
     try {
-        const where: Record<string, unknown> = {}
-
-        if (entity) where.entity = entity
-        if (action) where.action = action
-        if (userId) where.userId = userId
-
         const [logs, total] = await Promise.all([
             prisma.auditLog.findMany({
                 where,
                 skip,
                 take: limit,
-                orderBy: { createdAt: 'desc' },
+                orderBy: { createdAt: 'desc' }
             }),
-            prisma.auditLog.count({ where }),
+            prisma.auditLog.count({ where })
         ])
 
         return {
             logs,
             total,
             pages: Math.ceil(total / limit),
-            currentPage: page,
+            currentPage: page
         }
     } catch (error) {
         console.error('getAuditLogs error:', error)

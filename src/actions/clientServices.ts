@@ -5,7 +5,6 @@ import { auth } from '@/auth'
 import { revalidatePath } from 'next/cache'
 import bcrypt from 'bcryptjs'
 import { z } from 'zod'
-import '@/types/next-auth'
 
 async function getClientCompanyId(): Promise<string | null> {
     const session = await auth()
@@ -150,7 +149,7 @@ export async function updateClientProfile(data: z.infer<typeof updateProfileSche
 
     const validation = updateProfileSchema.safeParse(data)
     if (!validation.success) {
-        return { success: false, error: validation.error.errors[0].message }
+        return { success: false, error: validation.error.issues[0].message }
     }
 
     try {
@@ -176,7 +175,7 @@ export async function changeClientPassword(data: z.infer<typeof changePasswordSc
 
     const validation = changePasswordSchema.safeParse(data)
     if (!validation.success) {
-        return { success: false, error: validation.error.errors[0].message }
+        return { success: false, error: validation.error.issues[0].message }
     }
 
     try {

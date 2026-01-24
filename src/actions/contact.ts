@@ -3,6 +3,8 @@
 import { prisma } from '@/lib/prisma'
 import { z } from 'zod'
 import { headers } from 'next/headers'
+import DOMPurify from 'isomorphic-dompurify'
+import { getClientIp } from '@/lib/rate-limit'
 
 const contactSchema = z.object({
     name: z.string().min(2, 'Ad Soyad en az 2 karakter olmalıdır'),
@@ -20,8 +22,8 @@ export type ContactState = {
 
 export async function submitContact(prevState: ContactState, formData: FormData): Promise<ContactState> {
     // 1. Get Security Context (IP & User Agent)
-    const headersList = headers()
-    const ip = headersList.get('x-forwarded-for')?.split(',')[0] || '127.0.0.1'
+    const headersList = await headers()
+    const ip = await getClientIp()
     const userAgent = headersList.get('user-agent') || 'Unknown'
 
     // 2. Rate Limiting (Max 5 requests per hour per IP)
@@ -38,12 +40,11 @@ export async function submitContact(prevState: ContactState, formData: FormData)
             console.warn(`[RATE LIMIT] blocked IP: ${ip}`)
             return {
                 success: false,
-                message: 'Çok fazla istek gönderdiniz. Lütfen bir saat sonra tekrar deneyiniz.', // Security by obscurity: don't reveal exact limit
+                message: 'Çok fazla istek gönderdiniz. Lütfen bir saat sonra tekrar deneyiniz.',
             }
         }
     } catch (error) {
         console.error('Rate limit check failed:', error)
-        // Fail open or closed? Closed for security.
         return { success: false, message: 'Sistem yoğunluğu, lütfen bekleyiniz.' }
     }
 
@@ -64,14 +65,14 @@ export async function submitContact(prevState: ContactState, formData: FormData)
         }
     }
 
-    // 4. Save to DB with Legal Evidence
+    // 4. Save to DB with Legal Evidence (Sanitized)
     try {
         await prisma.contactMessage.create({
             data: {
-                name: validatedFields.data.name,
+                name: DOMPurify.sanitize(validatedFields.data.name),
                 email: validatedFields.data.email,
                 phone: validatedFields.data.phone || '',
-                message: validatedFields.data.message,
+                message: DOMPurify.sanitize(validatedFields.data.message),
                 ipAddress: ip,
                 userAgent: userAgent,
                 kvkkApprovedAt: new Date(),

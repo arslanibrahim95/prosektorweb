@@ -1,6 +1,6 @@
 /* eslint-disable jsx-a11y/alt-text */
 import React from 'react'
-import { Page, Text, View, Document, StyleSheet, Image } from '@react-pdf/renderer'
+import { Page, Text, View, Document, StyleSheet } from '@react-pdf/renderer'
 import { registerFonts } from '@/lib/pdf/fonts'
 
 // Register fonts immediately
@@ -139,8 +139,39 @@ const styles = StyleSheet.create({
     },
 })
 
+interface ProposalItem {
+    description: string
+    quantity: number
+    unitPrice: number
+    totalPrice: number
+}
+
+interface ProposalCompany {
+    name: string
+    address?: string | null
+    email?: string | null
+    phone?: string | null
+    taxNo?: string | null
+    taxOffice?: string | null
+}
+
+interface ProposalData {
+    id: string
+    createdAt: Date | string
+    validUntil?: Date | string | null
+    company?: ProposalCompany | null
+    subject: string
+    notes?: string | null
+    items?: ProposalItem[]
+    currency: string
+    subtotal: number
+    taxRate: number
+    taxAmount: number
+    total: number
+}
+
 interface ProposalDocumentProps {
-    data: any // Keeping as any for flexibility, ideally should be Proposal type
+    data: ProposalData
 }
 
 export const ProposalDocument: React.FC<ProposalDocumentProps> = ({ data }) => {
@@ -204,7 +235,7 @@ export const ProposalDocument: React.FC<ProposalDocumentProps> = ({ data }) => {
                         <View style={styles.colPrice}><Text style={styles.tableHeaderText}>Birim Fiyat</Text></View>
                         <View style={styles.colTotal}><Text style={styles.tableHeaderText}>Tutar</Text></View>
                     </View>
-                    {data.items?.map((item: any, index: number) => (
+                    {data.items?.map((item, index) => (
                         <View key={index} style={styles.tableRow}>
                             <View style={styles.colDesc}><Text style={styles.tableCell}>{item.description}</Text></View>
                             <View style={styles.colQty}><Text style={styles.tableCell}>{item.quantity}</Text></View>

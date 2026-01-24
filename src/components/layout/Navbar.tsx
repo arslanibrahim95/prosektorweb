@@ -22,6 +22,9 @@ export function Navbar({ variant = 'landing', onOpenLogin }: NavbarProps) {
         if (onOpenLogin) {
             setMobileMenuOpen(false)
             onOpenLogin()
+        } else {
+            // Default fallback
+            window.location.href = '/login'
         }
     }
 
@@ -45,17 +48,19 @@ export function Navbar({ variant = 'landing', onOpenLogin }: NavbarProps) {
                 </div>
 
                 {/* Direct Login Link */}
-                <Link
-                    href="/login"
+                <button
+                    onClick={handleLoginClick}
                     className="hidden md:block px-5 py-2 bg-brand-600 text-white rounded-md text-sm font-semibold shadow-sm hover:bg-brand-700 transition-all hover:shadow-md active:bg-brand-800"
                 >
                     Giriş Yap
-                </Link>
+                </button>
 
                 {/* Mobile Menu Toggle */}
                 <button
                     className="md:hidden p-2 text-neutral-600"
                     onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                    aria-label={mobileMenuOpen ? "Menüyü kapat" : "Menüyü aç"}
+                    aria-expanded={mobileMenuOpen}
                 >
                     {mobileMenuOpen ? <X /> : <Menu />}
                 </button>
@@ -71,12 +76,12 @@ export function Navbar({ variant = 'landing', onOpenLogin }: NavbarProps) {
                     <Link href="/blog" className="block text-brand-600 font-medium" onClick={() => setMobileMenuOpen(false)}>Blog</Link>
                     <Link href={getLink('#iletisim')} className="block text-neutral-600 font-medium" onClick={() => setMobileMenuOpen(false)}>İletişim</Link>
                     {/* Direct Login Link */}
-                    <Link
-                        href="/login"
+                    <button
+                        onClick={handleLoginClick}
                         className="w-full text-center px-5 py-3 bg-brand-600 text-white rounded-md text-sm font-semibold shadow-sm block"
                     >
                         Giriş Yap
-                    </Link>
+                    </button>
                 </div>
             )}
         </nav>

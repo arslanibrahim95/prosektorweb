@@ -4,7 +4,7 @@ import { prisma } from '@/lib/prisma'
 import { requireAuth } from '@/lib/auth-guard'
 import { auth } from '@/auth'
 import { logAudit } from '@/lib/audit'
-import { getErrorMessage, getZodErrorMessage } from '@/lib/action-types'
+import { getErrorMessage, getZodErrorMessage, validatePagination } from '@/lib/action-types'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 import { ServiceType, BillingCycle, ServiceStatus } from '@prisma/client'
@@ -205,8 +205,8 @@ export async function getServices(options?: {
     page?: number
     limit?: number
 }) {
-    const { status, upcoming, search = '', page = 1, limit = 10 } = options || {}
-    const skip = (page - 1) * limit
+    const { status, upcoming, search = '' } = options || {}
+    const { page, limit, skip } = validatePagination(options?.page, options?.limit)
 
     try {
         const session = await auth()

@@ -11,6 +11,8 @@ const EnvSchema = z.object({
   OPENAI_API_KEY: z.string().optional(),
   RESEND_API_KEY: z.string().optional(),
   NODE_ENV: z.enum(['development', 'production', 'test']).optional(),
+  UPSTASH_REDIS_REST_URL: z.string().url().optional(),
+  UPSTASH_REDIS_REST_TOKEN: z.string().min(1).optional(),
   SITE_OUTPUT_DIR: z.string().optional(),
   PREVIEW_DOMAIN: z.string().optional(),
   DEFAULT_SERVER_IP: z.string().optional(),
@@ -20,7 +22,7 @@ const EnvSchema = z.object({
 export function validateEnv() {
   const result = EnvSchema.safeParse(process.env);
   if (!result.success) {
-    const missing = result.error.errors.map(e => e.path.join('.'));
+    const missing = result.error.issues.map(e => e.path.join('.'));
     throw new Error(`Missing/Invalid ENV vars: ${missing.join(', ')}`);
   }
   return result.data;

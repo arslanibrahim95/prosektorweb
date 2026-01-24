@@ -116,12 +116,12 @@ export async function getProjectById(id: string) {
         if (!session?.user) return null
 
         const userCompanyId = await getUserCompanyId(session.user.id, session.user.role as 'ADMIN' | 'CLIENT')
-        if (!userCompanyId && session.user.role !== 'ADMIN') return null
+        if (session.user.role !== 'ADMIN' && !userCompanyId) return null
 
         const project = await prisma.webProject.findFirst({
             where: {
                 id,
-                companyId: session.user.role === 'ADMIN' ? undefined : userCompanyId,
+                companyId: session.user.role === 'ADMIN' ? undefined : userCompanyId!,
             },
             include: {
                 company: true,

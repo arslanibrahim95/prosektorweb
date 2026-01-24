@@ -45,8 +45,8 @@ export async function createTask(formData: FormData): Promise<TaskFormState> {
             data: {
                 title: validated.title,
                 description: validated.description,
-                status: validated.status as any,
-                priority: validated.priority as any,
+                status: validated.status,
+                priority: validated.priority,
                 dueDate: dueDate,
                 webProjectId: validated.webProjectId || null,
             }
@@ -72,14 +72,15 @@ export async function updateTaskStatus(id: string, status: string): Promise<Task
     try {
         await requireAuth()
 
-        const statuses = ['TODO', 'IN_PROGRESS', 'DONE', 'ARCHIVED']
-        if (!statuses.includes(status)) {
+        const StatusSchema = z.nativeEnum(TaskStatus)
+        const parsed = StatusSchema.safeParse(status)
+        if (!parsed.success) {
             return { success: false, error: 'Geçersiz durum' }
         }
 
         await prisma.task.update({
             where: { id },
-            data: { status: status as any }
+            data: { status: parsed.data }
         })
 
         revalidatePath('/admin/tasks')
@@ -183,15 +184,19 @@ export async function createSubTask(input: SubTaskInput): Promise<TaskFormState>
             dueDate = new Date(input.dueDate)
         }
 
+        const priority = input.priority && Object.values(TaskPriority).includes(input.priority as TaskPriority)
+            ? input.priority as TaskPriority
+            : TaskPriority.NORMAL
+
         const subTask = await prisma.task.create({
             data: {
                 title: input.title,
-                priority: (input.priority as any) || 'NORMAL',
+                priority,
                 dueDate,
                 assignedTo: input.assignedTo,
                 parentId: input.parentId,
                 webProjectId: parent.webProjectId,
-                status: 'TODO'
+                status: TaskStatus.TODO
             }
         })
 

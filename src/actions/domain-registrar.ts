@@ -48,7 +48,7 @@ export async function searchDomainsWithPricing(query: string): Promise<{
     error?: string
 }> {
     const ip = await getClientIp()
-    const limit = await checkRateLimit(`domain_search:${ip}`, 20, 3600) // 20 attempts per hour
+    const limit = await checkRateLimit(`domain_search:${ip}`, { limit: 20, windowSeconds: 3600 }) // 20 attempts per hour
 
     if (!limit.success) {
         return { success: false, results: [], error: 'Saatlik arama limitine ulaştınız.' }
@@ -194,6 +194,24 @@ export async function purchaseDomain(
                 console.log('DNS setup warning:', e)
             }
         }
+
+        // Log Domain Purchase
+        // Log Domain Purchase
+        const auditLib = await import('@/lib/audit')
+        const authLib = await import('@/auth')
+        const session = await authLib.auth()
+
+        await auditLib.createAuditLog({
+            action: 'DOMAIN_PURCHASE',
+            entity: 'Domain',
+            entityId: domain,
+            details: {
+                companyId,
+                registrar: 'Cloudflare',
+                price: 'Standard'
+            },
+            userId: session?.user?.id
+        })
 
         revalidatePath('/admin/domains')
         return { success: true, domain: result.domain }

@@ -1,13 +1,57 @@
+import { prisma } from '@/lib/prisma'
+import { notFound } from 'next/navigation'
 import Link from 'next/link'
 
-export default async function InstantDemoPage({ params }: { params: { slug: string } }) {
-    const slug = params.slug
-    const companyName = slug
-        .split('-')
-        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-        .join(' ')
+export const dynamic = 'force-dynamic'
 
-    // Dummy Content Generation based on Slug (Deterministic)
+export default async function InstantDemoPage({ params }: { params: { slug: string } }) {
+    const project = await prisma.webProject.findUnique({
+        where: { slug: params.slug },
+        include: {
+            company: {
+                include: {
+                    invoices: true
+                }
+            }
+        }
+    })
+
+    if (!project) {
+        notFound()
+    }
+
+    // Check expiration
+    const isExpired = project.previewEndsAt && new Date() > new Date(project.previewEndsAt)
+
+    if (isExpired) {
+        return (
+            <div className="min-h-screen bg-slate-900 flex items-center justify-center p-4">
+                <div className="bg-white rounded-2xl max-w-md w-full p-8 text-center shadow-2xl">
+                    <div className="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <h1 className="text-2xl font-bold text-slate-800 mb-2">Demo Süresi Doldu</h1>
+                    <p className="text-slate-600 mb-8">
+                        Minimum seviyede tutulan bu önizleme sürümünün süresi dolmuştur.
+                        <br />
+                        Web sitenizi hemen yayınlamak için teklifinizi onaylayın.
+                    </p>
+                    <Link href="/contact" className="block w-full bg-blue-600 text-white font-bold py-3 px-6 rounded-xl hover:bg-blue-700 transition transform hover:scale-105">
+                        Teklifi İncele / Satın Al
+                    </Link>
+                </div>
+            </div>
+        )
+    }
+
+    // Use Company Name or Project Name
+    const companyName = project.company.name || project.name
+
+    // TODO: In future, use generatedContents if available suitable for preview
+    // For now, we use the deterministic dummy content but customized with real company name
+
     const services = [
         'İş Sağlığı ve Güvenliği',
         'Risk Analizi ve Değerlendirme',
@@ -23,11 +67,20 @@ export default async function InstantDemoPage({ params }: { params: { slug: stri
             <div className="bg-slate-900 text-white px-4 py-3 flex justify-between items-center sticky top-0 z-50 shadow-lg">
                 <div className="flex items-center gap-2">
                     <span className="bg-blue-600 text-xs px-2 py-1 rounded font-bold">CANLI DEMO</span>
-                    <span className="text-sm text-slate-300">Bu bir önizlemedir.</span>
+                    <span className="text-sm text-slate-300 hidden md:inline">
+                        Bu bir önizlemedir: {project.slug}
+                    </span>
                 </div>
-                <Link href="/contact" className="bg-green-600 hover:bg-green-500 px-4 py-1.5 rounded text-sm font-medium transition-colors">
-                    Sitemi Satın Al 🚀
-                </Link>
+                <div className="flex items-center gap-3">
+                    {project.previewEndsAt && (
+                        <div className="text-xs text-orange-400 font-mono hidden md:block">
+                            Bitiş: {new Date(project.previewEndsAt).toLocaleDateString('tr-TR')}
+                        </div>
+                    )}
+                    <Link href="/contact" className="bg-green-600 hover:bg-green-500 px-4 py-1.5 rounded text-sm font-medium transition-colors">
+                        Sitemi Satın Al 🚀
+                    </Link>
+                </div>
             </div>
 
             {/* Header */}
@@ -35,10 +88,10 @@ export default async function InstantDemoPage({ params }: { params: { slug: stri
                 <div className="container mx-auto px-4 py-4 flex justify-between items-center">
                     <h1 className="text-2xl font-bold text-slate-800">{companyName}</h1>
                     <nav className="hidden md:flex gap-6 text-sm text-slate-600">
-                        <a href="#" className="hover:text-blue-600">Kurumsal</a>
-                        <a href="#" className="hover:text-blue-600">Hizmetlerimiz</a>
-                        <a href="#" className="hover:text-blue-600">Belgeler</a>
-                        <a href="#" className="hover:text-blue-600">İletişim</a>
+                        <span className="cursor-pointer hover:text-blue-600">Kurumsal</span>
+                        <span className="cursor-pointer hover:text-blue-600">Hizmetlerimiz</span>
+                        <span className="cursor-pointer hover:text-blue-600">Belgeler</span>
+                        <span className="cursor-pointer hover:text-blue-600">İletişim</span>
                     </nav>
                 </div>
             </header>

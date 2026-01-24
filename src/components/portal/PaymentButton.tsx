@@ -5,11 +5,10 @@ import { CreditCard, Copy, Check } from 'lucide-react'
 import { toast } from 'sonner'
 
 interface PaymentButtonProps {
-    amount: number
     invoiceNo: string
 }
 
-export function PaymentButton({ amount, invoiceNo }: PaymentButtonProps) {
+export function PaymentButton({ invoiceNo }: PaymentButtonProps) {
     const [isOpen, setIsOpen] = useState(false)
     const [copied, setCopied] = useState(false)
 

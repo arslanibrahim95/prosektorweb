@@ -2,9 +2,7 @@
 
 import { prisma } from '@/lib/prisma'
 import { auth } from '@/auth'
-import { redirect } from 'next/navigation'
 import { TicketPriority, TicketCategory } from '@prisma/client'
-import '@/types/next-auth'
 
 async function getClientCompanyId(): Promise<string | null> {
     const session = await auth()

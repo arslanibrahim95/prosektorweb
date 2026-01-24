@@ -8,7 +8,7 @@ interface FooterProps {
     variant?: 'landing' | 'inner'
 }
 
-export function Footer({ variant = 'landing' }: FooterProps) {
+export function Footer({ }: FooterProps) {
     return (
         <footer className="relative mt-20">
             {/* Animated Wave SVG */}
@@ -64,7 +64,7 @@ export function Footer({ variant = 'landing' }: FooterProps) {
                                 </div>
                             </div>
                             <p className="text-neutral-400 max-w-sm leading-relaxed text-sm">
-                                OSGB'lere özel profesyonel web çözümleri. Dijital kimliğinizi sektörün diline uygun tasarlıyoruz.
+                                OSGB&apos;lere özel profesyonel web çözümleri. Dijital kimliğinizi sektörün diline uygun tasarlıyoruz.
                             </p>
                         </div>
 
@@ -157,7 +157,7 @@ export function Footer({ variant = 'landing' }: FooterProps) {
                             © 2026 ProSektorWeb. Tüm hakları saklıdır.
                         </p>
                         <div className="flex items-center gap-2">
-                            <span className="text-xs text-neutral-600">Türkiye'de</span>
+                            <span className="text-xs text-neutral-600">Türkiye&apos;de</span>
                             <span className="animate-pulse">💖</span>
                             <span className="text-xs text-neutral-600">ile yapıldı</span>
                         </div>

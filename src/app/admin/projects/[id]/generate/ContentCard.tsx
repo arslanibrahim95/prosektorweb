@@ -19,7 +19,7 @@ import {
     Loader2,
     type LucideIcon
 } from 'lucide-react';
-import DOMPurify from 'isomorphic-dompurify';
+import { sanitizeHtml } from '@/lib/security/sanitize';
 import { approveContent, rejectContent, generatePageContent } from '@/actions/generate';
 import type { GeneratedContent } from '@prisma/client';
 import type { ContentType } from '@/lib/ai/types';
@@ -167,7 +167,7 @@ export function ContentCard({
                     <div className="bg-neutral-50 rounded-lg p-4 max-h-64 overflow-y-auto">
                         <div
                             className="prose prose-sm max-w-none"
-                            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(content.content) }}
+                            dangerouslySetInnerHTML={{ __html: sanitizeHtml(content.content) }}
                         />
                     </div>
 

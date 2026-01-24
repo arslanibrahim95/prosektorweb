@@ -29,6 +29,21 @@ interface CloudflareDnsRecord {
     proxied?: boolean
 }
 
+interface DnsRecordPayload {
+    type: string
+    name: string
+    content: string
+    ttl: number
+    priority?: number
+    proxied?: boolean
+}
+
+interface RegisteredDomain {
+    name: string
+    expires_at: string
+    registered_at: string
+}
+
 export class CloudflareService {
     private apiToken: string
 
@@ -159,7 +174,7 @@ export class CloudflareService {
         proxied: boolean = false
     ): Promise<{ success: boolean; record?: CloudflareDnsRecord; error?: string }> {
         try {
-            const body: any = { type, name, content, ttl }
+            const body: DnsRecordPayload = { type, name, content, ttl }
             if (priority !== undefined) body.priority = priority
             if (type === 'A' || type === 'AAAA' || type === 'CNAME') {
                 body.proxied = proxied
@@ -192,7 +207,7 @@ export class CloudflareService {
         proxied: boolean = false
     ): Promise<{ success: boolean; error?: string }> {
         try {
-            const body: any = { type, name, content, ttl }
+            const body: DnsRecordPayload = { type, name, content, ttl }
             if (priority !== undefined) body.priority = priority
             if (type === 'A' || type === 'AAAA' || type === 'CNAME') {
                 body.proxied = proxied
@@ -267,7 +282,7 @@ export class CloudflareService {
             // Simplified: Just try to enable or assume enabled if we can add rules. 
             // Correct API: POST /zones/{zone_identifier}/email/routing/enabled
 
-            const response = await this.request<any>(
+            const response = await this.request<{ enabled: boolean }>(
                 `/zones/${zoneId}/email/routing/enabled`,
                 'POST',
                 { enabled: true }
@@ -294,7 +309,7 @@ export class CloudflareService {
             const [localPart, ...rest] = email.split('@')
             const domain = rest.join('@')
 
-            const response = await this.request<any>(
+            const response = await this.request<{ id: string }>(
                 `/zones/${zoneId}/email/routing/rules`,
                 'POST',
                 {
@@ -456,9 +471,10 @@ export class CloudflareService {
             postalCode: string
             country: string
             phone: string
+            phone: string
             email: string
         }
-    ): Promise<{ success: boolean; domain?: any; error?: string }> {
+    ): Promise<{ success: boolean; domain?: RegisteredDomain; error?: string }> {
         try {
             const accountId = await this.getAccountId()
             if (!accountId) {

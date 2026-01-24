@@ -2,7 +2,7 @@
 
 import {
     ResponsiveContainer, AreaChart, Area, XAxis, YAxis,
-    Tooltip, CartesianGrid, PieChart, Pie, Cell, Legend
+    Tooltip, CartesianGrid, PieChart, Pie, Cell
 } from 'recharts'
 
 interface TrafficChartProps {
@@ -96,7 +96,7 @@ export function DeviceChart({ mobile, desktop, tablet }: DeviceChartProps) {
                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                 </Pie>
-                <Tooltip formatter={(value: any) => [`%${value.toFixed(1)}`, '']} />
+                <Tooltip formatter={(value: number) => [`%${value.toFixed(1)}`, '']} />
             </PieChart>
         </ResponsiveContainer>
     )

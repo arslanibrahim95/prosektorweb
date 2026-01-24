@@ -1,6 +1,5 @@
 import { PrismaClient } from '@prisma/client'
 import { PrismaMariaDb } from '@prisma/adapter-mariadb'
-import { createPool } from 'mariadb'
 
 const connectionString = process.env.DATABASE_URL!
 const adapter = new PrismaMariaDb(connectionString)
@@ -9,24 +8,40 @@ const globalForPrisma = globalThis as unknown as { prisma: PrismaClient }
 
 const prismaBase = globalForPrisma.prisma || new PrismaClient({ adapter })
 
+// Type-safe soft delete model delegates
+const softDeleteModels = {
+    Company: prismaBase.company,
+    User: prismaBase.user,
+    Invoice: prismaBase.invoice,
+    WebProject: prismaBase.webProject,
+} as const
+
+type SoftDeleteModelName = keyof typeof softDeleteModels
+
+function isSoftDeleteModel(model: string): model is SoftDeleteModelName {
+    return model in softDeleteModels
+}
+
 export const prisma = prismaBase.$extends({
     query: {
         $allModels: {
             async findMany({ model, args, query }) {
-                if (['Company', 'User', 'Invoice', 'WebProject'].includes(model)) {
+                if (isSoftDeleteModel(model)) {
                     args.where = { deletedAt: null, ...args.where }
                 }
                 return query(args)
             },
             async findFirst({ model, args, query }) {
-                if (['Company', 'User', 'Invoice', 'WebProject'].includes(model)) {
+                if (isSoftDeleteModel(model)) {
                     args.where = { deletedAt: null, ...args.where }
                 }
                 return query(args)
             },
             async delete({ model, args, query }) {
-                if (['Company', 'User', 'Invoice', 'WebProject'].includes(model)) {
-                    return (prismaBase as any)[model.toLowerCase()].update({
+                if (isSoftDeleteModel(model)) {
+                    const delegate = softDeleteModels[model]
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
+                    return (delegate.update as Function)({
                         ...args,
                         data: { deletedAt: new Date() }
                     })
@@ -34,8 +49,10 @@ export const prisma = prismaBase.$extends({
                 return query(args)
             },
             async deleteMany({ model, args, query }) {
-                if (['Company', 'User', 'Invoice', 'WebProject'].includes(model)) {
-                    return (prismaBase as any)[model.toLowerCase()].updateMany({
+                if (isSoftDeleteModel(model)) {
+                    const delegate = softDeleteModels[model]
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
+                    return (delegate.updateMany as Function)({
                         ...args,
                         data: { deletedAt: new Date() }
                     })

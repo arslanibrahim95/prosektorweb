@@ -4,10 +4,11 @@ import { prisma } from '@/lib/prisma'
 import { requireAuth } from '@/lib/auth-guard'
 import { auth } from '@/auth'
 import { logAudit } from '@/lib/audit'
-import { getErrorMessage, getZodErrorMessage, isPrismaUniqueConstraintError } from '@/lib/action-types'
+import { getErrorMessage, getZodErrorMessage, isPrismaUniqueConstraintError, validatePagination } from '@/lib/action-types'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 import { getUserCompanyId } from '@/lib/guards/tenant-guard'
+import { InvoiceStatus } from '@prisma/client'
 
 // ==========================================
 // TYPES
@@ -38,6 +39,10 @@ const InvoiceSchema = z.object({
 // HELPERS
 // ==========================================
 
+/**
+ * Generate invoice number - for display/suggestion only
+ * Actual number is generated inside transaction during creation
+ */
 export async function generateInvoiceNo(): Promise<string> {
     const year = new Date().getFullYear()
     const lastInvoice = await prisma.invoice.findFirst({
@@ -58,9 +63,34 @@ export async function generateInvoiceNo(): Promise<string> {
     return `${year}-${newNumber}`
 }
 
+/**
+ * Generate invoice number inside transaction (race-condition safe)
+ */
+async function generateInvoiceNoInTx(tx: Parameters<Parameters<typeof prisma.$transaction>[0]>[0]): Promise<string> {
+    const year = new Date().getFullYear()
+    const lastInvoice = await tx.invoice.findFirst({
+        where: {
+            invoiceNo: {
+                startsWith: `${year}-`,
+            },
+        },
+        orderBy: { invoiceNo: 'desc' },
+    })
+
+    if (!lastInvoice) {
+        return `${year}-0001`
+    }
+
+    const lastNumber = parseInt(lastInvoice.invoiceNo.split('-')[1], 10)
+    const newNumber = (lastNumber + 1).toString().padStart(4, '0')
+    return `${year}-${newNumber}`
+}
+
 // ==========================================
 // CREATE
 // ==========================================
+
+const MAX_INVOICE_RETRIES = 3
 
 export async function createInvoice(formData: FormData): Promise<InvoiceActionResult> {
     try {
@@ -84,30 +114,55 @@ export async function createInvoice(formData: FormData): Promise<InvoiceActionRe
         const taxAmount = subtotal * (taxRate / 100)
         const total = subtotal + taxAmount
 
-        const invoice = await prisma.invoice.create({
-            data: {
-                invoiceNo: validatedData.invoiceNo,
-                companyId: validatedData.companyId,
-                issueDate: new Date(validatedData.issueDate),
-                dueDate: new Date(validatedData.dueDate),
-                subtotal: subtotal,
-                taxRate: taxRate,
-                taxAmount: taxAmount,
-                total: total,
-                description: validatedData.description || null,
-                notes: validatedData.notes || null,
-            },
-        })
+        // Use transaction with retry for race condition handling
+        let lastError: unknown
+        for (let attempt = 0; attempt < MAX_INVOICE_RETRIES; attempt++) {
+            try {
+                const invoice = await prisma.$transaction(async (tx) => {
+                    // If user provided invoice number, use it; otherwise generate inside tx
+                    let invoiceNo = validatedData.invoiceNo
+                    if (!invoiceNo || invoiceNo === 'AUTO') {
+                        invoiceNo = await generateInvoiceNoInTx(tx)
+                    }
 
-        await logAudit({
-            action: 'CREATE',
-            entity: 'Invoice',
-            entityId: invoice.id,
-            details: { invoiceNo: invoice.invoiceNo, total },
-        })
+                    return tx.invoice.create({
+                        data: {
+                            invoiceNo,
+                            companyId: validatedData.companyId,
+                            issueDate: new Date(validatedData.issueDate),
+                            dueDate: new Date(validatedData.dueDate),
+                            subtotal: subtotal,
+                            taxRate: taxRate,
+                            taxAmount: taxAmount,
+                            total: total,
+                            description: validatedData.description || null,
+                            notes: validatedData.notes || null,
+                        },
+                    })
+                })
 
-        revalidatePath('/admin/invoices')
-        return { success: true, data: invoice }
+                await logAudit({
+                    action: 'CREATE',
+                    entity: 'Invoice',
+                    entityId: invoice.id,
+                    details: { invoiceNo: invoice.invoiceNo, total },
+                })
+
+                revalidatePath('/admin/invoices')
+                return { success: true, data: invoice }
+            } catch (error) {
+                lastError = error
+                // If unique constraint error, retry with new number
+                if (isPrismaUniqueConstraintError(error)) {
+                    continue
+                }
+                throw error
+            }
+        }
+
+        // All retries exhausted
+        console.error('createInvoice: max retries exceeded', lastError)
+        return { success: false, error: 'Fatura numarası oluşturulamadı, lütfen tekrar deneyin.' }
     } catch (error: unknown) {
         console.error('createInvoice error:', error)
 
@@ -133,8 +188,8 @@ export async function getInvoices(options?: {
     page?: number
     limit?: number
 }) {
-    const { search = '', status = '', page = 1, limit = 10 } = options || {}
-    const skip = (page - 1) * limit
+    const { search = '', status = '' } = options || {}
+    const { page, limit, skip } = validatePagination(options?.page, options?.limit)
 
     try {
         const session = await auth()
@@ -212,12 +267,12 @@ export async function getInvoiceById(id: string) {
         if (!session?.user) return null
 
         const userCompanyId = await getUserCompanyId(session.user.id, session.user.role as 'ADMIN' | 'CLIENT')
-        if (!userCompanyId && session.user.role !== 'ADMIN') return null
+        if (session.user.role !== 'ADMIN' && !userCompanyId) return null
 
         const invoice = await prisma.invoice.findFirst({
             where: {
                 id,
-                companyId: session.user.role === 'ADMIN' ? undefined : userCompanyId,
+                companyId: session.user.role === 'ADMIN' ? undefined : userCompanyId!,
             },
             include: {
                 company: true,
@@ -242,9 +297,15 @@ export async function updateInvoiceStatus(id: string, status: string): Promise<I
     try {
         await requireAuth()
 
+        const StatusSchema = z.nativeEnum(InvoiceStatus)
+        const parsed = StatusSchema.safeParse(status)
+        if (!parsed.success) {
+            return { success: false, error: 'Geçersiz fatura durumu' }
+        }
+
         const invoice = await prisma.invoice.update({
             where: { id },
-            data: { status: status as any },
+            data: { status: parsed.data },
         })
 
         await logAudit({

@@ -5,7 +5,7 @@
 
 import { prisma } from '@/lib/prisma';
 import type { GeneratedContent, WebProject, Company } from '@prisma/client';
-import DOMPurify from 'isomorphic-dompurify';
+import { sanitizeHtml } from '@/lib/security/sanitize';
 
 // ================================
 // TYPES
@@ -143,7 +143,7 @@ export class StaticSiteGenerator {
         navigation: string
     ): GeneratedPage {
         // Sanitize content before wrapping
-        const cleanContent = DOMPurify.sanitize(content.content);
+        const cleanContent = sanitizeHtml(content.content);
         const pageContent = this.wrapContent(cleanContent, navItem.type);
 
         const html = BASE_TEMPLATE(

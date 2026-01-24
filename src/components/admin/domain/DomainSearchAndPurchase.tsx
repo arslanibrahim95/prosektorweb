@@ -84,8 +84,9 @@ export function DomainSearchAndPurchase({ companies }: DomainSearchProps) {
         if (result.success) {
             setPurchaseResult({ success: true, message: `${selectedDomain.domain} başarıyla satın alındı!` })
             setSelectedDomain(null)
-            // Refresh search
-            handleSearch(e as any)
+            // Refresh search - create synthetic form event
+            const syntheticEvent = { preventDefault: () => {} } as React.FormEvent
+            handleSearch(syntheticEvent)
         } else {
             setPurchaseResult({ success: false, message: result.error || 'Satın alma başarısız' })
         }

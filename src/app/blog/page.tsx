@@ -128,66 +128,86 @@ export default async function BlogPage({
             <section className="px-6 pb-24">
                 <div className="max-w-6xl mx-auto">
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {posts.map((post) => (
-                            <Link
-                                key={post.slug}
-                                href={`/blog/${post.slug}`}
-                                className="group h-full block"
-                            >
-                                <SpotlightCard className="h-full border-neutral-200 p-0 overflow-hidden hover:shadow-xl transition-all duration-500" spotlightColor="rgba(220, 38, 38, 0.15)">
-                                    {/* Image */}
-                                    <div className="aspect-[16/10] relative overflow-hidden bg-neutral-100">
-                                        {post.coverImage && (
-                                            <img
-                                                src={post.coverImage}
-                                                alt={post.title}
-                                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                                            />
-                                        )}
-                                        <div className="absolute top-4 left-4">
-                                            <span className="px-3 py-1 bg-white/95 backdrop-blur-md text-brand-700 text-xs font-bold rounded-full shadow-sm ring-1 ring-black/5">
-                                                {post.category?.name || 'Genel'}
-                                            </span>
-                                        </div>
-                                    </div>
-
-                                    {/* Content */}
-                                    <div className="p-8 flex flex-col flex-grow">
-                                        <div className="flex items-center gap-3 text-xs text-neutral-500 font-medium mb-4 uppercase tracking-wider">
-                                            <span className="flex items-center gap-1.5">
-                                                <Calendar className="w-3.5 h-3.5" />
-                                                {formatDate(post.publishedAt)}
-                                            </span>
-                                            <span className="w-1 h-1 rounded-full bg-neutral-300"></span>
-                                            <span className="flex items-center gap-1.5">
-                                                <Clock className="w-3.5 h-3.5" />
-                                                {post.readingTime} dk
-                                            </span>
-                                        </div>
-
-                                        <h2 className="text-2xl font-bold font-serif mb-3 text-neutral-900 leading-tight group-hover:text-brand-600 transition-colors">
-                                            {post.title}
-                                        </h2>
-
-                                        <p className="text-neutral-600 text-sm leading-relaxed line-clamp-3 mb-6 flex-grow">
-                                            {post.excerpt}
-                                        </p>
-
-                                        <div className="pt-6 border-t border-neutral-100 flex items-center justify-between mt-auto">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-8 h-8 rounded-full bg-brand-50 flex items-center justify-center text-brand-600 ring-2 ring-white">
-                                                    <User className="w-4 h-4" />
-                                                </div>
-                                                <span className="text-xs font-bold text-neutral-700">{post.authorName}</span>
+                        {posts.length > 0 ? (
+                            posts.map((post) => (
+                                <Link
+                                    key={post.slug}
+                                    href={`/blog/${post.slug}`}
+                                    className="group h-full block"
+                                >
+                                    <SpotlightCard className="h-full border-neutral-200 p-0 overflow-hidden hover:shadow-xl transition-all duration-500" spotlightColor="rgba(220, 38, 38, 0.15)">
+                                        {/* Image */}
+                                        <div className="aspect-[16/10] relative overflow-hidden bg-neutral-100">
+                                            {post.coverImage && (
+                                                <img
+                                                    src={post.coverImage}
+                                                    alt={post.title}
+                                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                                                />
+                                            )}
+                                            <div className="absolute top-4 left-4">
+                                                <span className="px-3 py-1 bg-white/95 backdrop-blur-md text-brand-700 text-xs font-bold rounded-full shadow-sm ring-1 ring-black/5">
+                                                    {post.category?.name || 'Genel'}
+                                                </span>
                                             </div>
-                                            <span className="text-sm font-bold text-brand-600 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-[-10px] group-hover:translate-x-0">
-                                                Devamını Oku <ChevronRight className="w-4 h-4" />
-                                            </span>
                                         </div>
-                                    </div>
-                                </SpotlightCard>
-                            </Link>
-                        ))}
+
+                                        {/* Content */}
+                                        <div className="p-8 flex flex-col flex-grow">
+                                            <div className="flex items-center gap-3 text-xs text-neutral-500 font-medium mb-4 uppercase tracking-wider">
+                                                <span className="flex items-center gap-1.5">
+                                                    <Calendar className="w-3.5 h-3.5" />
+                                                    {formatDate(post.publishedAt)}
+                                                </span>
+                                                <span className="w-1 h-1 rounded-full bg-neutral-300"></span>
+                                                <span className="flex items-center gap-1.5">
+                                                    <Clock className="w-3.5 h-3.5" />
+                                                    {post.readingTime} dk
+                                                </span>
+                                            </div>
+
+                                            <h2 className="text-2xl font-bold font-serif mb-3 text-neutral-900 leading-tight group-hover:text-brand-600 transition-colors">
+                                                {post.title}
+                                            </h2>
+
+                                            <p className="text-neutral-600 text-sm leading-relaxed line-clamp-3 mb-6 flex-grow">
+                                                {post.excerpt}
+                                            </p>
+
+                                            <div className="pt-6 border-t border-neutral-100 flex items-center justify-between mt-auto">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-8 h-8 rounded-full bg-brand-50 flex items-center justify-center text-brand-600 ring-2 ring-white">
+                                                        <User className="w-4 h-4" />
+                                                    </div>
+                                                    <span className="text-xs font-bold text-neutral-700">{post.authorName}</span>
+                                                </div>
+                                                <span className="text-sm font-bold text-brand-600 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-[-10px] group-hover:translate-x-0">
+                                                    Devamını Oku <ChevronRight className="w-4 h-4" />
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </SpotlightCard>
+                                </Link>
+                            ))
+                        ) : (
+                            <div className="col-span-full py-24 text-center">
+                                <div className="w-24 h-24 bg-neutral-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                                    <Search className="w-10 h-10 text-neutral-400" />
+                                </div>
+                                <h3 className="text-xl font-bold text-neutral-900 mb-2">Sonuç Bulunamadı</h3>
+                                <p className="text-neutral-500 max-w-md mx-auto">
+                                    Aradığınız kriterlere uygun makale bulunmamaktadır. Lütfen farklı anahtar kelimeler deneyin veya filtreleri temizleyin.
+                                </p>
+                                {categorySlug && (
+                                    <Link
+                                        href="/blog"
+                                        className="inline-flex mt-6 px-6 py-2.5 bg-brand-600 text-white font-bold rounded-lg hover:bg-brand-700 transition-colors"
+                                    >
+                                        Filtreleri Temizle
+                                    </Link>
+                                )}
+                            </div>
+                        )}
                     </div>
 
                     {/* Pagination */}

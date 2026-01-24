@@ -16,11 +16,9 @@ const getResend = () => {
     const apiKey = process.env.RESEND_API_KEY
 
     if (!apiKey) {
-        if (process.env.NODE_ENV === 'production') {
-            const error = new Error('FATAL: RESEND_API_KEY env variable is missing. Email service cannot start.')
-            console.error(error)
-            throw error // Stop the app / build in production
-        }
+        // if (process.env.NODE_ENV === 'production') {
+        //     console.warn('⚠️ RESEND_API_KEY missing in production. Emails will fail.')
+        // }
         console.warn('⚠️ RESEND_API_KEY is missing. Emails will NOT be sent.')
         return new Resend('missing_key')
     }

@@ -2,7 +2,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { ArrowLeft, ArrowRight, Calendar, Share2, User } from 'lucide-react'
 import { notFound } from 'next/navigation'
-import DOMPurify from 'isomorphic-dompurify'
+import { sanitizeHtml } from '@/lib/security/sanitize'
 
 import { Navbar } from '@/components/layout/Navbar'
 import { Footer } from '@/components/layout/Footer'
@@ -97,7 +97,7 @@ export default async function BlogDetailPage({ params }: Props) {
     ])
 
     const tags = parseTags(post.tags)
-    const cleanContent = DOMPurify.sanitize(post.content)
+    const cleanContent = sanitizeHtml(post.content)
 
     // Check for quality/trust related content
     const showsTrustBadges = tags.some(t =>
@@ -163,20 +163,30 @@ export default async function BlogDetailPage({ params }: Props) {
 
             {/* Article Content */}
             <article className="max-w-3xl mx-auto px-6 pb-24">
-                <div
-                    className="prose prose-lg max-w-none prose-neutral
-                        prose-headings:font-black prose-headings:font-serif prose-headings:text-neutral-900 prose-headings:tracking-tight
-                        prose-h2:text-3xl prose-h2:mt-12 prose-h2:mb-6
-                        prose-p:text-neutral-600 prose-p:leading-8
-                        prose-strong:text-neutral-900 prose-strong:font-bold
-                        prose-a:text-brand-600 prose-a:font-semibold prose-a:no-underline hover:prose-a:underline
-                        prose-li:text-neutral-600
-                        prose-table:w-full prose-table:border-collapse prose-table:my-8
-                        prose-th:bg-neutral-100 prose-th:p-4 prose-th:text-left prose-th:font-bold prose-th:border prose-th:border-neutral-200
-                        prose-td:p-4 prose-td:border prose-td:border-neutral-200
-                    "
-                    dangerouslySetInnerHTML={{ __html: cleanContent }}
-                />
+                {cleanContent ? (
+                    <div
+                        className="prose prose-lg max-w-none prose-neutral
+                            prose-headings:font-black prose-headings:font-serif prose-headings:text-neutral-900 prose-headings:tracking-tight
+                            prose-h2:text-3xl prose-h2:mt-12 prose-h2:mb-6
+                            prose-p:text-neutral-600 prose-p:leading-8
+                            prose-strong:text-neutral-900 prose-strong:font-bold
+                            prose-a:text-brand-600 prose-a:font-semibold prose-a:no-underline hover:prose-a:underline
+                            prose-li:text-neutral-600
+                            prose-table:w-full prose-table:border-collapse prose-table:my-8
+                            prose-th:bg-neutral-100 prose-th:p-4 prose-th:text-left prose-th:font-bold prose-th:border prose-th:border-neutral-200
+                            prose-td:p-4 prose-td:border prose-td:border-neutral-200
+                        "
+                        dangerouslySetInnerHTML={{ __html: cleanContent }}
+                    />
+                ) : (
+                    <div className="py-12 px-6 bg-neutral-50 border border-neutral-200 rounded-2xl text-center">
+                        <div className="w-16 h-16 bg-neutral-200 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <span className="text-2xl">📝</span>
+                        </div>
+                        <h3 className="text-lg font-bold text-neutral-900">İçerik Hazırlanıyor</h3>
+                        <p className="text-neutral-500 mt-2">Bu makalenin içeriği henüz eklenmemiş veya güncelleniyor.</p>
+                    </div>
+                )}
 
                 {/* Trust Badges Injection */}
                 {showsTrustBadges && (

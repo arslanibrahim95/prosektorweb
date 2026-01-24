@@ -25,7 +25,7 @@ import { checkRateLimit, getClientIp } from '@/lib/rate-limit'
 
 export async function verifyClientAccess(osgbName: string, code: string): Promise<VerifyResult> {
     const ip = await getClientIp()
-    const limit = await checkRateLimit(`auth:${ip}`, 5, 15 * 60) // 5 attempts per 15 min
+    const limit = await checkRateLimit(`auth:${ip}`, { limit: 5, windowSeconds: 15 * 60 }) // 5 attempts per 15 min
 
     if (!limit.success) {
         return { success: false, error: 'Çok fazla deneme yaptınız. Lütfen 15 dakika bekleyin.' }
@@ -55,11 +55,30 @@ export async function verifyClientAccess(osgbName: string, code: string): Promis
         authorizedClient.code
     )
 
+    if (isValid) {
+        // Log Success
+        await import('@/lib/audit').then(m => m.createAuditLog({
+            action: 'LOGIN_SUCCESS',
+            entity: 'Client',
+            entityId: authorizedClient.name,
+            details: { osgbName, ip },
+            ipAddress: ip
+        }))
+    } else {
+        // Log Failure
+        await import('@/lib/audit').then(m => m.createAuditLog({
+            action: 'LOGIN_FAILED',
+            entity: 'Client',
+            details: { osgbName, ip, error: 'Invalid Credentials' },
+            ipAddress: ip
+        }))
+    }
+
     // In production, we fetch this from DB based on Authorized Client link
-    // For now, consistent server-side date (e.g. 7 days from now or fixed)
-    // To prove server-side control, let's say it expires in 3 days.
-    const previewEndsAt = new Date()
-    previewEndsAt.setDate(previewEndsAt.getDate() + 3)
+    // FIXED: Using a fixed date for the demo client to prevent infinite trial extension on every login
+    // In a real DB scenario, this would be `authorizedClient.expiresAt`
+    const demoExpirationDate = new Date('2026-02-01T00:00:00Z') // Fixed date for demo
+    const previewEndsAt = isValid ? demoExpirationDate : new Date()
 
     return isValid
         ? { success: true, previewEndsAt: previewEndsAt.toISOString() }

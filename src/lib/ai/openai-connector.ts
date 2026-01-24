@@ -46,7 +46,6 @@ export class OpenAIConnector implements AIConnector {
         const finalConfig = { ...this.defaultConfig, ...config };
 
         try {
-            const startTime = Date.now();
 
             const response = await this.client.chat.completions.create({
                 model: finalConfig.model,

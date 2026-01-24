@@ -1,5 +1,4 @@
 import type { NextAuthConfig } from 'next-auth';
-import '@/types/next-auth'; // Type extensions
 
 export const authConfig = {
     pages: {

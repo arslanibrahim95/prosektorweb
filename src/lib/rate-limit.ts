@@ -1,84 +1,77 @@
-import { prisma } from '@/lib/prisma'
+import { redis } from '@/lib/redis'
+import { Ratelimit } from '@upstash/ratelimit'
 import { headers } from 'next/headers'
 
+/**
+ * Get client IP respecting Vercel/Cloudflare headers
+ */
 export async function getClientIp() {
-    // In Next.js Server Actions, we can access headers
     const h = await headers()
-    // 'x-forwarded-for' is standard but review warned it's spoofable.
-    // However, in Vercel/Cloudflare environment, the first IP in x-forwarded-for is usually trustworthy if configured correctly.
-    // The review said: "Use a trusted proxy header (e.g., x-real-ip) or deploy edge-level rate limiting"
-    // Since we are in app code, we'll try x-real-ip then x-forwarded-for.
-    const realIp = h.get('x-real-ip')
-    const forwardedFor = h.get('x-forwarded-for')
 
+    // Vercel / Cloudflare
+    const vercelForwarded = h.get('x-vercel-forwarded-for')
+    if (vercelForwarded) return vercelForwarded
+
+    const realIp = h.get('x-real-ip')
     if (realIp) return realIp
-    if (forwardedFor) return forwardedFor.split(',')[0].trim()
+
+    const forwardedFor = h.get('x-forwarded-for')
+    if (forwardedFor) {
+        return forwardedFor.split(',')[0].trim()
+    }
+
     return '127.0.0.1'
 }
 
+export interface RateLimitOptions {
+    /** Max requests allowed in the window */
+    limit?: number
+    /** Window duration in seconds */
+    windowSeconds?: number
+}
+
+// Memory cache for extreme performance (optional, good for high-traffic)
+const cache = new Map()
+
 /**
- * Check rate limit for a given key (IP or identifier)
- * @param identifier Unique key (e.g. URI + IP)
- * @param limit Max requests
- * @param windowSeconds Window in seconds
- * @returns { success: boolean, reset: Date }
+ * Check rate limit using Redis (Sliding Window)
  */
-export async function checkRateLimit(identifier: string, limit: number = 10, windowSeconds: number = 60) {
-    const key = `rate_limit:${identifier}`
-    const now = new Date()
+export async function checkRateLimit(
+    identifier: string,
+    options: RateLimitOptions = {}
+): Promise<{ success: boolean; reset?: Date }> {
+    const {
+        limit = 10,
+        windowSeconds = 60
+    } = options
 
     try {
-        // Clean up expired (optional, doing it lazily on access or via cron is better, but here we do it transactionally/lazily)
-        // Prisma upsert is good here.
-
-        // Strategy: 
-        // 1. Upsert: create if new, update if exists (but strictly we need to check expiry first)
-
-        // Let's fetch first
-        const record = await prisma.rateLimit.findUnique({
-            where: { key }
-        })
-
-        // If no record or expired
-        if (!record || record.expiresAt < now) {
-            const expiresAt = new Date(now.getTime() + windowSeconds * 1000)
-            await prisma.rateLimit.upsert({
-                where: { key },
-                create: {
-                    key,
-                    points: 1,
-                    expiresAt
-                },
-                update: {
-                    points: 1,
-                    expiresAt
-                }
-            })
+        if (!process.env.UPSTASH_REDIS_REST_URL) {
+            console.warn('Redis not configured, bypassing rate limit')
             return { success: true }
         }
 
-        // If record active
-        if (record.points >= limit) {
-            return { success: false, reset: record.expiresAt }
-        }
-
-        // Increment
-        await prisma.rateLimit.update({
-            where: { key },
-            data: {
-                points: { increment: 1 }
-            }
+        // Create a new ratelimit instance 
+        // Best practice: Create one instance per distinct limit/window configuration
+        const ratelimit = new Ratelimit({
+            redis: redis,
+            limiter: Ratelimit.slidingWindow(limit, `${windowSeconds} s`),
+            analytics: true,
+            prefix: '@upstash/ratelimit',
+            ephemeralCache: cache,
         })
 
-        return { success: true }
+        // Execute rate limit check
+        const { success, reset } = await ratelimit.limit(identifier)
 
-    } catch (e) {
-        console.error("Rate limit error", e)
-        // If DB fails, fail open or closed? 
-        // Security-wise: Fail Closed. But reliability-wise: Fail Open is common.
-        // User asked for Fail-Closed on financial/external APIs. For rate limit internal DB error?
-        // Let's assume valid access if DB is down to avoid DoS-ing valid users during maintenance, 
-        // unless it's critical login.
+        return {
+            success,
+            reset: new Date(reset)
+        }
+
+    } catch (error) {
+        console.error('Rate limit error:', error)
+        // Fail open: Allow traffic if Redis is down
         return { success: true }
     }
 }

@@ -1,8 +1,7 @@
 import { prisma } from '@/lib/prisma'
 import { createTicket } from '@/actions/ticket'
 import Link from 'next/link'
-import { ChevronLeft, Loader2, Save } from 'lucide-react'
-import { TicketPriority, TicketCategory } from '@prisma/client'
+import { ChevronLeft, Save } from 'lucide-react'
 
 export default async function NewTicketPage() {
     const companies = await prisma.company.findMany({
@@ -26,7 +25,7 @@ export default async function NewTicketPage() {
                 </div>
             </div>
 
-            <form action={createTicket as any} className="bg-white p-8 rounded-2xl border border-neutral-200 shadow-sm space-y-6">
+            <form action={async (formData: FormData) => { 'use server'; await createTicket(formData) }} className="bg-white p-8 rounded-2xl border border-neutral-200 shadow-sm space-y-6">
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">

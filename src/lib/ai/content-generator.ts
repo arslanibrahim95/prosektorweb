@@ -9,8 +9,6 @@ import type {
     CompanyInfo,
     GenerationRequest,
     GeneratedContentResult,
-    OSGBCompanyInfo,
-    OSGB_DEFAULT_SERVICES,
 } from './types';
 
 // ================================

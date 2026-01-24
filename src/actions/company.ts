@@ -2,13 +2,12 @@
 
 import { prisma } from '@/lib/prisma'
 import { requireAuth } from '@/lib/auth-guard'
+import { getUserCompanyId } from '@/lib/guards/tenant-guard'
 import { auth } from '@/auth'
 import { logAudit } from '@/lib/audit'
-import { getErrorMessage, getZodErrorMessage } from '@/lib/action-types'
+import { getErrorMessage, getZodErrorMessage, validatePagination } from '@/lib/action-types'
 import { revalidatePath } from 'next/cache'
-import { redirect } from 'next/navigation'
 import { z } from 'zod'
-import { getUserCompanyId } from '@/lib/guards/tenant-guard'
 
 // ==========================================
 // TYPES
@@ -92,8 +91,8 @@ export async function getCompanies(options?: {
     page?: number
     limit?: number
 }) {
-    const { search = '', page = 1, limit = 10 } = options || {}
-    const skip = (page - 1) * limit
+    const { search = '' } = options || {}
+    const { page, limit, skip } = validatePagination(options?.page, options?.limit)
 
     try {
         const session = await auth()
@@ -150,10 +149,15 @@ export async function getCompanyById(id: string) {
 
         const userCompanyId = await getUserCompanyId(session.user.id, session.user.role as 'ADMIN' | 'CLIENT')
 
+        // If client and no company ID, they can't see any company
+        if (session.user.role !== 'ADMIN' && !userCompanyId) {
+            return null
+        }
+
         const company = await prisma.company.findFirst({
             where: {
                 id,
-                ...(session.user.role === 'ADMIN' ? {} : { id: userCompanyId }),
+                ...(session.user.role === 'ADMIN' ? {} : { id: userCompanyId! }),
             },
             include: {
                 workplaces: {

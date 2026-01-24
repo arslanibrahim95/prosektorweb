@@ -26,6 +26,22 @@ interface ModalSystemProps {
     initialState?: ModalStep
 }
 
+interface BackButtonProps {
+    to: ModalStep
+    setStep: (step: ModalStep) => void
+}
+
+function BackButton({ to, setStep }: BackButtonProps) {
+    return (
+        <button
+            onClick={() => setStep(to)}
+            className="mt-4 flex items-center justify-center gap-2 w-full text-neutral-500 hover:text-neutral-900 text-sm font-medium transition-colors focus:ring-2 focus:ring-brand-500 focus:outline-none rounded-lg p-2"
+        >
+            <ArrowLeft className="w-4 h-4" /> Geri Dön
+        </button>
+    )
+}
+
 export function ModalSystem({ isOpen, onClose, initialState = ModalStep.INITIAL_CHOICE }: ModalSystemProps) {
     const [step, setStep] = useState<ModalStep>(initialState)
     const [osgbName, setOsgbName] = useState('Evren Ada OSGB')
@@ -104,36 +120,59 @@ export function ModalSystem({ isOpen, onClose, initialState = ModalStep.INITIAL_
         setStep(ModalStep.PURCHASE_SUCCESS)
     }
 
+    // Focus Trap & ESC Handler
+    useEffect(() => {
+        if (!isOpen) return
+
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') {
+                onClose()
+            }
+        }
+
+        document.addEventListener('keydown', handleKeyDown)
+        // Prevent body scroll
+        document.body.style.overflow = 'hidden'
+
+        return () => {
+            document.removeEventListener('keydown', handleKeyDown)
+            document.body.style.overflow = 'unset'
+        }
+    }, [isOpen, onClose])
+
     if (!isOpen) return null
 
-    // --- RENDER HELPERS ---
-    const BackButton = ({ to }: { to: ModalStep }) => (
-        <button
-            onClick={() => setStep(to)}
-            className="mt-4 flex items-center justify-center gap-2 w-full text-neutral-500 hover:text-neutral-900 text-sm font-medium transition-colors"
-        >
-            <ArrowLeft className="w-4 h-4" /> Geri Dön
-        </button>
-    )
 
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+        <div
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="modal-title"
+        >
             {/* Backdrop */}
             <div
                 className="absolute inset-0 bg-neutral-900/60 backdrop-blur-sm transition-opacity"
                 onClick={onClose}
+                aria-hidden="true"
             />
 
             {/* Modal Content */}
-            <div className="relative bg-white w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200 h-auto max-h-[90vh] overflow-y-auto">
+            <div
+                className="relative bg-white w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200 h-auto max-h-[90vh] overflow-y-auto outline-none"
+                tabIndex={-1}
+            >
                 <button
                     onClick={onClose}
-                    className="absolute top-4 right-4 p-2 text-neutral-400 hover:text-neutral-900 hover:bg-neutral-100 rounded-full transition-all z-10"
+                    className="absolute top-4 right-4 p-2 text-neutral-400 hover:text-neutral-900 hover:bg-neutral-100 rounded-full transition-all z-10 focus:ring-2 focus:ring-brand-500 focus:outline-none"
+                    aria-label="Kapat"
                 >
                     <X className="w-6 h-6" />
                 </button>
 
                 <div className="p-8 md:p-10">
+                    {/* Content Logic Remains Same but ensure headings have IDs for aria-labelledby if needed */}
+                    {/* ... Step Logic ... */}
 
                     {/* Initial Choice */}
                     {step === ModalStep.INITIAL_CHOICE && (
@@ -141,15 +180,15 @@ export function ModalSystem({ isOpen, onClose, initialState = ModalStep.INITIAL_
                             <div className="bg-brand-50 text-brand-700 text-sm font-bold py-2 px-4 rounded-full inline-block mb-6">
                                 Önizleme alanı yalnızca adına özel çalışma yapılan OSGB’lere açılır.
                             </div>
-                            <h2 className="text-2xl font-bold mb-4 text-neutral-900">Erişim Kodu</h2>
+                            <h2 id="modal-title" className="text-2xl font-bold mb-4 text-neutral-900">Erişim Kodu</h2>
                             <p className="text-neutral-500 mb-8 max-w-md mx-auto">
                                 Eğer firmanız için bir web sitesi hazırlandıysa, önizleme erişim kodu size WhatsApp veya e-posta ile gönderilmiştir.
                             </p>
                             <div className="space-y-3">
-                                <button onClick={() => setStep(ModalStep.LOGIN)} className="w-full py-4 bg-brand-600 text-white rounded-xl font-bold hover:bg-brand-700 transition-colors shadow-lg shadow-brand-200">
+                                <button onClick={() => setStep(ModalStep.LOGIN)} className="w-full py-4 bg-brand-600 text-white rounded-xl font-bold hover:bg-brand-700 transition-colors shadow-lg shadow-brand-200 focus:ring-4 focus:ring-brand-200 focus:outline-none">
                                     Kodum Var
                                 </button>
-                                <button onClick={() => setStep(ModalStep.REQUEST_INTRO)} className="w-full py-4 bg-white text-neutral-700 border border-neutral-200 rounded-xl font-bold hover:bg-neutral-50 transition-colors">
+                                <button onClick={() => setStep(ModalStep.REQUEST_INTRO)} className="w-full py-4 bg-white text-neutral-700 border border-neutral-200 rounded-xl font-bold hover:bg-neutral-50 transition-colors focus:ring-4 focus:ring-neutral-200 focus:outline-none">
                                     Kodum Yok
                                 </button>
                             </div>
@@ -162,8 +201,9 @@ export function ModalSystem({ isOpen, onClose, initialState = ModalStep.INITIAL_
                             <h2 className="text-2xl font-bold mb-6 text-neutral-900">Giriş Yap</h2>
                             <div className="space-y-4 mb-6">
                                 <div>
-                                    <label className="block text-sm font-semibold text-neutral-700 mb-1">OSGB Adı</label>
+                                    <label htmlFor="loginName" className="block text-sm font-semibold text-neutral-700 mb-1">OSGB Adı</label>
                                     <input
+                                        id="loginName"
                                         type="text"
                                         value={loginInputName}
                                         onChange={(e) => setLoginInputName(e.target.value)}
@@ -172,8 +212,9 @@ export function ModalSystem({ isOpen, onClose, initialState = ModalStep.INITIAL_
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-semibold text-neutral-700 mb-1">Önizleme Kodu</label>
+                                    <label htmlFor="loginCode" className="block text-sm font-semibold text-neutral-700 mb-1">Önizleme Kodu</label>
                                     <input
+                                        id="loginCode"
                                         type="text"
                                         value={loginInputCode}
                                         onChange={(e) => setLoginInputCode(e.target.value)}
@@ -183,18 +224,18 @@ export function ModalSystem({ isOpen, onClose, initialState = ModalStep.INITIAL_
                                 </div>
                             </div>
                             {loginError && (
-                                <div className="bg-red-50 text-red-600 p-3 rounded-lg mb-6 text-sm font-semibold flex items-center gap-2">
+                                <div className="bg-red-50 text-red-600 p-3 rounded-lg mb-6 text-sm font-semibold flex items-center gap-2" role="alert">
                                     <AlertCircle className="w-4 h-4" /> {loginError}
                                 </div>
                             )}
                             <button
                                 onClick={handleLogin}
                                 disabled={isPending}
-                                className="w-full py-4 bg-brand-600 text-white rounded-xl font-bold hover:bg-brand-700 transition-colors disabled:opacity-70"
+                                className="w-full py-4 bg-brand-600 text-white rounded-xl font-bold hover:bg-brand-700 transition-colors disabled:opacity-70 focus:ring-4 focus:ring-brand-200 focus:outline-none"
                             >
                                 {isPending ? 'Kontrol Ediliyor...' : 'Giriş Yap'}
                             </button>
-                            <BackButton to={ModalStep.INITIAL_CHOICE} />
+                            <BackButton to={ModalStep.INITIAL_CHOICE} setStep={setStep} />
                         </div>
                     )}
 
@@ -205,10 +246,10 @@ export function ModalSystem({ isOpen, onClose, initialState = ModalStep.INITIAL_
                             <p className="text-neutral-500 mb-8">
                                 Web siteniz için önizleme hazırlayalım, erişim kodunuzu size iletelim. En geç 24–72 saat içinde erişim kodunuz gönderilir.
                             </p>
-                            <button onClick={() => setStep(ModalStep.REQUEST_FORM)} className="w-full py-4 bg-brand-600 text-white rounded-xl font-bold hover:bg-brand-700 transition-colors">
+                            <button onClick={() => setStep(ModalStep.REQUEST_FORM)} className="w-full py-4 bg-brand-600 text-white rounded-xl font-bold hover:bg-brand-700 transition-colors focus:ring-4 focus:ring-brand-200 focus:outline-none">
                                 Önizleme Talebi Bırak
                             </button>
-                            <BackButton to={ModalStep.INITIAL_CHOICE} />
+                            <BackButton to={ModalStep.INITIAL_CHOICE} setStep={setStep} />
                         </div>
                     )}
 
@@ -218,19 +259,32 @@ export function ModalSystem({ isOpen, onClose, initialState = ModalStep.INITIAL_
                             <h2 className="text-2xl font-bold mb-2 text-neutral-900">Önizleme Talebi</h2>
                             <p className="text-sm text-neutral-500 mb-6">Erişim yalnızca OSGB yetkililerine açılır.</p>
                             <div className="space-y-4 mb-8">
-                                <input type="text" placeholder="OSGB Ticari Ünvanı" className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-lg" />
-                                <input type="text" placeholder="Yetkili Adı Soyadı" className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-lg" />
-                                <input type="email" placeholder="E-posta Adresi" className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-lg" />
-                                <input type="tel" placeholder="Cep Telefonu (WhatsApp için)" className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-lg" />
+                                {/* Added Labels for A11y */}
+                                <div>
+                                    <label htmlFor="req_company" className="sr-only">OSGB Ticari Ünvanı</label>
+                                    <input id="req_company" type="text" placeholder="OSGB Ticari Ünvanı" className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none" />
+                                </div>
+                                <div>
+                                    <label htmlFor="req_name" className="sr-only">Yetkili Adı Soyadı</label>
+                                    <input id="req_name" type="text" placeholder="Yetkili Adı Soyadı" className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none" />
+                                </div>
+                                <div>
+                                    <label htmlFor="req_email" className="sr-only">E-posta Adresi</label>
+                                    <input id="req_email" type="email" placeholder="E-posta Adresi" className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none" />
+                                </div>
+                                <div>
+                                    <label htmlFor="req_phone" className="sr-only">Cep Telefonu</label>
+                                    <input id="req_phone" type="tel" placeholder="Cep Telefonu (WhatsApp için)" className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none" />
+                                </div>
                                 <div className="flex items-start gap-3">
-                                    <input type="checkbox" className="mt-1 w-4 h-4 text-brand-600 rounded" />
-                                    <label className="text-sm text-neutral-500">OSGB adına web sitesi önizleme talebinde bulunmaya yetkiliyim.</label>
+                                    <input id="req_auth" type="checkbox" className="mt-1 w-4 h-4 text-brand-600 rounded focus:ring-brand-500" />
+                                    <label htmlFor="req_auth" className="text-sm text-neutral-500">OSGB adına web sitesi önizleme talebinde bulunmaya yetkiliyim.</label>
                                 </div>
                             </div>
-                            <button onClick={handlePreviewRequest} className="w-full py-4 bg-brand-600 text-white rounded-xl font-bold hover:bg-brand-700 transition-colors">
+                            <button onClick={handlePreviewRequest} className="w-full py-4 bg-brand-600 text-white rounded-xl font-bold hover:bg-brand-700 transition-colors focus:ring-4 focus:ring-brand-200 focus:outline-none">
                                 Talebi Gönder
                             </button>
-                            <BackButton to={ModalStep.REQUEST_INTRO} />
+                            <BackButton to={ModalStep.REQUEST_INTRO} setStep={setStep} />
                         </div>
                     )}
 
@@ -244,7 +298,7 @@ export function ModalSystem({ isOpen, onClose, initialState = ModalStep.INITIAL_
                             <p className="text-neutral-500 mb-8">
                                 OSGB’niz için web sitesi önizleme talebiniz başarıyla alındı. Kodunuz WhatsApp veya e-posta yoluyla tarafınıza iletilecektir.
                             </p>
-                            <button onClick={onClose} className="w-full py-4 bg-brand-600 text-white rounded-xl font-bold hover:bg-brand-700 transition-colors">
+                            <button onClick={onClose} className="w-full py-4 bg-brand-600 text-white rounded-xl font-bold hover:bg-brand-700 transition-colors focus:ring-4 focus:ring-brand-200 focus:outline-none">
                                 Anlaşıldı
                             </button>
                         </div>
@@ -259,14 +313,14 @@ export function ModalSystem({ isOpen, onClose, initialState = ModalStep.INITIAL_
                             <div className="grid grid-cols-2 gap-6 mb-8">
                                 <button
                                     onClick={() => { setSelectedDesign('Aksiyon'); setStep(ModalStep.PREVIEW_DETAIL) }}
-                                    className="p-6 bg-white border-2 border-neutral-100 rounded-2xl hover:border-brand-500 hover:shadow-xl transition-all group"
+                                    className="p-6 bg-white border-2 border-neutral-100 rounded-2xl hover:border-brand-500 hover:shadow-xl transition-all group focus:ring-2 focus:ring-brand-500 focus:outline-none"
                                 >
                                     <h3 className="text-xl font-bold text-neutral-800 mb-2 group-hover:text-brand-600">Aksiyon</h3>
                                     <span className="text-xs font-bold bg-brand-50 text-brand-700 px-3 py-1 rounded-full group-hover:bg-brand-600 group-hover:text-white transition-colors">ÖNİZLEME</span>
                                 </button>
                                 <button
                                     onClick={() => { setSelectedDesign('Vizyon'); setStep(ModalStep.PREVIEW_DETAIL) }}
-                                    className="p-6 bg-white border-2 border-neutral-100 rounded-2xl hover:border-brand-500 hover:shadow-xl transition-all group"
+                                    className="p-6 bg-white border-2 border-neutral-100 rounded-2xl hover:border-brand-500 hover:shadow-xl transition-all group focus:ring-2 focus:ring-brand-500 focus:outline-none"
                                 >
                                     <h3 className="text-xl font-bold text-neutral-800 mb-2 group-hover:text-brand-600">Vizyon</h3>
                                     <span className="text-xs font-bold bg-brand-50 text-brand-700 px-3 py-1 rounded-full group-hover:bg-brand-600 group-hover:text-white transition-colors">ÖNİZLEME</span>
@@ -292,10 +346,10 @@ export function ModalSystem({ isOpen, onClose, initialState = ModalStep.INITIAL_
                             </div>
 
                             <div className="flex flex-col gap-3">
-                                <button onClick={() => setStep(ModalStep.READY_TO_PUBLISH)} className="w-full py-4 bg-brand-600 text-white rounded-xl font-bold hover:bg-brand-700 transition-colors shadow-lg">
+                                <button onClick={() => setStep(ModalStep.READY_TO_PUBLISH)} className="w-full py-4 bg-brand-600 text-white rounded-xl font-bold hover:bg-brand-700 transition-colors shadow-lg focus:ring-4 focus:ring-brand-200 focus:outline-none">
                                     Bu tasarımı yayına al (7.000 TL)
                                 </button>
-                                <BackButton to={ModalStep.DASHBOARD} />
+                                <BackButton to={ModalStep.DASHBOARD} setStep={setStep} />
                             </div>
                         </div>
                     )}
@@ -310,10 +364,10 @@ export function ModalSystem({ isOpen, onClose, initialState = ModalStep.INITIAL_
                             <div className="bg-brand-50 border-l-4 border-brand-600 p-4 rounded-r-lg mb-8">
                                 <p className="text-sm text-brand-900">Yayına alma sonrasında talep edilen yeni sayfa veya yapısal değişiklikler ek hizmet kapsamında değerlendirilir.</p>
                             </div>
-                            <button onClick={() => setStep(ModalStep.PAYMENT)} className="w-full py-4 bg-brand-600 text-white rounded-xl font-bold hover:bg-brand-700 transition-colors">
+                            <button onClick={() => setStep(ModalStep.PAYMENT)} className="w-full py-4 bg-brand-600 text-white rounded-xl font-bold hover:bg-brand-700 transition-colors focus:ring-4 focus:ring-brand-200 focus:outline-none">
                                 Ödeme Sayfasına Git
                             </button>
-                            <BackButton to={ModalStep.PREVIEW_DETAIL} />
+                            <BackButton to={ModalStep.PREVIEW_DETAIL} setStep={setStep} />
                         </div>
                     )}
 
@@ -335,8 +389,8 @@ export function ModalSystem({ isOpen, onClose, initialState = ModalStep.INITIAL_
                             <div className="space-y-3 mb-8">
                                 {['Mesafeli Satış Sözleşmesi', 'Gizlilik ve KVKK', 'İptal ve İade Koşulları'].map((text, i) => (
                                     <div key={i} className="flex items-center gap-3">
-                                        <input type="checkbox" className="w-4 h-4 text-brand-600 rounded" />
-                                        <label className="text-sm text-neutral-600">{text}ni okudum</label>
+                                        <input id={`contract_${i}`} type="checkbox" className="w-4 h-4 text-brand-600 rounded focus:ring-brand-500" />
+                                        <label htmlFor={`contract_${i}`} className="text-sm text-neutral-600">{text}ni okudum</label>
                                     </div>
                                 ))}
                             </div>
@@ -346,7 +400,7 @@ export function ModalSystem({ isOpen, onClose, initialState = ModalStep.INITIAL_
                                 Demo Modu: Herhangi bir kart bilgisi girmenize gerek yoktur.
                             </div>
 
-                            <button onClick={handlePayment} className="w-full py-4 bg-green-600 text-white rounded-xl font-bold hover:bg-green-700 transition-colors flex items-center justify-center gap-2">
+                            <button onClick={handlePayment} className="w-full py-4 bg-green-600 text-white rounded-xl font-bold hover:bg-green-700 transition-colors flex items-center justify-center gap-2 focus:ring-4 focus:ring-green-200 focus:outline-none">
                                 <CreditCard className="w-5 h-5" /> Ödemeyi Tamamla
                             </button>
                         </div>
@@ -362,7 +416,7 @@ export function ModalSystem({ isOpen, onClose, initialState = ModalStep.INITIAL_
                             <p className="text-neutral-500 mb-8">
                                 Web siteniz yayına alınma sırasına alınmıştır. Alan adı bağlantısı ve teknik kurulum için ekibimiz sizinle iletişime geçecektir.
                             </p>
-                            <button onClick={onClose} className="w-full py-4 bg-brand-600 text-white rounded-xl font-bold hover:bg-brand-700 transition-colors">
+                            <button onClick={onClose} className="w-full py-4 bg-brand-600 text-white rounded-xl font-bold hover:bg-brand-700 transition-colors focus:ring-4 focus:ring-brand-200 focus:outline-none">
                                 Kapat
                             </button>
                         </div>
@@ -383,7 +437,7 @@ export function ModalSystem({ isOpen, onClose, initialState = ModalStep.INITIAL_
                                 <div className="text-2xl font-bold text-brand-600">Yeni Fiyat: 12.500 TL</div>
                                 <div className="text-xs text-neutral-400">Yeniden Aktifleştirme Bedeli</div>
                             </div>
-                            <button onClick={() => setStep(ModalStep.REACTIVATE_OFFER)} className="w-full py-4 bg-brand-600 text-white rounded-xl font-bold hover:bg-brand-700 transition-colors">
+                            <button onClick={() => setStep(ModalStep.REACTIVATE_OFFER)} className="w-full py-4 bg-brand-600 text-white rounded-xl font-bold hover:bg-brand-700 transition-colors focus:ring-4 focus:ring-brand-200 focus:outline-none">
                                 Önizlemeyi Tekrar Aktifleştir
                             </button>
                         </div>

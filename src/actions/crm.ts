@@ -5,6 +5,7 @@ import { getErrorMessage, getZodErrorMessage } from '@/lib/action-types'
 import { requireAuth } from '@/lib/auth-guard'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
+import { ActivityType, CompanyStatus } from '@prisma/client'
 
 // ==========================================
 // TYPES
@@ -161,7 +162,7 @@ export async function deleteContact(id: string, companyId: string): Promise<CrmA
 
 const ActivitySchema = z.object({
     companyId: z.string().min(1),
-    type: z.enum(['CALL', 'EMAIL', 'MEETING', 'NOTE', 'TASK', 'REMINDER']),
+    type: z.nativeEnum(ActivityType),
     title: z.string().min(1, 'Başlık gerekli'),
     description: z.string().optional(),
     dueDate: z.string().optional(),
@@ -184,7 +185,7 @@ export async function createActivity(formData: FormData): Promise<CrmActionResul
         const activity = await prisma.companyActivity.create({
             data: {
                 companyId: validated.companyId,
-                type: validated.type as any,
+                type: validated.type,
                 title: validated.title,
                 description: validated.description || null,
                 dueDate: validated.dueDate ? new Date(validated.dueDate) : null,
@@ -243,9 +244,15 @@ export async function updateCompanyStatus(id: string, status: string): Promise<C
     try {
         await requireAuth()
 
+        const StatusSchema = z.nativeEnum(CompanyStatus)
+        const parsed = StatusSchema.safeParse(status)
+        if (!parsed.success) {
+            return { success: false, error: 'Geçersiz durum' }
+        }
+
         await prisma.company.update({
             where: { id },
-            data: { status: status as any },
+            data: { status: parsed.data },
         })
 
         revalidatePath('/admin/companies')

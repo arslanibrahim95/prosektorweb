@@ -4,7 +4,7 @@ import { prisma } from '@/lib/prisma'
 import { requireAuth } from '@/lib/auth-guard'
 import { auth } from '@/auth'
 import { logAudit } from '@/lib/audit'
-import { getErrorMessage, getZodErrorMessage } from '@/lib/action-types'
+import { getErrorMessage, getZodErrorMessage, validatePagination } from '@/lib/action-types'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 import { TicketStatus, TicketPriority, TicketCategory } from '@prisma/client'
@@ -180,8 +180,8 @@ export async function getTickets(options?: {
     page?: number
     limit?: number
 }) {
-    const { status, search = '', page = 1, limit = 10 } = options || {}
-    const skip = (page - 1) * limit
+    const { status, search = '' } = options || {}
+    const { page, limit, skip } = validatePagination(options?.page, options?.limit)
 
     try {
         const session = await auth()
@@ -242,12 +242,12 @@ export async function getTicketById(id: string) {
         if (!session?.user) return null
 
         const userCompanyId = await getUserCompanyId(session.user.id, session.user.role as 'ADMIN' | 'CLIENT')
-        if (!userCompanyId && session.user.role !== 'ADMIN') return null
+        if (session.user.role !== 'ADMIN' && !userCompanyId) return null
 
         const ticket = await prisma.ticket.findFirst({
             where: {
                 id,
-                companyId: session.user.role === 'ADMIN' ? undefined : userCompanyId,
+                companyId: session.user.role === 'ADMIN' ? undefined : userCompanyId!,
             },
             include: {
                 company: true,

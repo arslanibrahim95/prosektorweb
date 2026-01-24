@@ -1,17 +1,61 @@
 'use client'
 
-import { useEffect, useState } from 'react'
 import { TrafficChart, DeviceChart, TrafficSources, PerformanceGauge } from '@/components/portal/AnalyticsCharts'
 import Link from 'next/link'
 import {
-    ArrowLeft, Users, Eye, Clock, TrendingDown, Globe, Zap,
-    Shield, Link2, FileSearch, Calendar, RefreshCw, CheckCircle,
-    AlertTriangle, ExternalLink, Smartphone, Monitor, Tablet
+    ArrowLeft, Users, Eye, Clock, TrendingDown, RefreshCw, CheckCircle,
+    ExternalLink, Smartphone, Monitor, Tablet, Shield
 } from 'lucide-react'
 
+interface TrafficSource {
+    name: string
+    percent: number
+}
+
+interface TopPage {
+    path: string
+    views: number
+}
+
+interface DailyStat {
+    date: Date | string
+    visitors: number
+    pageViews: number
+}
+
+interface Analytics {
+    trafficSources?: TrafficSource[]
+    topPages?: TopPage[]
+    totalVisitors?: number
+    pageViews?: number
+    bounceRate?: number
+    avgSessionDuration?: number
+    mobilePercent?: number
+    desktopPercent?: number
+    tabletPercent?: number
+    pageSpeedScore?: number
+    mobileScore?: number
+    seoScore?: number
+    accessibilityScore?: number
+    domainAuthority?: number
+    backlinks?: number
+    indexedPages?: number
+    sslStatus?: string
+    sslValidUntil?: Date | string
+    uptimePercent?: number
+    lastUpdated?: Date | string
+}
+
+interface Project {
+    name: string
+    siteUrl?: string
+    previewUrl?: string
+    analytics?: Analytics
+}
+
 interface AnalyticsDetailClientProps {
-    project: any
-    dailyStats: any[]
+    project: Project | null
+    dailyStats: DailyStat[]
 }
 
 export default function AnalyticsDetailClient({ project, dailyStats }: AnalyticsDetailClientProps) {
@@ -26,7 +70,7 @@ export default function AnalyticsDetailClient({ project, dailyStats }: Analytics
     }
 
     // Format daily stats for chart
-    const chartData = dailyStats.map((stat: any) => ({
+    const chartData = dailyStats.map((stat) => ({
         date: new Date(stat.date).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' }),
         visitors: stat.visitors,
         pageViews: stat.pageViews
@@ -40,7 +84,7 @@ export default function AnalyticsDetailClient({ project, dailyStats }: Analytics
     }
 
     // Traffic sources from JSON
-    const trafficSources = (analytics?.trafficSources as any[]) || [
+    const trafficSources: TrafficSource[] = analytics?.trafficSources ?? [
         { name: 'Google', percent: 55 },
         { name: 'Direkt', percent: 25 },
         { name: 'Sosyal Medya', percent: 12 },
@@ -48,7 +92,7 @@ export default function AnalyticsDetailClient({ project, dailyStats }: Analytics
     ]
 
     // Top pages from JSON
-    const topPages = (analytics?.topPages as any[]) || []
+    const topPages: TopPage[] = analytics?.topPages ?? []
 
     // SSL Status
     const sslValid = analytics?.sslStatus === 'VALID'
@@ -223,7 +267,7 @@ export default function AnalyticsDetailClient({ project, dailyStats }: Analytics
                         <div className="flex items-center justify-between p-4 bg-neutral-50 rounded-xl">
                             <div className="flex items-center gap-3">
                                 <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${sslValid ? 'bg-green-100 text-green-600' :
-                                        sslExpiringSoon ? 'bg-amber-100 text-amber-600' : 'bg-red-100 text-red-600'
+                                    sslExpiringSoon ? 'bg-amber-100 text-amber-600' : 'bg-red-100 text-red-600'
                                     }`}>
                                     <Shield className="w-5 h-5" />
                                 </div>
@@ -238,7 +282,7 @@ export default function AnalyticsDetailClient({ project, dailyStats }: Analytics
                                 </div>
                             </div>
                             <span className={`px-3 py-1 rounded-full text-xs font-bold ${sslValid ? 'bg-green-100 text-green-700' :
-                                    sslExpiringSoon ? 'bg-amber-100 text-amber-700' : 'bg-red-100 text-red-700'
+                                sslExpiringSoon ? 'bg-amber-100 text-amber-700' : 'bg-red-100 text-red-700'
                                 }`}>
                                 {sslValid ? 'Geçerli' : sslExpiringSoon ? 'Yakında Bitiyor' : 'Kontrol Gerekli'}
                             </span>
@@ -267,7 +311,7 @@ export default function AnalyticsDetailClient({ project, dailyStats }: Analytics
                 <div className="bg-white border border-neutral-200 rounded-2xl p-6">
                     <h2 className="text-lg font-bold text-neutral-900 mb-4">En Çok Ziyaret Edilen Sayfalar</h2>
                     <div className="space-y-3">
-                        {topPages.map((page: any, index: number) => (
+                        {topPages.map((page, index) => (
                             <div key={index} className="flex items-center justify-between p-3 bg-neutral-50 rounded-xl">
                                 <div className="flex items-center gap-3">
                                     <span className="w-8 h-8 bg-white rounded-lg border border-neutral-200 flex items-center justify-center text-sm font-bold text-neutral-600">

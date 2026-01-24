@@ -137,8 +137,9 @@ async function generateWithPythonPipeline(
                     PATH: process.env.PATH,
                     ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY,
                     OPENAI_API_KEY: process.env.OPENAI_API_KEY,
+                    NODE_ENV: process.env.NODE_ENV,
                     // Add other specific keys if the python script needs them
-                },
+                } as NodeJS.ProcessEnv,
                 cwd: process.cwd(),
             });
 

@@ -4,19 +4,14 @@ import { useState, useMemo } from 'react'
 import { updateTaskStatus, deleteTask } from '@/actions/task' // Import actions
 import {
     Clock,
-    MoreVertical,
     Calendar,
     CheckCircle2,
     Circle,
-    ArrowRight,
     PlayCircle,
-    Archive,
     Trash2,
-    AlertCircle
 } from 'lucide-react'
-import Link from 'next/link'
 
-type Task = {
+export type Task = {
     id: string
     title: string
     description: string | null

@@ -1,11 +1,21 @@
 import { getTasks } from '@/actions/task'
 import { PageHeader } from '@/components/admin/ui/PageHeader'
-import { TaskBoard } from '@/components/admin/task/TaskBoard'
+import { TaskBoard, type Task } from '@/components/admin/task/TaskBoard'
 import { Plus } from 'lucide-react'
-import Link from 'next/link'
 
 export default async function TasksPage() {
     const { data: tasks = [] } = await getTasks()
+
+    // Map the data to match Task type
+    const mappedTasks: Task[] = tasks.map(task => ({
+        id: task.id,
+        title: task.title,
+        description: task.description,
+        status: task.status,
+        priority: task.priority,
+        dueDate: task.dueDate,
+        webProject: task.webProject,
+    }))
 
     return (
         <div className="space-y-6 h-[calc(100vh-8rem)] flex flex-col">
@@ -21,7 +31,7 @@ export default async function TasksPage() {
             />
 
             <div className="flex-1 min-h-0">
-                <TaskBoard initialTasks={tasks as any[]} />
+                <TaskBoard initialTasks={mappedTasks} />
             </div>
         </div>
     )

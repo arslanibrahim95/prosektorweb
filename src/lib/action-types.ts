@@ -83,3 +83,52 @@ export function getZodErrorMessage(error: unknown): string {
     }
     return 'Doğrulama hatası oluştu.'
 }
+
+// ==========================================
+// PAGINATION VALIDATION
+// ==========================================
+
+/** Pagination configuration constants */
+export const PAGINATION = {
+    DEFAULT_PAGE: 1,
+    DEFAULT_LIMIT: 10,
+    MIN_LIMIT: 1,
+    MAX_LIMIT: 100,
+} as const
+
+/**
+ * Validates and normalizes pagination parameters.
+ * Prevents DoS attacks via excessive limit values.
+ *
+ * @param page - Page number (1-indexed)
+ * @param limit - Items per page
+ * @returns Validated pagination parameters with skip value
+ *
+ * @example
+ * const { page, limit, skip } = validatePagination(rawPage, rawLimit)
+ */
+export function validatePagination(
+    page?: number | string | null,
+    limit?: number | string | null
+): { page: number; limit: number; skip: number } {
+    // Parse and validate page
+    let validPage = typeof page === 'string' ? parseInt(page, 10) : (page ?? PAGINATION.DEFAULT_PAGE)
+    if (isNaN(validPage) || validPage < 1) {
+        validPage = PAGINATION.DEFAULT_PAGE
+    }
+
+    // Parse and validate limit
+    let validLimit = typeof limit === 'string' ? parseInt(limit, 10) : (limit ?? PAGINATION.DEFAULT_LIMIT)
+    if (isNaN(validLimit) || validLimit < PAGINATION.MIN_LIMIT) {
+        validLimit = PAGINATION.DEFAULT_LIMIT
+    }
+    if (validLimit > PAGINATION.MAX_LIMIT) {
+        validLimit = PAGINATION.MAX_LIMIT
+    }
+
+    return {
+        page: validPage,
+        limit: validLimit,
+        skip: (validPage - 1) * validLimit,
+    }
+}

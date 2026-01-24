@@ -25,7 +25,7 @@ export default async function PortalLayout({
 }) {
     const session = await auth()
     const companyId = session?.user?.companyId
-    const companyName = await getCompanyName(companyId)
+    const companyName = await getCompanyName(companyId || null)
 
     return (
         <div className="min-h-screen bg-neutral-50 flex flex-col relative overflow-hidden">

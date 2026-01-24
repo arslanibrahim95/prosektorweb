@@ -20,6 +20,7 @@ export function ContentEditor({ content, onChange, editable = true }: EditorProp
                 HTMLAttributes: {
                     class: 'text-brand-600 hover:underline',
                 },
+                validate: href => /^((https?|mailto|tel):)/.test(href),
             }),
         ],
         content,
@@ -85,6 +86,13 @@ export function ContentEditor({ content, onChange, editable = true }: EditorProp
                             editor.chain().focus().extendMarkRange('link').unsetLink().run()
                             return
                         }
+
+                        // Security check
+                        if (!/^((https?|mailto|tel):)/.test(url)) {
+                            alert('Geçersiz URL. Sadece http, https, mailto ve tel protokolleri kabul edilir.')
+                            return
+                        }
+
                         editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run()
                     }}
                     className={`p-2 rounded hover:bg-neutral-200 transition-colors ${editor.isActive('link') ? 'bg-neutral-200 text-neutral-900' : 'text-neutral-600'}`}

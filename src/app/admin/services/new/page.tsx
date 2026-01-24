@@ -25,7 +25,7 @@ export default async function NewServicePage() {
                 </div>
             </div>
 
-            <form action={createService as any} className="bg-white p-8 rounded-2xl border border-neutral-200 shadow-sm space-y-6">
+            <form action={async (formData: FormData) => { 'use server'; await createService(formData) }} className="bg-white p-8 rounded-2xl border border-neutral-200 shadow-sm space-y-6">
 
                 <div className="space-y-2">
                     <label className="text-sm font-semibold text-neutral-700">Müşteri <span className="text-red-500">*</span></label>

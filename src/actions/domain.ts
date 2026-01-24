@@ -385,7 +385,7 @@ export async function searchDomains(query: string): Promise<DomainSearchResult> 
         const rateKey = session.user?.id || ip
 
         // 30 requests per hour per user/IP
-        const limit = await checkRateLimit(`domain_search:${rateKey}`, 30, 3600)
+        const limit = await checkRateLimit(`domain_search:${rateKey}`, { limit: 30, windowSeconds: 3600 })
 
         if (!limit.success) {
             return { success: false, results: [], error: 'Çok fazla istek gönderdiniz. Lütfen daha sonra tekrar deneyiniz.' }
