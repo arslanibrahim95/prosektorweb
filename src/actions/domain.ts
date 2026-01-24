@@ -6,6 +6,7 @@ import { requireAuth } from '@/lib/auth-guard'
 import { auth } from '@/auth'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
+import { encryptSensitive } from '@/lib/auth/crypto'
 
 // ==========================================
 // TYPES
@@ -261,9 +262,19 @@ export async function deleteDnsRecord(id: string, domainId: string): Promise<Dom
 export async function getApiConfigs() {
     try {
         await requireAuth(['ADMIN'])
-        return await prisma.apiConfig.findMany({
+        const configs = await prisma.apiConfig.findMany({
             orderBy: { name: 'asc' },
         })
+
+        // Mask sensitive credentials - don't expose full values
+        return configs.map(config => ({
+            ...config,
+            apiKey: config.apiKey ? '••••••••' + (config.apiKey.slice(-4) || '') : null,
+            apiSecret: config.apiSecret ? '••••••••' + (config.apiSecret.slice(-4) || '') : null,
+            // Flag to indicate if credentials exist
+            hasApiKey: !!config.apiKey,
+            hasApiSecret: !!config.apiSecret,
+        }))
     } catch (error) {
         console.error('getApiConfigs error:', error)
         return []
@@ -281,12 +292,16 @@ export async function saveApiConfig(formData: FormData): Promise<DomainActionRes
         const apiEndpoint = formData.get('apiEndpoint') as string
         const defaultIp = formData.get('defaultIp') as string
 
+        // Encrypt sensitive credentials before storing
+        const encryptedApiKey = apiKey ? encryptSensitive(apiKey) : null
+        const encryptedApiSecret = apiSecret ? encryptSensitive(apiSecret) : null
+
         await prisma.apiConfig.upsert({
             where: { provider },
             update: {
                 name,
-                apiKey: apiKey || null,
-                apiSecret: apiSecret || null,
+                apiKey: encryptedApiKey,
+                apiSecret: encryptedApiSecret,
                 apiEndpoint: apiEndpoint || null,
                 defaultIp: defaultIp || null,
                 isActive: true,
@@ -294,8 +309,8 @@ export async function saveApiConfig(formData: FormData): Promise<DomainActionRes
             create: {
                 provider,
                 name,
-                apiKey: apiKey || null,
-                apiSecret: apiSecret || null,
+                apiKey: encryptedApiKey,
+                apiSecret: encryptedApiSecret,
                 apiEndpoint: apiEndpoint || null,
                 defaultIp: defaultIp || null,
                 isActive: true,

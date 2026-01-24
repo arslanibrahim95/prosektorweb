@@ -8,6 +8,7 @@ import { Navbar } from '@/components/layout/Navbar'
 import { Footer } from '@/components/layout/Footer'
 import { prisma } from '@/lib/prisma'
 import TrustBadges from '@/components/ui/TrustBadges'
+import { BlogCTA } from '@/components/blog/BlogCTA'
 
 // --- Types ---
 type Props = {
@@ -252,6 +253,10 @@ export default async function BlogDetailPage({ params }: Props) {
                     ) : null}
                 </div>
             </article>
+
+            <div className="max-w-4xl mx-auto px-6 pb-24">
+                <BlogCTA />
+            </div>
 
             <Footer variant="inner" />
         </div>

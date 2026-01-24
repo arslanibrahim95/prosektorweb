@@ -57,10 +57,14 @@ export async function createPayment(formData: FormData): Promise<PaymentActionRe
         for (let attempt = 0; attempt < MAX_PAYMENT_RETRIES; attempt++) {
             try {
                 const result = await prisma.$transaction(async (tx) => {
-                    // Read current invoice state
-                    const invoice = await tx.invoice.findUniqueOrThrow({
-                        where: { id: validatedData.invoiceId },
+                    // Read current invoice state (manual deletedAt filter since tx lacks extension)
+                    const invoice = await tx.invoice.findFirst({
+                        where: { id: validatedData.invoiceId, deletedAt: null },
                     })
+
+                    if (!invoice) {
+                        throw new Error('INVOICE_NOT_FOUND')
+                    }
 
                     const currentPaidAmount = Number(invoice.paidAmount)
                     const total = Number(invoice.total)
@@ -154,6 +158,10 @@ export async function createPayment(formData: FormData): Promise<PaymentActionRe
             return { success: false, error: 'Ödeme tutarı fatura toplamını aşamaz.' }
         }
 
+        if (error instanceof Error && error.message === 'INVOICE_NOT_FOUND') {
+            return { success: false, error: 'Fatura bulunamadı veya silinmiş.' }
+        }
+
         return { success: false, error: 'Ödeme kaydedilirken bir hata oluştu.' }
     }
 }
@@ -171,8 +179,9 @@ export async function deletePayment(id: string): Promise<PaymentActionResult> {
         for (let attempt = 0; attempt < MAX_PAYMENT_RETRIES; attempt++) {
             try {
                 const result = await prisma.$transaction(async (tx) => {
-                    const payment = await tx.payment.findUnique({
-                        where: { id },
+                    // Note: tx doesn't have soft-delete extension, so filter manually
+                    const payment = await tx.payment.findFirst({
+                        where: { id, deletedAt: null },
                         include: { invoice: true },
                     })
 
@@ -194,8 +203,11 @@ export async function deletePayment(id: string): Promise<PaymentActionResult> {
                         newStatus = 'PARTIAL'
                     }
 
-                    // Delete payment first
-                    await tx.payment.delete({ where: { id } })
+                    // Soft delete payment (manual since tx doesn't have extension)
+                    await tx.payment.update({
+                        where: { id },
+                        data: { deletedAt: new Date() }
+                    })
 
                     // Optimistic lock: Update only if paidAmount hasn't changed
                     const updateResult = await tx.invoice.updateMany({

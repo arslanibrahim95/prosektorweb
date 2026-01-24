@@ -16,7 +16,7 @@ export function Hero() {
                 </div>
 
                 <BlurText
-                    text="Merhaba, OSGB’nizin Dijital Kimliği Artık Bir Soru İşareti Değil."
+                    text="OSGB'nize Özel Profesyonel Web Siteniz 24 Saatte Yayına Hazır."
                     delay={50}
                     animateBy="words"
                     direction="top"

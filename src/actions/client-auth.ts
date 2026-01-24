@@ -25,7 +25,11 @@ import { checkRateLimit, getClientIp } from '@/lib/rate-limit'
 
 export async function verifyClientAccess(osgbName: string, code: string): Promise<VerifyResult> {
     const ip = await getClientIp()
-    const limit = await checkRateLimit(`auth:${ip}`, { limit: 5, windowSeconds: 15 * 60 }) // 5 attempts per 15 min
+    const limit = await checkRateLimit(`auth:${ip}`, {
+        limit: 5,
+        windowSeconds: 15 * 60,
+        failClosed: true // Security-critical: block on Redis errors
+    })
 
     if (!limit.success) {
         return { success: false, error: 'Çok fazla deneme yaptınız. Lütfen 15 dakika bekleyin.' }

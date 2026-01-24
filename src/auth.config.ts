@@ -18,9 +18,9 @@ export const authConfig = {
         // Session callback - exposes token data to client
         session({ session, token }) {
             if (token && session.user) {
-                session.user.role = token.role
-                session.user.companyId = token.companyId
-                session.user.id = token.id
+                session.user.role = token.role as string
+                session.user.companyId = token.companyId as string | null
+                session.user.id = token.id as string
             }
             return session
         },

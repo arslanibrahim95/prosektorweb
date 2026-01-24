@@ -17,6 +17,7 @@ export default function AdminLoginPage() {
                             <Shield className="w-5 h-5 text-neutral-400" />
                         </div>
                         <h1 className="text-lg font-semibold text-neutral-200">Sistem Yönetimi</h1>
+                        <p className="text-xs text-neutral-500 mt-1">Yalnızca ProSektorWeb ekibi</p>
                     </div>
 
                     {/* Form */}

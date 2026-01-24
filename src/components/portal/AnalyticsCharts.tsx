@@ -96,7 +96,7 @@ export function DeviceChart({ mobile, desktop, tablet }: DeviceChartProps) {
                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                 </Pie>
-                <Tooltip formatter={(value: number) => [`%${value.toFixed(1)}`, '']} />
+                <Tooltip formatter={(value) => [`%${(value as number)?.toFixed(1) ?? '0'}`, '']} />
             </PieChart>
         </ResponsiveContainer>
     )

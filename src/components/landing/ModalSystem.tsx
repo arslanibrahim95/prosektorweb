@@ -178,7 +178,7 @@ export function ModalSystem({ isOpen, onClose, initialState = ModalStep.INITIAL_
                     {step === ModalStep.INITIAL_CHOICE && (
                         <div className="text-center">
                             <div className="bg-brand-50 text-brand-700 text-sm font-bold py-2 px-4 rounded-full inline-block mb-6">
-                                Önizleme alanı yalnızca adına özel çalışma yapılan OSGB’lere açılır.
+                                Size özel hazırladığımız tasarımları görmek için erişim kodunuzu kullanın veya hemen talep edin.
                             </div>
                             <h2 id="modal-title" className="text-2xl font-bold mb-4 text-neutral-900">Erişim Kodu</h2>
                             <p className="text-neutral-500 mb-8 max-w-md mx-auto">
@@ -189,7 +189,7 @@ export function ModalSystem({ isOpen, onClose, initialState = ModalStep.INITIAL_
                                     Kodum Var
                                 </button>
                                 <button onClick={() => setStep(ModalStep.REQUEST_INTRO)} className="w-full py-4 bg-white text-neutral-700 border border-neutral-200 rounded-xl font-bold hover:bg-neutral-50 transition-colors focus:ring-4 focus:ring-neutral-200 focus:outline-none">
-                                    Kodum Yok
+                                    Önizleme Kodu İste
                                 </button>
                             </div>
                         </div>
@@ -299,7 +299,7 @@ export function ModalSystem({ isOpen, onClose, initialState = ModalStep.INITIAL_
                                 OSGB’niz için web sitesi önizleme talebiniz başarıyla alındı. Kodunuz WhatsApp veya e-posta yoluyla tarafınıza iletilecektir.
                             </p>
                             <button onClick={onClose} className="w-full py-4 bg-brand-600 text-white rounded-xl font-bold hover:bg-brand-700 transition-colors focus:ring-4 focus:ring-brand-200 focus:outline-none">
-                                Anlaşıldı
+                                Harika, Bekliyorum
                             </button>
                         </div>
                     )}
@@ -395,9 +395,9 @@ export function ModalSystem({ isOpen, onClose, initialState = ModalStep.INITIAL_
                                 ))}
                             </div>
 
-                            <div className="bg-amber-100 border border-amber-300 text-amber-700 px-4 py-3 rounded-lg mb-4 text-sm font-semibold">
+                            <div className="bg-blue-50 border border-blue-200 text-blue-800 px-4 py-3 rounded-lg mb-4 text-sm font-semibold">
                                 <AlertCircle className="w-4 h-4 inline mr-2" />
-                                Demo Modu: Herhangi bir kart bilgisi girmenize gerek yoktur.
+                                Ödeme ekranı bakımda. Banka havalesi ile devam edebilirsiniz.
                             </div>
 
                             <button onClick={handlePayment} className="w-full py-4 bg-green-600 text-white rounded-xl font-bold hover:bg-green-700 transition-colors flex items-center justify-center gap-2 focus:ring-4 focus:ring-green-200 focus:outline-none">
@@ -433,9 +433,8 @@ export function ModalSystem({ isOpen, onClose, initialState = ModalStep.INITIAL_
                                 Önizleme süresi sona erdiği için tasarımlar arşivlenmiştir.
                             </p>
                             <div className="bg-neutral-50 p-4 rounded-xl border border-neutral-200 mb-8 inline-block w-full max-w-sm">
-                                <div className="text-sm text-neutral-500 line-through">Eski Fiyat: 7.000 TL</div>
-                                <div className="text-2xl font-bold text-brand-600">Yeni Fiyat: 12.500 TL</div>
-                                <div className="text-xs text-neutral-400">Yeniden Aktifleştirme Bedeli</div>
+                                <div className="text-2xl font-bold text-brand-600">Yeniden hazırlama bedeli: 12.500 TL</div>
+                                <div className="text-xs text-neutral-400">yeni tasarım + revize hakkı</div>
                             </div>
                             <button onClick={() => setStep(ModalStep.REACTIVATE_OFFER)} className="w-full py-4 bg-brand-600 text-white rounded-xl font-bold hover:bg-brand-700 transition-colors focus:ring-4 focus:ring-brand-200 focus:outline-none">
                                 Önizlemeyi Tekrar Aktifleştir

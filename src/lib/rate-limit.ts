@@ -28,6 +28,12 @@ export interface RateLimitOptions {
     limit?: number
     /** Window duration in seconds */
     windowSeconds?: number
+    /**
+     * If true, returns { success: false } when Redis errors occur.
+     * Use for security-critical endpoints like authentication.
+     * Default: false (fail open - allows requests on error)
+     */
+    failClosed?: boolean
 }
 
 // Memory cache for extreme performance (optional, good for high-traffic)
@@ -42,12 +48,17 @@ export async function checkRateLimit(
 ): Promise<{ success: boolean; reset?: Date }> {
     const {
         limit = 10,
-        windowSeconds = 60
+        windowSeconds = 60,
+        failClosed = false
     } = options
 
     try {
         if (!process.env.UPSTASH_REDIS_REST_URL) {
             console.warn('Redis not configured, bypassing rate limit')
+            // For security-critical endpoints, don't bypass - fail closed
+            if (failClosed) {
+                return { success: false, reset: new Date(Date.now() + 60000) }
+            }
             return { success: true }
         }
 
@@ -71,7 +82,13 @@ export async function checkRateLimit(
 
     } catch (error) {
         console.error('Rate limit error:', error)
-        // Fail open: Allow traffic if Redis is down
+
+        // Fail Closed: Block request on error (security-critical endpoints like auth)
+        // Fail Open: Allow request on error (availability over security)
+        if (failClosed) {
+            return { success: false, reset: new Date(Date.now() + 60000) } // Retry after 1 min
+        }
+
         return { success: true }
     }
 }

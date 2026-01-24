@@ -160,13 +160,16 @@ export async function purchaseDomain(
         // Register domain via Cloudflare
         const result = await cf.registerDomain(domain, 1, contactInfo)
 
-        if (!result.success) {
-            return { success: false, error: result.error }
+        if (!result.success || !result.domain) {
+            return { success: false, error: result.error || 'Domain kaydı alınamadı' }
         }
 
         // Save to our database
         const serverIp = getDefaultServerIp()
         const tld = '.' + domain.split('.').slice(1).join('.')
+        const expiresAt = result.domain.expires_at
+            ? new Date(result.domain.expires_at)
+            : new Date(Date.now() + 365 * 24 * 60 * 60 * 1000) // Default 1 year
 
         await prisma.domain.create({
             data: {
@@ -176,7 +179,7 @@ export async function purchaseDomain(
                 registrar: 'Cloudflare',
                 serverIp: serverIp || null,
                 registeredAt: new Date(),
-                expiresAt: new Date(result.domain.expires_at),
+                expiresAt,
                 companyId: companyId || null,
                 notes: 'Cloudflare üzerinden satın alındı',
             },

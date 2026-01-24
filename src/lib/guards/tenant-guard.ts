@@ -1,7 +1,7 @@
 import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
 
-export async function enforceTenantAccess(companyId: string, _resourceId?: string): Promise<boolean> {
+export async function enforceTenantAccess(companyId: string): Promise<boolean> {
   const session = await auth();
   if (!session?.user) return false;
 

@@ -6,9 +6,10 @@ import { toast } from 'sonner'
 
 interface PaymentButtonProps {
     invoiceNo: string
+    amount?: number
 }
 
-export function PaymentButton({ invoiceNo }: PaymentButtonProps) {
+export function PaymentButton({ invoiceNo, amount }: PaymentButtonProps) {
     const [isOpen, setIsOpen] = useState(false)
     const [copied, setCopied] = useState(false)
 
@@ -63,6 +64,11 @@ export function PaymentButton({ invoiceNo }: PaymentButtonProps) {
                             <CreditCard className="w-8 h-8" />
                         </div>
                         <h3 className="text-xl font-bold text-neutral-900">Ödeme Bilgileri</h3>
+                        {amount !== undefined && amount > 0 && (
+                            <div className="mt-2 text-2xl font-bold text-brand-600">
+                                {amount.toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺
+                            </div>
+                        )}
                         <p className="text-neutral-500 mt-2 text-sm">
                             Online ödeme sistemimiz bakım aşamasındadır. Lütfen ödemenizi aşağıdaki banka hesabına yapınız.
                         </p>

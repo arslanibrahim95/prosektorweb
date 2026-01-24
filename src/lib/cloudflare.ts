@@ -306,8 +306,8 @@ export class CloudflareService {
     ): Promise<{ success: boolean; error?: string }> {
         try {
             // POST /zones/{zone_identifier}/email/routing/rules
-            const [localPart, ...rest] = email.split('@')
-            const domain = rest.join('@')
+            const [localPart] = email.split('@')
+            // const domain = rest.join('@')
 
             const response = await this.request<{ id: string }>(
                 `/zones/${zoneId}/email/routing/rules`,
@@ -471,7 +471,6 @@ export class CloudflareService {
             postalCode: string
             country: string
             phone: string
-            phone: string
             email: string
         }
     ): Promise<{ success: boolean; domain?: RegisteredDomain; error?: string }> {
@@ -559,6 +558,7 @@ export class CloudflareService {
 // ==========================================
 
 import { prisma } from '@/lib/prisma'
+import { decryptSensitive, isEncrypted } from '@/lib/auth/crypto'
 
 export async function getCloudflareService(): Promise<CloudflareService | null> {
     try {
@@ -574,7 +574,11 @@ export async function getCloudflareService(): Promise<CloudflareService | null> 
         })
 
         if (config?.apiKey) {
-            return new CloudflareService(config.apiKey)
+            // Decrypt if encrypted
+            const apiKey = isEncrypted(config.apiKey)
+                ? decryptSensitive(config.apiKey)
+                : config.apiKey
+            return new CloudflareService(apiKey)
         }
 
         return null

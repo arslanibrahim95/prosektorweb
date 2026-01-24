@@ -214,7 +214,7 @@ export async function getProposalById(id: string) {
                         email: true,
                         phone: true,
                         address: true,
-                        taxNo: true,
+                        taxId: true,
                         taxOffice: true
                     }
                 },

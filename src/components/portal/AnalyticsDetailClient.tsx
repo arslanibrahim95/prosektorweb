@@ -1,6 +1,6 @@
 'use client'
 
-import { TrafficChart, DeviceChart, TrafficSources, PerformanceGauge } from '@/components/portal/AnalyticsCharts'
+import { TrafficChart, TrafficSources, PerformanceGauge } from '@/components/portal/AnalyticsCharts'
 import Link from 'next/link'
 import {
     ArrowLeft, Users, Eye, Clock, TrendingDown, RefreshCw, CheckCircle,

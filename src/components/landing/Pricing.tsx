@@ -23,7 +23,7 @@ export function Pricing() {
                                 "Hızlı & Mobil Uyumlu",
                                 "Temel SEO Kurulumu",
                                 "İletişim & Harita",
-                                "7 Gün Ücretsiz Deneme"
+                                "7 Gün Ücretsiz Önizleme"
                             ].map((feat, i) => (
                                 <li key={i} className="flex items-center gap-3 text-neutral-700">
                                     <div className="p-1 rounded-full bg-neutral-100 text-neutral-600">
@@ -35,6 +35,7 @@ export function Pricing() {
                         </ul>
                         <div className="pt-8 border-t border-neutral-200/50">
                             <div className="text-3xl font-bold text-neutral-900 font-serif">7.000 TL <span className="text-sm font-sans font-normal text-neutral-500">+ KDV</span></div>
+                            <p className="text-xs text-neutral-500 mt-2">Tek fiyat: kalite ve süreç aynı, sadece kapsam farkı.</p>
                         </div>
                     </div>
 
@@ -51,7 +52,7 @@ export function Pricing() {
                                 "Gelişmiş Hizmet Sayfaları",
                                 "Blog & Haber Modülü",
                                 "Detaylı SEO & Analytics",
-                                "7 Gün Ücretsiz Deneme"
+                                "7 Gün Ücretsiz Önizleme"
                             ].map((feat, i) => (
                                 <li key={i} className="flex items-center gap-3 text-neutral-800 font-medium">
                                     <div className="p-1 rounded-full bg-brand-100 text-brand-600">
@@ -63,20 +64,21 @@ export function Pricing() {
                         </ul>
                         <div className="pt-8 border-t border-brand-100">
                             <div className="text-3xl font-bold text-brand-700 font-serif">7.000 TL <span className="text-sm font-sans font-normal text-neutral-500">+ KDV</span></div>
+                            <p className="text-xs text-brand-600/80 mt-2">Tek fiyat: kalite ve süreç aynı, sadece kapsam farkı.</p>
                         </div>
                     </div>
                 </div>
 
                 <div className="text-center mt-12 max-w-3xl mx-auto">
                     <p className="text-neutral-500 mb-6 bg-brand-50 p-4 rounded-lg text-sm border border-brand-100">
-                        <strong>Neden iki paket, tek fiyat?</strong><br />
-                        Biz karmaşık fiyat tablolarına inanmıyoruz. Çünkü biz emeği değil, sonucu fiyatlandırıyoruz. Hangi paketi seçerseniz seçin, kalite ve süreç değişmez.
+                        <strong>Hızlı bir başlangıç mı istiyorsunuz, yoksa detaylı bir kurumsal yapı mı?</strong><br />
+                        Karar sizin, fiyat sabit. İhtiyacınıza en uygun modeli seçin.
                     </p>
                     <OpenModalButton
                         step={ModalStep.INITIAL_CHOICE}
                         className="px-8 py-3 bg-brand-600 text-white rounded-full font-bold shadow-md hover:bg-brand-700 transition-colors"
                     >
-                        Web Sitemi İncele
+                        Ücretsiz Önizleme Al (7 gün)
                     </OpenModalButton>
                 </div>
             </div>
