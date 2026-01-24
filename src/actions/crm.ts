@@ -3,6 +3,12 @@
 import { prisma } from '@/lib/prisma'
 import { getErrorMessage, getZodErrorMessage } from '@/lib/action-types'
 import { requireAuth } from '@/lib/auth-guard'
+import {
+    requireTenantAccess,
+    requireCompanyAccess,
+    TenantAccessError,
+    UnauthorizedError
+} from '@/lib/tenant-guard'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 import { ActivityType, CompanyStatus } from '@prisma/client'
@@ -37,6 +43,9 @@ export async function createNote(formData: FormData): Promise<CrmActionResult> {
 
         const validated = NoteSchema.parse(rawData)
 
+        // Tenant isolation: verify user can access this company
+        await requireCompanyAccess(validated.companyId)
+
         const note = await prisma.companyNote.create({
             data: validated,
         })
@@ -45,6 +54,9 @@ export async function createNote(formData: FormData): Promise<CrmActionResult> {
         return { success: true, data: note }
     } catch (error: unknown) {
         console.error('createNote error:', error)
+        if (error instanceof TenantAccessError || error instanceof UnauthorizedError) {
+            return { success: false, error: error.message }
+        }
         if (error instanceof z.ZodError) {
             return { success: false, error: getZodErrorMessage(error) }
         }
@@ -56,11 +68,17 @@ export async function deleteNote(id: string, companyId: string): Promise<CrmActi
     try {
         await requireAuth()
 
+        // Tenant isolation: verify user owns this note
+        await requireTenantAccess('note', id)
+
         await prisma.companyNote.delete({ where: { id } })
         revalidatePath(`/admin/companies/${companyId}`)
         return { success: true }
     } catch (error) {
         console.error('deleteNote error:', error)
+        if (error instanceof TenantAccessError || error instanceof UnauthorizedError) {
+            return { success: false, error: error.message }
+        }
         return { success: false, error: 'Not silinirken hata oluştu.' }
     }
 }
@@ -68,6 +86,9 @@ export async function deleteNote(id: string, companyId: string): Promise<CrmActi
 export async function toggleNotePin(id: string, companyId: string): Promise<CrmActionResult> {
     try {
         await requireAuth()
+
+        // Tenant isolation: verify user owns this note
+        await requireTenantAccess('note', id)
 
         const note = await prisma.companyNote.findUnique({ where: { id } })
         if (!note) return { success: false, error: 'Not bulunamadı.' }
@@ -81,6 +102,9 @@ export async function toggleNotePin(id: string, companyId: string): Promise<CrmA
         return { success: true }
     } catch (error) {
         console.error('toggleNotePin error:', error)
+        if (error instanceof TenantAccessError || error instanceof UnauthorizedError) {
+            return { success: false, error: error.message }
+        }
         return { success: false, error: 'İşlem başarısız.' }
     }
 }
@@ -113,6 +137,9 @@ export async function createContact(formData: FormData): Promise<CrmActionResult
 
         const validated = ContactSchema.parse(rawData)
 
+        // Tenant isolation: verify user can access this company
+        await requireCompanyAccess(validated.companyId)
+
         // If this is primary, remove primary from others
         if (validated.isPrimary) {
             await prisma.companyContact.updateMany({
@@ -136,6 +163,9 @@ export async function createContact(formData: FormData): Promise<CrmActionResult
         return { success: true, data: contact }
     } catch (error: unknown) {
         console.error('createContact error:', error)
+        if (error instanceof TenantAccessError || error instanceof UnauthorizedError) {
+            return { success: false, error: error.message }
+        }
         if (error instanceof z.ZodError) {
             return { success: false, error: getZodErrorMessage(error) }
         }
@@ -147,11 +177,17 @@ export async function deleteContact(id: string, companyId: string): Promise<CrmA
     try {
         await requireAuth()
 
+        // Tenant isolation: verify user owns this contact
+        await requireTenantAccess('contact', id)
+
         await prisma.companyContact.delete({ where: { id } })
         revalidatePath(`/admin/companies/${companyId}`)
         return { success: true }
     } catch (error) {
         console.error('deleteContact error:', error)
+        if (error instanceof TenantAccessError || error instanceof UnauthorizedError) {
+            return { success: false, error: error.message }
+        }
         return { success: false, error: 'Kişi silinirken hata oluştu.' }
     }
 }
@@ -182,6 +218,9 @@ export async function createActivity(formData: FormData): Promise<CrmActionResul
 
         const validated = ActivitySchema.parse(rawData)
 
+        // Tenant isolation: verify user can access this company
+        await requireCompanyAccess(validated.companyId)
+
         const activity = await prisma.companyActivity.create({
             data: {
                 companyId: validated.companyId,
@@ -196,6 +235,9 @@ export async function createActivity(formData: FormData): Promise<CrmActionResul
         return { success: true, data: activity }
     } catch (error: unknown) {
         console.error('createActivity error:', error)
+        if (error instanceof TenantAccessError || error instanceof UnauthorizedError) {
+            return { success: false, error: error.message }
+        }
         if (error instanceof z.ZodError) {
             return { success: false, error: getZodErrorMessage(error) }
         }
@@ -206,6 +248,9 @@ export async function createActivity(formData: FormData): Promise<CrmActionResul
 export async function toggleActivityComplete(id: string, companyId: string): Promise<CrmActionResult> {
     try {
         await requireAuth()
+
+        // Tenant isolation: verify user owns this activity
+        await requireTenantAccess('activity', id)
 
         const activity = await prisma.companyActivity.findUnique({ where: { id } })
         if (!activity) return { success: false, error: 'Aktivite bulunamadı.' }
@@ -219,6 +264,9 @@ export async function toggleActivityComplete(id: string, companyId: string): Pro
         return { success: true }
     } catch (error) {
         console.error('toggleActivityComplete error:', error)
+        if (error instanceof TenantAccessError || error instanceof UnauthorizedError) {
+            return { success: false, error: error.message }
+        }
         return { success: false, error: 'İşlem başarısız.' }
     }
 }
@@ -227,11 +275,17 @@ export async function deleteActivity(id: string, companyId: string): Promise<Crm
     try {
         await requireAuth()
 
+        // Tenant isolation: verify user owns this activity
+        await requireTenantAccess('activity', id)
+
         await prisma.companyActivity.delete({ where: { id } })
         revalidatePath(`/admin/companies/${companyId}`)
         return { success: true }
     } catch (error) {
         console.error('deleteActivity error:', error)
+        if (error instanceof TenantAccessError || error instanceof UnauthorizedError) {
+            return { success: false, error: error.message }
+        }
         return { success: false, error: 'Aktivite silinirken hata oluştu.' }
     }
 }
@@ -243,6 +297,9 @@ export async function deleteActivity(id: string, companyId: string): Promise<Crm
 export async function updateCompanyStatus(id: string, status: string): Promise<CrmActionResult> {
     try {
         await requireAuth()
+
+        // Tenant isolation: verify user can access this company
+        await requireTenantAccess('company', id)
 
         const StatusSchema = z.nativeEnum(CompanyStatus)
         const parsed = StatusSchema.safeParse(status)
@@ -260,6 +317,9 @@ export async function updateCompanyStatus(id: string, status: string): Promise<C
         return { success: true }
     } catch (error) {
         console.error('updateCompanyStatus error:', error)
+        if (error instanceof TenantAccessError || error instanceof UnauthorizedError) {
+            return { success: false, error: error.message }
+        }
         return { success: false, error: 'Durum güncellenirken hata oluştu.' }
     }
 }
