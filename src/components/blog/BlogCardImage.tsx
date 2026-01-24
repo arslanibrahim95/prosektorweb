@@ -15,13 +15,13 @@ export function BlogCardImage({ src, alt, categoryName = 'Genel' }: BlogCardImag
     // Fallback UI
     const Fallback = () => (
         <div className="w-full h-full bg-neutral-100 flex items-center justify-center overflow-hidden relative group-hover:scale-105 transition-transform duration-700">
-            {/* 
-                 Ideally we would map categoryName to different images here:
-                 categoryName.includes('Sağlık') ? healthImage : safetyImage 
-             */}
             <img
-                src="/assets/placeholders/isg-safety-abstract.png"
-                alt="İSG Görsel"
+                src={
+                    categoryName.toLowerCase().includes('sağlık')
+                        ? "/assets/placeholders/isg-health-abstract.png"
+                        : "/assets/placeholders/isg-safety-abstract.png"
+                }
+                alt={`${categoryName} Görsel`}
                 className="w-full h-full object-cover opacity-90"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
