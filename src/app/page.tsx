@@ -5,6 +5,7 @@ import { Footer } from '@/components/layout/Footer'
 import { ContactForm } from '@/components/landing/ContactForm'
 import { LandingProvider } from '@/components/landing/LandingContext'
 import { GlobalModal } from '@/components/landing/GlobalModal'
+import { Container } from '@/components/ui/Container'
 
 // Extracted Server Components
 import { Hero } from '@/components/landing/Hero'
@@ -57,12 +58,14 @@ export default function HomePage() {
         <FAQ />
 
         {/* Contact Form */}
-        <section id="iletisim" className="py-24 px-6 bg-transparent relative z-0">
-          <div className="max-w-xl mx-auto text-center mb-10">
-            <h2 className="text-3xl font-bold mb-4 text-neutral-900">Bize Yazın</h2>
-            <p className="text-neutral-500">Soru, öneri ve talepleriniz için mesaj bırakın.<br />En geç 1 iş günü içinde dönüş yaparız.</p>
-          </div>
-          <ContactForm />
+        <section id="iletisim" className="py-24 relative z-0">
+          <Container>
+            <div className="max-w-xl mx-auto text-center mb-10">
+              <h2 className="text-3xl font-bold mb-4 text-neutral-900">Bize Yazın</h2>
+              <p className="text-neutral-500">Soru, öneri ve talepleriniz için mesaj bırakın.<br />En geç 1 iş günü içinde dönüş yaparız.</p>
+            </div>
+            <ContactForm />
+          </Container>
         </section>
 
         {/* Footer */}

@@ -85,7 +85,7 @@ export default async function BlogPage({
             </section>
 
             {/* Search & Filters */}
-            <section className="px-6 -mt-8 mb-16 relative z-10">
+            <section className="px-6 -mt-4 md:-mt-8 mb-16 relative z-10">
                 <div className="max-w-6xl mx-auto">
                     <div className="bg-white/90 backdrop-blur-2xl p-6 rounded-3xl shadow-2xl border border-white/50 flex flex-col md:flex-row gap-4 items-center justify-between ring-1 ring-neutral-900/5">
                         {/* Search */}

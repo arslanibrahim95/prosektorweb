@@ -41,8 +41,8 @@ export function Pricing() {
                     </div>
 
                     {/* VİZYON */}
-                    <div className="relative p-10 rounded-3xl border border-brand-200 bg-white/60 backdrop-blur-2xl shadow-2xl shadow-brand-900/10 flex flex-col overflow-hidden transform md:-translate-y-6">
-                        <div className="absolute top-0 inset-x-0 h-1.5 bg-brand-600 shadow-[0_0_20px_rgba(200,30,30,0.5)]" />
+                    <div className="relative p-10 rounded-3xl border border-brand-200 bg-white/60 backdrop-blur-2xl shadow-2xl shadow-brand-900/10 flex flex-col overflow-hidden">
+                        <div className="absolute top-0 inset-x-0 h-1 bg-brand-600 shadow-[0_0_20px_rgba(200,30,30,0.5)]" />
                         <div className="absolute top-4 right-4 px-3 py-1 bg-brand-100 text-brand-700 text-xs font-bold rounded-full">EDİTÖRÜN SEÇİMİ</div>
 
                         <h3 className="text-4xl font-serif font-bold mb-2 text-neutral-900">Vizyon</h3>

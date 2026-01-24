@@ -115,7 +115,7 @@ export default async function BlogDetailPage({ params }: Props) {
                 <div className="max-w-4xl mx-auto px-6 pt-12">
 
                     {/* Meta Info */}
-                    <div className="flex items-center justify-between mb-8">
+                    <div className="flex flex-wrap gap-4 items-center justify-between mb-8">
                         <Link
                             href={`/blog?category=${post.category?.slug}`}
                             className="inline-flex items-center gap-2 px-4 py-1.5 bg-white border border-brand-200 shadow-sm text-brand-600 rounded-full text-sm font-bold hover:shadow-md transition"
@@ -132,7 +132,7 @@ export default async function BlogDetailPage({ params }: Props) {
                         {post.title}
                     </h1>
 
-                    <div className="flex items-center justify-between border-y border-neutral-200 py-6 mb-12">
+                    <div className="flex flex-wrap gap-4 items-center justify-between border-y border-neutral-200 py-6 mb-12">
                         <div className="flex items-center gap-4">
                             <div className="w-12 h-12 rounded-full bg-brand-50 flex items-center justify-center text-brand-600 border border-brand-100">
                                 <User className="w-6 h-6" />

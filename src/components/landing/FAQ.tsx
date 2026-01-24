@@ -1,9 +1,11 @@
 import { ChevronDown } from 'lucide-react'
 
+import { Container } from '@/components/ui/Container'
+
 export function FAQ() {
     return (
-        <section id="sss" className="py-24 px-6 relative z-0">
-            <div className="max-w-3xl mx-auto">
+        <section id="sss" className="py-24 relative z-0">
+            <Container size="narrow">
                 <h2 className="text-3xl font-bold mb-10 text-center text-neutral-900">Sık Sorulan Sorular</h2>
                 <div className="space-y-4">
                     {[
@@ -24,7 +26,7 @@ export function FAQ() {
                         </details>
                     ))}
                 </div>
-            </div>
+            </Container>
         </section>
     )
 }
