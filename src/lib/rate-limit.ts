@@ -43,7 +43,7 @@ const cache = new Map()
  * Check rate limit using Redis (Sliding Window)
  */
 export async function checkRateLimit(
-    identifier: string,
+    identifier?: string,
     options: RateLimitOptions = {}
 ): Promise<{ success: boolean; reset?: Date; limit?: number; remaining?: number }> {
     const {
@@ -51,6 +51,8 @@ export async function checkRateLimit(
         windowSeconds = 60,
         failClosed = false
     } = options
+
+    const finalIdentifier = identifier || await getClientIp()
 
     try {
         if (!process.env.UPSTASH_REDIS_REST_URL) {
@@ -73,7 +75,7 @@ export async function checkRateLimit(
         })
 
         // Execute rate limit check
-        const { success, limit: limitUsed, remaining, reset } = await ratelimit.limit(identifier)
+        const { success, limit: limitUsed, remaining, reset } = await ratelimit.limit(finalIdentifier)
 
         return {
             success,

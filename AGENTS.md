@@ -74,6 +74,25 @@ export async function action(formData: FormData) {
 }
 ```
 
+### API Routes Template (safeApi)
+
+Use `safeApi` wrapper for all Route Handlers to get free Rate Limiting, Sentry, and standardized error responses.
+
+```typescript
+// app/api/route_path/route.ts
+import { safeApi } from '@/lib/safe-api';
+import { NextResponse } from 'next/server';
+
+export const GET = safeApi(async (req) => {
+  return { message: 'Hello World' };
+}, { rateLimit: { limit: 10, windowSeconds: 60 } });
+
+export const POST = safeApi(async (req, { params }) => {
+  // Logic here
+  return { success: true };
+}, { requireAuth: true });
+```
+
 ### Security Patterns
 ```typescript
 await requireAuth(); // or requireAuth(['ADMIN', 'CLIENT'])
@@ -129,6 +148,7 @@ describe('Feature', () => {
 8. **AUTH CHECK FIRST** - First line of protected actions
 9. **AUDIT LOG** - Critical operations
 10. **ERROR HANDLING** - Try-catch all async
+11. **USE SAFE_API** - Prefer `safeApi` wrapper for Route Handlers
 
 ---
 

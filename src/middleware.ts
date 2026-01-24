@@ -9,7 +9,9 @@ import { logger } from "@/lib/logger"
 const { auth } = NextAuth(authConfig)
 const intlMiddleware = createMiddleware(routing);
 
-export default auth((req) => {
+import { checkRateLimit } from "@/lib/rate-limit"
+
+export default auth(async (req) => {
     // [TODO-OBS-002] Middleware Request ID & Logging
     const requestId = crypto.randomUUID()
     const requestStart = Date.now()
@@ -32,6 +34,27 @@ export default auth((req) => {
     const logExit = () => {
         const duration = Date.now() - requestStart
         logger.info({ ...logContext, duration }, 'Request processed')
+    }
+
+    // 0. Rate Limiting (Security)
+    const ip = req.headers.get('x-forwarded-for') || '127.0.0.1'
+
+    // Strict limit for Auth/Login
+    if (req.nextUrl.pathname.startsWith('/api/auth') || req.nextUrl.pathname === '/login') {
+        const { success } = await checkRateLimit(`auth:${ip}`, { limit: 10, windowSeconds: 60 })
+        if (!success) {
+            logExit()
+            return new NextResponse('Too Many Requests', { status: 429 })
+        }
+    }
+
+    // General API limit
+    if (req.nextUrl.pathname.startsWith('/api')) {
+        const { success } = await checkRateLimit(`api:${ip}`, { limit: 100, windowSeconds: 60 })
+        if (!success) {
+            logExit()
+            return Response.json({ error: 'Too Many Requests' }, { status: 429 })
+        }
     }
 
     // 1. API Protection (Skip Intl)
