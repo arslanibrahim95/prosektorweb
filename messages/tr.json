@@ -25,5 +25,56 @@
         "error_invalid": "E-posta veya şifre hatalı.",
         "kvkk": "KVKK Uyumlu",
         "ssl": "256-bit SSL"
+    },
+    "Home": {
+        "title": "OSGB Web Sitesi | 7000 TL Tek Fiyat | ProSektorWeb",
+        "description": "OSGB’nize özel web sitesi. 7 gün ücretsiz deneyin, sonra satın alın. Tek fiyat, premium tasarım.",
+        "contact_section_title": "Bize Yazın",
+        "contact_section_desc": "Soru, öneri ve talepleriniz için mesaj bırakın. En geç 1 iş günü içinde dönüş yaparız."
+    },
+    "Hero": {
+        "badge": "2026 Vizyonu İçin Hazır",
+        "title": "OSGB'nize Özel Profesyonel Web Siteniz 24 Saatte Yayına Hazır.",
+        "subtitle": "İSG sektörünü tanıyor, OSGB’lere özel web sitelerini önceden hazırlıyor ve doğru kurumlarla buluşturuyoruz.",
+        "cta_start": "Ücretsiz Önizleme Başlat (7 gün)",
+        "footer_text": "7 Gün Ücretsiz • Tek Fiyat"
+    },
+    "Features": {
+        "why_title": "Neden Biz?",
+        "why_subtitle": "Sektörün dinamiklerini biliyoruz, size hız ve kalite vadediyoruz.",
+        "item1_title": "Sektörü Tanıyoruz",
+        "item1_desc": "OSGB mevzuatını, yetki belgelerini ve jargonunu biliyoruz.",
+        "item2_title": "Önce Görürsünüz",
+        "item2_desc": "Sürpriz yok. Satın almadan önce sitenizi birebir incelersiniz.",
+        "item3_title": "Hızlı Sonuç",
+        "item3_desc": "Uzun toplantılarla vakit kaybetmezsiniz. Süreç net ve hızlıdır.",
+        "item4_title": "Sadece OSGB",
+        "item4_desc": "Tüm odağımız iş sağlığı ve güvenliği sektörü.",
+        "how_title": "Nasıl Çalışırız?",
+        "how_subtitle": "Karmaşık süreçler yok. Net ve hızlı bir yol izleriz.",
+        "step1_title": "Analiz",
+        "step1_desc": "OSGB’nizin faaliyet alanını, hizmet verdiği şehirleri ve İSG’ye özel ihtiyaçları analiz ederiz.",
+        "step2_title": "Tasarım",
+        "step2_desc": "OSGB’nize özel iki farklı web sitesi hazırlarız: biri sade ve hızlı, diğeri kurumsal ve detaylı.",
+        "step3_title": "Önizleme Kodu",
+        "step3_desc": "Hazırlanan web sitelerini inceleyebilmeniz için önizleme erişim kodu oluştururuz.",
+        "step4_title": "Yayına Alma",
+        "step4_desc": "Web sitenizi 7 gün ücretsiz incelersiniz. Karar verdiğinizde yayına alırız."
+    },
+    "Contact": {
+        "success_title": "Teşekkürler!",
+        "new_message": "Yeni Mesaj Gönder",
+        "name_label": "Ad Soyad",
+        "name_placeholder": "Adınız Soyadınız",
+        "phone_label": "Telefon",
+        "phone_placeholder": "05XX XXX XX XX",
+        "email_label": "E-posta",
+        "email_placeholder": "ornek@osgb.com",
+        "message_label": "Mesaj",
+        "message_placeholder": "Mesajınız...",
+        "kvkk_text": "KVKK onay formunu okudum, onaylıyorum.",
+        "kvkk_subtext": "Yasal gereklilik nedeniyle IP bilgisi kayıt altına alınır.",
+        "submit": "GÖNDER",
+        "submitting": "GÖNDERİLİYOR..."
     }
 }

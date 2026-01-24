@@ -25,5 +25,56 @@
         "error_invalid": "Invalid email or password.",
         "kvkk": "GDPR Compliant",
         "ssl": "256-bit SSL"
+    },
+    "Home": {
+        "title": "OSGB Website | 7000 TL Fixed Price | ProSektorWeb",
+        "description": "Custom website for your OSGB. Try for 7 days free, then buy. Fixed price, premium design.",
+        "contact_section_title": "Contact Us",
+        "contact_section_desc": "Leave a message for questions, suggestions and requests. We will get back to you within 1 business day at the latest."
+    },
+    "Hero": {
+        "badge": "Ready for 2026 Vision",
+        "title": "Your Custom Professional OSGB Website Ready in 24 Hours.",
+        "subtitle": "We know the OHS sector, prepare special websites for OSGBs in advance and bring them together with the right institutions.",
+        "cta_start": "Start Free Preview (7 days)",
+        "footer_text": "7 Days Free • Fixed Price"
+    },
+    "Features": {
+        "why_title": "Why Us?",
+        "why_subtitle": "We know the dynamics of the sector, we promise you speed and quality.",
+        "item1_title": "We Know the Sector",
+        "item1_desc": "We know the OSGB legislation, authorization certificates and jargon.",
+        "item2_title": "See Before You Buy",
+        "item2_desc": "No surprises. You can examine your site exactly before purchasing.",
+        "item3_title": "Fast Results",
+        "item3_desc": "You won't waste time with long meetings. The process is clear and fast.",
+        "item4_title": "Only OSGB",
+        "item4_desc": "Our entire focus is the occupational health and safety sector.",
+        "how_title": "How We Work",
+        "how_subtitle": "No complicated processes. We follow a clear and fast path.",
+        "step1_title": "Analysis",
+        "step1_desc": "We analyze your OSGB's field of activity, the cities it serves and special OHS needs.",
+        "step2_title": "Design",
+        "step2_desc": "We prepare two different websites for your OSGB: one simple and fast, the other corporate and detailed.",
+        "step3_title": "Preview Code",
+        "step3_desc": "We create a preview access code so you can examine the prepared websites.",
+        "step4_title": "Going Live",
+        "step4_desc": "You examine your website for 7 days free of charge. We go live when you decide."
+    },
+    "Contact": {
+        "success_title": "Thank You!",
+        "new_message": "Send New Message",
+        "name_label": "Full Name",
+        "name_placeholder": "Your Full Name",
+        "phone_label": "Phone",
+        "phone_placeholder": "05XX XXX XX XX",
+        "email_label": "Email",
+        "email_placeholder": "example@osgb.com",
+        "message_label": "Message",
+        "message_placeholder": "Your message...",
+        "kvkk_text": "I have read and agree to the KVKK consent form.",
+        "kvkk_subtext": "Due to legal requirements, IP information is recorded.",
+        "submit": "SEND",
+        "submitting": "SENDING..."
     }
 }

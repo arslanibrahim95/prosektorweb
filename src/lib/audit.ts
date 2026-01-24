@@ -28,8 +28,23 @@ export async function createAuditLog(data: {
     userAgent?: string
 }) {
     try {
-        // Serialize details to ensure it's valid JSON
-        const safeDetails = data.details ? JSON.parse(JSON.stringify(data.details)) : {}
+        // Serialize details to ensure it's valid JSON (Handle circular references)
+        const getCircularReplacer = () => {
+            const seen = new WeakSet();
+            return (key: string, value: unknown) => {
+                if (typeof value === "object" && value !== null) {
+                    if (seen.has(value)) {
+                        return "[Circular]";
+                    }
+                    seen.add(value);
+                }
+                return value;
+            };
+        };
+
+        const safeDetails = data.details
+            ? JSON.parse(JSON.stringify(data.details, getCircularReplacer()))
+            : {}
 
         await prisma.auditLog.create({
             data: {

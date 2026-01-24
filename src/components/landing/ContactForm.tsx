@@ -3,6 +3,7 @@
 import { useActionState, useRef, useEffect, useState } from 'react'
 import { submitContact, ContactState } from '@/actions/contact'
 import { Loader2, CheckCircle, AlertCircle, RefreshCw } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 const initialState: ContactState = {
     success: false,
@@ -10,6 +11,7 @@ const initialState: ContactState = {
 }
 
 export function ContactForm() {
+    const t = useTranslations('Contact')
     const [state, formAction, isPending] = useActionState(submitContact, initialState)
     const formRef = useRef<HTMLFormElement>(null)
 
@@ -34,36 +36,22 @@ export function ContactForm() {
                     <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
                         <CheckCircle className="w-8 h-8" />
                     </div>
-                    <h3 className="text-xl font-bold text-neutral-900 mb-2">Teşekkürler!</h3>
+                    <h3 className="text-xl font-bold text-neutral-900 mb-2">{t('success_title')}</h3>
                     <p className="text-neutral-600 mb-6">{state.message}</p>
                     <button
                         onClick={() => {
-                            // Ideally we should reset the server action state, but standard way is to unmount/mount or just let user navigate
-                            // Since useActionState doesn't provide a reset, we can just hide the success message by resetting parent state if we lifted it,
-                            // or simple reload if that was the only easy way.
-                            // Better UX: "Yeni Mesaj Gönder" just resets the UI if we wrap it in a fresh component key or have a reset handler.
-                            // For now, let's allow "Yeni Mesaj" to just be a button that refreshes or better, redirect to contact.
-                            window.location.href = '/#iletisim'
-                            // Or better, we can reload ONLY if we really must, but let's try to find a soft way.
-                            // Actually, with useActionState, the state is sticky. 
-                            // Accepted "quick fix" for now is removing the forced reload on successful submission logic if it was automatic.
-                            // But here it invites user to "Yeni Mesaj Gönder".
-                            // Let's use a soft reload for now as per "Minimal Refactor" to avoid full page reload if possible,
-                            // but window.location.reload() IS a full page reload.
-                            // Fix: Use router.refresh() or just let them stay.
                             window.location.reload()
                         }}
                         className="text-sm text-brand-600 font-semibold hover:text-brand-700 flex items-center justify-center gap-2 mx-auto"
                     >
-                        <RefreshCw className="w-4 h-4" /> Yeni Mesaj Gönder
+                        <RefreshCw className="w-4 h-4" /> {t('new_message')}
                     </button>
                 </div>
             ) : (
                 <form ref={formRef} action={formAction} className="space-y-4">
                     <input type="hidden" name="idempotencyKey" value={idempotencyKey} />
-                    {/* Input fields remain same */}
                     <div>
-                        <label htmlFor="name" className="block text-sm font-semibold text-neutral-700 mb-1">Ad Soyad</label>
+                        <label htmlFor="name" className="block text-sm font-semibold text-neutral-700 mb-1">{t('name_label')}</label>
                         <input
                             id="name"
                             name="name"
@@ -72,7 +60,7 @@ export function ContactForm() {
                             aria-invalid={!!state.errors?.name}
                             aria-describedby={state.errors?.name ? "name-error" : undefined}
                             className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-lg focus:border-brand-500 focus:ring-2 focus:ring-brand-200 outline-none transition-all"
-                            placeholder="Adınız Soyadınız"
+                            placeholder={t('name_placeholder')}
                         />
                         <div className="min-h-[20px] mt-1">
                             {state.errors?.name && (
@@ -83,21 +71,18 @@ export function ContactForm() {
                         </div>
                     </div>
 
-                    {/* Phone, Email, Message, KVKK inputs remain same... I will use existing content just adding ref */}
-                    {/* Since I am replacing the whole block, I need to include all inputs */}
-
                     <div>
-                        <label className="block text-sm font-semibold text-neutral-700 mb-1">Telefon</label>
+                        <label className="block text-sm font-semibold text-neutral-700 mb-1">{t('phone_label')}</label>
                         <input
                             name="phone"
                             type="tel"
                             className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-lg focus:border-brand-500 focus:ring-2 focus:ring-brand-200 outline-none transition-all"
-                            placeholder="05XX XXX XX XX"
+                            placeholder={t('phone_placeholder')}
                         />
                     </div>
 
                     <div>
-                        <label htmlFor="email" className="block text-sm font-semibold text-neutral-700 mb-1">E-posta</label>
+                        <label htmlFor="email" className="block text-sm font-semibold text-neutral-700 mb-1">{t('email_label')}</label>
                         <input
                             id="email"
                             name="email"
@@ -106,7 +91,7 @@ export function ContactForm() {
                             aria-invalid={!!state.errors?.email}
                             aria-describedby={state.errors?.email ? "email-error" : undefined}
                             className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-lg focus:border-brand-500 focus:ring-2 focus:ring-brand-200 outline-none transition-all"
-                            placeholder="ornek@osgb.com"
+                            placeholder={t('email_placeholder')}
                         />
                         <div className="min-h-[20px] mt-1">
                             {state.errors?.email && (
@@ -118,13 +103,13 @@ export function ContactForm() {
                     </div>
 
                     <div>
-                        <label className="block text-sm font-semibold text-neutral-700 mb-1">Mesaj</label>
+                        <label className="block text-sm font-semibold text-neutral-700 mb-1">{t('message_label')}</label>
                         <textarea
                             name="message"
                             rows={4}
                             required
                             className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-lg focus:border-brand-500 focus:ring-2 focus:ring-brand-200 outline-none transition-all resize-none"
-                            placeholder="Mesajınız..."
+                            placeholder={t('message_placeholder')}
                         ></textarea>
                         {state.errors?.message && (
                             <p className="text-sm text-red-600 mt-1 flex items-center gap-1">
@@ -143,8 +128,8 @@ export function ContactForm() {
                                 className="mt-1 w-4 h-4 text-brand-600 rounded border-neutral-300 focus:ring-brand-500"
                             />
                             <label htmlFor="kvkk" className="text-sm text-neutral-500 cursor-pointer select-none">
-                                KVKK onay formunu okudum, onaylıyorum.
-                                <span className="block text-xs text-neutral-400 mt-0.5">Yasal gereklilik nedeniyle IP bilgisi kayıt altına alınır.</span>
+                                {t('kvkk_text')}
+                                <span className="block text-xs text-neutral-400 mt-0.5">{t('kvkk_subtext')}</span>
                             </label>
                         </div>
                         <div className="min-h-[20px]">
@@ -171,10 +156,10 @@ export function ContactForm() {
                         {isPending ? (
                             <>
                                 <Loader2 className="w-5 h-5 animate-spin" />
-                                GÖNDERİLİYOR...
+                                {t('submitting')}
                             </>
                         ) : (
-                            'GÖNDER'
+                            t('submit')
                         )}
                     </button>
                 </form>

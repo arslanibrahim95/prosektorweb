@@ -96,93 +96,89 @@ async function generateInvoiceNoInTx(tx: Parameters<Parameters<typeof prisma.$tr
 // CREATE
 // ==========================================
 
+import { createSafeAction } from '@/lib/safe-action'
+
+// ... existing imports ...
+
+// ==========================================
+// CREATE
+// ==========================================
+
 const MAX_INVOICE_RETRIES = 3
 
-export async function createInvoice(formData: FormData): Promise<InvoiceActionResult> {
-    try {
-        await requireAuth()
+const createInvoiceHandler = async (formData: FormData) => {
+    await requireAuth()
 
-        const rawData = {
-            companyId: formData.get('companyId') as string,
-            invoiceNo: formData.get('invoiceNo') as string,
-            issueDate: formData.get('issueDate') as string,
-            dueDate: formData.get('dueDate') as string,
-            subtotal: formData.get('subtotal') as string,
-            taxRate: formData.get('taxRate') as string || '20',
-            description: formData.get('description') as string || undefined,
-            notes: formData.get('notes') as string || undefined,
-        }
-
-        const validatedData = InvoiceSchema.parse(rawData)
-
-        const subtotal = validatedData.subtotal
-        const taxRate = validatedData.taxRate
-        const taxAmount = subtotal * (taxRate / 100)
-        const total = subtotal + taxAmount
-
-        // Use transaction with retry for race condition handling
-        let lastError: unknown
-        for (let attempt = 0; attempt < MAX_INVOICE_RETRIES; attempt++) {
-            try {
-                const invoice = await prisma.$transaction(async (tx) => {
-                    // If user provided invoice number, use it; otherwise generate inside tx
-                    let invoiceNo = validatedData.invoiceNo
-                    if (!invoiceNo || invoiceNo === 'AUTO') {
-                        invoiceNo = await generateInvoiceNoInTx(tx)
-                    }
-
-                    return tx.invoice.create({
-                        data: {
-                            invoiceNo,
-                            companyId: validatedData.companyId,
-                            issueDate: new Date(validatedData.issueDate),
-                            dueDate: new Date(validatedData.dueDate),
-                            subtotal: subtotal,
-                            taxRate: taxRate,
-                            taxAmount: taxAmount,
-                            total: total,
-                            description: validatedData.description || null,
-                            notes: validatedData.notes || null,
-                        },
-                    })
-                })
-
-                await logAudit({
-                    action: 'CREATE',
-                    entity: 'Invoice',
-                    entityId: invoice.id,
-                    details: { invoiceNo: invoice.invoiceNo, total },
-                })
-
-                revalidatePath('/admin/invoices')
-                return { success: true, data: invoice }
-            } catch (error) {
-                lastError = error
-                // If unique constraint error, retry with new number
-                if (isPrismaUniqueConstraintError(error)) {
-                    continue
-                }
-                throw error
-            }
-        }
-
-        // All retries exhausted
-        console.error('createInvoice: max retries exceeded', lastError)
-        return { success: false, error: 'Fatura numarası oluşturulamadı, lütfen tekrar deneyin.' }
-    } catch (error: unknown) {
-        console.error('createInvoice error:', error)
-
-        if (error instanceof z.ZodError) {
-            return { success: false, error: getZodErrorMessage(error) }
-        }
-
-        if (isPrismaUniqueConstraintError(error)) {
-            return { success: false, error: 'Bu fatura numarası zaten kullanılıyor.' }
-        }
-
-        return { success: false, error: getErrorMessage(error) }
+    const rawData = {
+        companyId: formData.get('companyId') as string,
+        invoiceNo: formData.get('invoiceNo') as string,
+        issueDate: formData.get('issueDate') as string,
+        dueDate: formData.get('dueDate') as string,
+        subtotal: formData.get('subtotal') as string,
+        taxRate: formData.get('taxRate') as string || '20',
+        description: formData.get('description') as string || undefined,
+        notes: formData.get('notes') as string || undefined,
     }
+
+    const validatedData = InvoiceSchema.parse(rawData)
+
+    const subtotal = validatedData.subtotal
+    const taxRate = validatedData.taxRate
+    const taxAmount = subtotal * (taxRate / 100)
+    const total = subtotal + taxAmount
+
+    // Use transaction with retry for race condition handling
+    let lastError: unknown
+    for (let attempt = 0; attempt < MAX_INVOICE_RETRIES; attempt++) {
+        try {
+            const invoice = await prisma.$transaction(async (tx) => {
+                // If user provided invoice number, use it; otherwise generate inside tx
+                let invoiceNo = validatedData.invoiceNo
+                if (!invoiceNo || invoiceNo === 'AUTO') {
+                    invoiceNo = await generateInvoiceNoInTx(tx)
+                }
+
+                return tx.invoice.create({
+                    data: {
+                        invoiceNo,
+                        companyId: validatedData.companyId,
+                        issueDate: new Date(validatedData.issueDate),
+                        dueDate: new Date(validatedData.dueDate),
+                        subtotal: subtotal,
+                        taxRate: taxRate,
+                        taxAmount: taxAmount,
+                        total: total,
+                        description: validatedData.description || null,
+                        notes: validatedData.notes || null,
+                    },
+                })
+            })
+
+            await logAudit({
+                action: 'CREATE',
+                entity: 'Invoice',
+                entityId: invoice.id,
+                details: { invoiceNo: invoice.invoiceNo, total },
+            })
+
+            revalidatePath('/admin/invoices')
+            return invoice
+        } catch (error) {
+            lastError = error
+            // If unique constraint error, retry with new number
+            if (isPrismaUniqueConstraintError(error)) {
+                continue
+            }
+            throw error
+        }
+    }
+
+    // All retries exhausted
+    console.error('createInvoice: max retries exceeded', lastError)
+    throw new Error('Fatura numarası oluşturulamadı, lütfen tekrar deneyin.')
 }
+
+export const createInvoice = createSafeAction('createInvoice', createInvoiceHandler)
 
 // ==========================================
 // READ (List)

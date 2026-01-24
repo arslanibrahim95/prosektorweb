@@ -13,12 +13,20 @@ import { Features } from '@/components/landing/Features'
 import { Pricing } from '@/components/landing/Pricing'
 import { FAQ } from '@/components/landing/FAQ'
 
-export const metadata: Metadata = {
-  title: 'OSGB Web Sitesi | 7000 TL Tek Fiyat | ProSektorWeb',
-  description: 'OSGB’nize özel web sitesi. 7 gün ücretsiz deneyin, sonra satın alın. Tek fiyat, premium tasarım.',
+import { useTranslations } from 'next-intl'
+import { getTranslations } from 'next-intl/server'
+
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params
+  const t = await getTranslations({ locale, namespace: 'Home' })
+  return {
+    title: t('title'),
+    description: t('description'),
+  }
 }
 
 export default function HomePage() {
+  const t = useTranslations('Home')
   return (
     <LandingProvider>
       <div className="min-h-screen bg-transparent text-neutral-900 font-sans selection:bg-brand-100 selection:text-brand-900 relative overflow-hidden">
@@ -64,8 +72,8 @@ export default function HomePage() {
         <section id="iletisim" className="py-24 relative z-0">
           <Container>
             <div className="max-w-xl mx-auto text-center mb-10">
-              <h2 className="text-3xl font-bold mb-4 text-neutral-900">Bize Yazın</h2>
-              <p className="text-neutral-500">Soru, öneri ve talepleriniz için mesaj bırakın.<br />En geç 1 iş günü içinde dönüş yaparız.</p>
+              <h2 className="text-3xl font-bold mb-4 text-neutral-900">{t('contact_section_title')}</h2>
+              <p className="text-neutral-500">{t('contact_section_desc')}</p>
             </div>
             <ContactForm />
           </Container>

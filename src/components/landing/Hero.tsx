@@ -3,8 +3,10 @@ import BlurText from '@/components/ui/BlurText'
 import { OpenModalButton } from './OpenModalButton'
 import { ModalStep } from './ModalSystem'
 import { Container } from '@/components/ui/Container'
+import { useTranslations } from 'next-intl'
 
 export function Hero() {
+    const t = useTranslations('Hero')
     return (
         <section className="pt-32 pb-24 relative flex flex-col items-center text-center">
             <Container size="narrow">
@@ -14,15 +16,15 @@ export function Hero() {
                             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-400 opacity-75"></span>
                             <span className="relative inline-flex rounded-full h-2 w-2 bg-brand-500"></span>
                         </span>
-                        2026 Vizyonu İçin Hazır
+                        {t('badge')}
                     </div>
 
                     <h1 className="text-5xl md:text-7xl font-bold font-serif leading-tight mb-8 text-neutral-900 tracking-tight drop-shadow-sm text-center justify-center animate-in fade-in zoom-in-95 duration-500">
-                        OSGB'nize Özel Profesyonel Web Siteniz 24 Saatte Yayına Hazır.
+                        {t('title')}
                     </h1>
 
                     <p className="text-xl md:text-2xl text-neutral-600 max-w-2xl mx-auto mb-12 leading-relaxed font-light">
-                        İSG sektörünü tanıyor, OSGB’lere özel web sitelerini önceden hazırlıyor ve doğru kurumlarla buluşturuyoruz.
+                        {t('subtitle')}
                     </p>
                     <div className="flex flex-col items-center gap-4">
                         <OpenModalButton
@@ -30,11 +32,11 @@ export function Hero() {
                             className="group relative px-10 py-5 bg-brand-600 text-white rounded-full text-lg font-bold shadow-lg shadow-brand-600/30 hover:shadow-brand-600/50 hover:-translate-y-1 transition-all duration-300 overflow-hidden"
                         >
                             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
-                            Ücretsiz Önizleme Başlat (7 gün)
+                            {t('cta_start')}
                         </OpenModalButton>
                         <div className="flex items-center gap-2 text-sm font-medium text-neutral-500">
                             <Clock className="w-4 h-4" />
-                            <span>7 Gün Ücretsiz • Tek Fiyat</span>
+                            <span>{t('footer_text')}</span>
                         </div>
                     </div>
                 </div>

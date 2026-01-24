@@ -4,6 +4,8 @@ import createMiddleware from 'next-intl/middleware';
 import { routing } from '@/i18n/routing';
 import { NextRequest, NextResponse } from "next/server";
 
+import { logger } from "@/lib/logger"
+
 const { auth } = NextAuth(authConfig)
 const intlMiddleware = createMiddleware(routing);
 
@@ -12,7 +14,7 @@ export default auth((req) => {
     const requestId = crypto.randomUUID()
     const requestStart = Date.now()
 
-    // Structured log context (will be used or logged)
+    // Structured log context
     const logContext = {
         requestId,
         method: req.method,
@@ -21,12 +23,7 @@ export default auth((req) => {
         userAgent: req.headers.get('user-agent'),
     }
 
-    console.log(JSON.stringify({
-        ...logContext,
-        level: 'info',
-        msg: 'Request started',
-        time: new Date().toISOString()
-    }))
+    logger.info({ ...logContext }, 'Request started')
 
     const isLoggedIn = !!req.auth
     const userRole = req.auth?.user?.role
@@ -34,13 +31,7 @@ export default auth((req) => {
     // Helper for logging exit
     const logExit = () => {
         const duration = Date.now() - requestStart
-        console.log(JSON.stringify({
-            ...logContext,
-            level: 'info',
-            msg: 'Request processed',
-            duration,
-            time: new Date().toISOString()
-        }))
+        logger.info({ ...logContext, duration }, 'Request processed')
     }
 
     // 1. API Protection (Skip Intl)
@@ -128,7 +119,9 @@ export default auth((req) => {
 
     logExit()
     // Return the response created by intl middleware (which contains rewrites/headers)
-    return intlResponse;
+    const response = intlResponse;
+    response.headers.set('X-Request-Id', requestId);
+    return response;
 })
 
 export const config = {
