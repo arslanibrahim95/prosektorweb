@@ -4,7 +4,7 @@ import { prisma } from '@/lib/prisma'
 import { requireAuth } from '@/lib/auth-guard'
 import { auth } from '@/auth'
 import { logAudit } from '@/lib/audit'
-import { getErrorMessage, getZodErrorMessage, isPrismaUniqueConstraintError, validatePagination } from '@/lib/action-types'
+import { ActionResponse, getErrorMessage, getZodErrorMessage, isPrismaUniqueConstraintError, validatePagination } from '@/lib/action-types'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 import {
@@ -20,11 +20,8 @@ import { InvoiceStatus } from '@prisma/client'
 // TYPES
 // ==========================================
 
-export interface InvoiceActionResult {
-    success: boolean
-    data?: any
-    error?: string
-}
+export type InvoiceActionResult = ActionResponse<any>
+
 
 // ==========================================
 // VALIDATION SCHEMAS

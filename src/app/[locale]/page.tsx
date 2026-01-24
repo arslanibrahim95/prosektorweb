@@ -25,8 +25,8 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   }
 }
 
-export default function HomePage() {
-  const t = useTranslations('Home')
+export default async function HomePage() {
+  const t = await getTranslations('Home')
   return (
     <LandingProvider>
       <div className="min-h-screen bg-transparent text-neutral-900 font-sans selection:bg-brand-100 selection:text-brand-900 relative overflow-hidden">

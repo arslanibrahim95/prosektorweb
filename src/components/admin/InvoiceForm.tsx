@@ -17,6 +17,7 @@ interface InvoiceFormProps {
 
 const initialState: InvoiceActionResult = {
     success: false,
+    error: '',
 }
 
 export function InvoiceForm({ companies, initialInvoiceNo }: InvoiceFormProps) {
@@ -50,7 +51,7 @@ export function InvoiceForm({ companies, initialInvoiceNo }: InvoiceFormProps) {
     return (
         <form action={action} className="space-y-6">
             {/* Error Message */}
-            {state.error && (
+            {!state.success && state.error && (
                 <div className="p-4 bg-red-50 border border-red-200 rounded-xl flex items-center gap-3 text-red-700">
                     <AlertCircle className="w-5 h-5" />
                     <span>{state.error}</span>

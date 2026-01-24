@@ -45,7 +45,7 @@ const cache = new Map()
 export async function checkRateLimit(
     identifier: string,
     options: RateLimitOptions = {}
-): Promise<{ success: boolean; reset?: Date }> {
+): Promise<{ success: boolean; reset?: Date; limit?: number; remaining?: number }> {
     const {
         limit = 10,
         windowSeconds = 60,
@@ -73,10 +73,12 @@ export async function checkRateLimit(
         })
 
         // Execute rate limit check
-        const { success, reset } = await ratelimit.limit(identifier)
+        const { success, limit: limitUsed, remaining, reset } = await ratelimit.limit(identifier)
 
         return {
             success,
+            limit: limitUsed,
+            remaining,
             reset: new Date(reset)
         }
 

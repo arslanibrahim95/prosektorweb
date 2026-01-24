@@ -55,6 +55,7 @@ export function PaymentButton({ invoiceNo, amount }: PaymentButtonProps) {
                     <button
                         onClick={() => setIsOpen(false)}
                         className="absolute right-4 top-4 text-neutral-400 hover:text-neutral-600"
+                        aria-label="Kapat"
                     >
                         ✕
                     </button>
@@ -95,6 +96,7 @@ export function PaymentButton({ invoiceNo, amount }: PaymentButtonProps) {
                                     onClick={copyToClipboard}
                                     className="p-2 hover:bg-white rounded-lg transition-colors text-neutral-500 hover:text-brand-600"
                                     title="Kopyala"
+                                    aria-label="IBAN Kopyala"
                                 >
                                     {copied ? <Check className="w-4 h-4 text-green-600" /> : <Copy className="w-4 h-4" />}
                                 </button>

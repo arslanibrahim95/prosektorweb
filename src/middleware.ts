@@ -49,13 +49,13 @@ export default auth((req) => {
         // Require auth for all other API routes
         if (!isLoggedIn) {
             logExit()
-            return Response.json({ error: 'Unauthorized' }, { status: 401 })
+            return Response.json({ success: false, error: 'Unauthorized', code: 'UNAUTHORIZED' }, { status: 401 })
         }
 
         // Admin-only API routes
         if (req.nextUrl.pathname.startsWith('/api/admin') && userRole !== 'ADMIN') {
             logExit()
-            return Response.json({ error: 'Forbidden' }, { status: 403 })
+            return Response.json({ success: false, error: 'Forbidden', code: 'FORBIDDEN' }, { status: 403 })
         }
 
         logExit()

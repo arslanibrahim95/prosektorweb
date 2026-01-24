@@ -35,11 +35,16 @@ export const metadata: Metadata = {
   },
 };
 
+import { validateEnv } from "@/lib/config/env-validator";
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Fail-fast boot-time validation
+  validateEnv();
+
   return (
     <html lang="tr">
       <body className="font-sans antialiased">

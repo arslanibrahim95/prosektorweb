@@ -65,27 +65,26 @@ export function DomainSearchAndPurchase({ companies }: DomainSearchProps) {
 
         const formData = new FormData(e.currentTarget)
 
-        const result = await purchaseDomain(
-            selectedDomain.domain,
-            {
+        const result = await purchaseDomain({
+            domain: selectedDomain.domain,
+            contactInfo: {
                 firstName: formData.get('firstName') as string,
                 lastName: formData.get('lastName') as string,
-                organization: formData.get('organization') as string || undefined,
+                email: formData.get('email') as string,
+                phone: formData.get('phone') as string,
                 address: formData.get('address') as string,
                 city: formData.get('city') as string,
                 postalCode: formData.get('postalCode') as string,
-                country: formData.get('country') as string || 'TR',
-                phone: formData.get('phone') as string,
-                email: formData.get('email') as string,
+                country: formData.get('country') as string,
             },
-            formData.get('companyId') as string || undefined
-        )
+            companyId: formData.get('companyId') as string || undefined
+        })
 
         if (result.success) {
             setPurchaseResult({ success: true, message: `${selectedDomain.domain} başarıyla satın alındı!` })
             setSelectedDomain(null)
             // Refresh search - create synthetic form event
-            const syntheticEvent = { preventDefault: () => {} } as React.FormEvent
+            const syntheticEvent = { preventDefault: () => { } } as React.FormEvent
             handleSearch(syntheticEvent)
         } else {
             setPurchaseResult({ success: false, message: result.error || 'Satın alma başarısız' })
@@ -150,8 +149,8 @@ export function DomainSearchAndPurchase({ companies }: DomainSearchProps) {
             {/* Purchase Result */}
             {purchaseResult && (
                 <div className={`rounded-xl p-4 flex items-center gap-3 ${purchaseResult.success
-                        ? 'bg-green-50 border border-green-200 text-green-700'
-                        : 'bg-red-50 border border-red-200 text-red-700'
+                    ? 'bg-green-50 border border-green-200 text-green-700'
+                    : 'bg-red-50 border border-red-200 text-red-700'
                     }`}>
                     {purchaseResult.success ? (
                         <CheckCircle2 className="w-5 h-5" />
@@ -172,8 +171,8 @@ export function DomainSearchAndPurchase({ companies }: DomainSearchProps) {
                             <div
                                 key={result.domain}
                                 className={`bg-white rounded-xl border-2 p-6 transition-all ${result.available
-                                        ? 'border-green-200 hover:border-green-300 hover:shadow-lg'
-                                        : 'border-neutral-200 opacity-75'
+                                    ? 'border-green-200 hover:border-green-300 hover:shadow-lg'
+                                    : 'border-neutral-200 opacity-75'
                                     }`}
                             >
                                 <div className="flex items-center justify-between">
@@ -196,8 +195,8 @@ export function DomainSearchAndPurchase({ companies }: DomainSearchProps) {
                                             </div>
                                             <div className="text-sm text-neutral-500 flex items-center gap-2">
                                                 <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${result.available
-                                                        ? 'bg-green-100 text-green-700'
-                                                        : 'bg-neutral-100 text-neutral-500'
+                                                    ? 'bg-green-100 text-green-700'
+                                                    : 'bg-neutral-100 text-neutral-500'
                                                     }`}>
                                                     {result.available ? 'Müsait' : 'Alınmış'}
                                                 </span>
