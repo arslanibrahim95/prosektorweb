@@ -22,7 +22,7 @@ export function Hero() {
                         delay={50}
                         animateBy="words"
                         direction="top"
-                        className="text-5xl md:text-7xl font-bold font-serif leading-[1.1] mb-8 text-neutral-900 tracking-tight drop-shadow-sm text-center justify-center"
+                        className="text-5xl md:text-7xl font-bold font-serif leading-tight mb-8 text-neutral-900 tracking-tight drop-shadow-sm text-center justify-center"
                     />
 
                     <p className="text-xl md:text-2xl text-neutral-600 max-w-2xl mx-auto mb-12 leading-relaxed font-light">

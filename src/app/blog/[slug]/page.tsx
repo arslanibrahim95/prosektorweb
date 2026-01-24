@@ -128,7 +128,7 @@ export default async function BlogDetailPage({ params }: Props) {
                         </time>
                     </div>
 
-                    <h1 className="text-4xl md:text-5xl lg:text-6xl font-black font-serif leading-[1.1] mb-8 text-neutral-900 tracking-tight">
+                    <h1 className="text-4xl md:text-5xl lg:text-6xl font-black font-serif leading-tight mb-8 text-neutral-900 tracking-tight">
                         {post.title}
                     </h1>
 

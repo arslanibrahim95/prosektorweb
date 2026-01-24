@@ -170,7 +170,7 @@ export function ModalSystem({ isOpen, onClose, initialState = ModalStep.INITIAL_
                     <X className="w-6 h-6" />
                 </button>
 
-                <div className="p-8 md:p-10">
+                <div className="p-8 md:p-10 pb-20 md:pb-10">
                     {/* Content Logic Remains Same but ensure headings have IDs for aria-labelledby if needed */}
                     {/* ... Step Logic ... */}
 
