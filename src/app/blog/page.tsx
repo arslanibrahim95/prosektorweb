@@ -1,11 +1,12 @@
 import Link from 'next/link'
-import { ChevronLeft, Search, Calendar, Clock, ChevronRight, User } from 'lucide-react'
+import { ChevronLeft, Search, Calendar, Clock, ChevronRight, User, Image as ImageIcon } from 'lucide-react'
 import { Navbar } from '@/components/layout/Navbar'
 import { Footer } from '@/components/layout/Footer'
 import { prisma } from '@/lib/prisma'
 import { Prisma } from '@prisma/client'
 import Particles from '@/components/ui/Particles'
 import SpotlightCard from '@/components/ui/SpotlightCard'
+import { Pagination } from '@/components/blog/Pagination'
 
 // Helper to format date
 const formatDate = (date: Date) => {
@@ -138,12 +139,19 @@ export default async function BlogPage({
                                     <SpotlightCard className="h-full border-neutral-200 p-0 overflow-hidden hover:shadow-xl transition-all duration-500" spotlightColor="rgba(220, 38, 38, 0.15)">
                                         {/* Image */}
                                         <div className="aspect-[16/10] relative overflow-hidden bg-neutral-100">
-                                            {post.coverImage && (
+                                            {post.coverImage ? (
                                                 <img
                                                     src={post.coverImage}
                                                     alt={post.title}
                                                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                                                 />
+                                            ) : (
+                                                <div className="w-full h-full bg-gradient-to-br from-neutral-100 to-neutral-200 flex items-center justify-center group-hover:scale-105 transition-transform duration-700">
+                                                    <div className="text-neutral-300 flex flex-col items-center gap-2">
+                                                        <ImageIcon className="w-12 h-12" />
+                                                        <span className="text-xs font-bold uppercase tracking-widest opacity-50">ProSektorWeb</span>
+                                                    </div>
+                                                </div>
                                             )}
                                             <div className="absolute top-4 left-4">
                                                 <span className="px-3 py-1 bg-white/95 backdrop-blur-md text-brand-700 text-xs font-bold rounded-full shadow-sm ring-1 ring-black/5">
@@ -211,33 +219,9 @@ export default async function BlogPage({
                     </div>
 
                     {/* Pagination */}
-                    {totalPages > 1 && (
-                        <div className="flex items-center justify-center gap-3 mt-16">
-                            <Link
-                                href={page > 1 ? `/blog?page=${page - 1}` : '#'}
-                                className={`w-10 h-10 flex items-center justify-center border border-neutral-200 rounded-lg transition ${page > 1 ? 'hover:bg-neutral-50 text-neutral-600' : 'opacity-30 cursor-not-allowed text-neutral-400'}`}
-                            >
-                                <ChevronLeft className="w-5 h-5" />
-                            </Link>
-
-                            {Array.from({ length: totalPages }).map((_, i) => (
-                                <Link
-                                    key={i}
-                                    href={`/blog?page=${i + 1}`}
-                                    className={`w-10 h-10 flex items-center justify-center rounded-lg font-bold shadow-md transition ${page === i + 1 ? 'bg-brand-600 text-white' : 'bg-white border border-neutral-200 text-neutral-600 hover:bg-neutral-50'}`}
-                                >
-                                    {i + 1}
-                                </Link>
-                            ))}
-
-                            <Link
-                                href={page < totalPages ? `/blog?page=${page + 1}` : '#'}
-                                className={`w-10 h-10 flex items-center justify-center border border-neutral-200 rounded-lg transition ${page < totalPages ? 'hover:bg-neutral-50 text-neutral-600' : 'opacity-30 cursor-not-allowed text-neutral-400'}`}
-                            >
-                                <ChevronRight className="w-5 h-5" />
-                            </Link>
-                        </div>
-                    )}
+                    <div className="mt-12">
+                        <Pagination currentPage={page} totalPages={totalPages} baseUrl="/blog" />
+                    </div>
                     <div className="text-center text-sm text-gray-400 mt-4 font-medium">
                         Toplam {totalPosts} makale • Sayfa {page}/{totalPages || 1}
                     </div>
