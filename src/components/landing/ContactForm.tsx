@@ -66,11 +66,13 @@ export function ContactForm() {
                             className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-lg focus:border-brand-500 focus:ring-2 focus:ring-brand-200 outline-none transition-all"
                             placeholder="Adınız Soyadınız"
                         />
-                        {state.errors?.name && (
-                            <p id="name-error" role="alert" className="text-sm text-red-600 mt-1 flex items-center gap-1">
-                                <AlertCircle className="w-3 h-3" /> {state.errors.name[0]}
-                            </p>
-                        )}
+                        <div className="min-h-[20px] mt-1">
+                            {state.errors?.name && (
+                                <p id="name-error" role="alert" className="text-sm text-red-600 flex items-center gap-1 animate-in fade-in slide-in-from-top-1 duration-200">
+                                    <AlertCircle className="w-3 h-3" /> {state.errors.name[0]}
+                                </p>
+                            )}
+                        </div>
                     </div>
 
                     {/* Phone, Email, Message, KVKK inputs remain same... I will use existing content just adding ref */}
@@ -98,11 +100,13 @@ export function ContactForm() {
                             className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-lg focus:border-brand-500 focus:ring-2 focus:ring-brand-200 outline-none transition-all"
                             placeholder="ornek@osgb.com"
                         />
-                        {state.errors?.email && (
-                            <p id="email-error" role="alert" className="text-sm text-red-600 mt-1 flex items-center gap-1">
-                                <AlertCircle className="w-3 h-3" /> {state.errors.email[0]}
-                            </p>
-                        )}
+                        <div className="min-h-[20px] mt-1">
+                            {state.errors?.email && (
+                                <p id="email-error" role="alert" className="text-sm text-red-600 flex items-center gap-1 animate-in fade-in slide-in-from-top-1 duration-200">
+                                    <AlertCircle className="w-3 h-3" /> {state.errors.email[0]}
+                                </p>
+                            )}
+                        </div>
                     </div>
 
                     <div>
@@ -135,11 +139,13 @@ export function ContactForm() {
                                 <span className="block text-xs text-neutral-400 mt-0.5">IP adresiniz yasal zorunluluk gereği kayıt altına alınmaktadır.</span>
                             </label>
                         </div>
-                        {state.errors?.kvkk && (
-                            <p className="text-sm text-red-600 flex items-center gap-1 pl-7">
-                                <AlertCircle className="w-3 h-3" /> {state.errors.kvkk[0]}
-                            </p>
-                        )}
+                        <div className="min-h-[20px]">
+                            {state.errors?.kvkk && (
+                                <p className="text-sm text-red-600 flex items-center gap-1 pl-7 animate-in fade-in slide-in-from-top-1 duration-200">
+                                    <AlertCircle className="w-3 h-3" /> {state.errors.kvkk[0]}
+                                </p>
+                            )}
+                        </div>
                     </div>
 
                     {state.message && !state.success && (

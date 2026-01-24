@@ -1,11 +1,12 @@
 import { Check } from 'lucide-react'
 import { OpenModalButton } from './OpenModalButton'
 import { ModalStep } from './ModalSystem'
+import { Container } from '@/components/ui/Container'
 
 export function Pricing() {
     return (
-        <section id="fiyatlandirma" className="py-32 px-6 relative">
-            <div className="max-w-7xl mx-auto">
+        <section id="fiyatlandirma" className="py-32 relative">
+            <Container>
                 <div className="text-center mb-20">
                     <h2 className="text-4xl font-bold font-serif mb-4 text-neutral-900">Tek Fiyat, Üstün Kalite</h2>
                     <p className="text-lg text-neutral-500">Karmaşık paketler yok. İhtiyacınıza uygun olanı seçin.</p>
@@ -81,7 +82,7 @@ export function Pricing() {
                         Ücretsiz Önizleme Al (7 gün)
                     </OpenModalButton>
                 </div>
-            </div>
+            </Container>
         </section>
     )
 }

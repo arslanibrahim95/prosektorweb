@@ -3,6 +3,11 @@
 import { prisma } from '@/lib/prisma'
 import { getErrorMessage, getZodErrorMessage } from '@/lib/action-types'
 import { requireAuth } from '@/lib/auth-guard'
+import {
+    requireTenantAccess,
+    TenantAccessError,
+    UnauthorizedError
+} from '@/lib/guards/tenant-guard'
 import { logAudit } from '@/lib/audit'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
@@ -51,6 +56,9 @@ export async function createPayment(formData: FormData): Promise<PaymentActionRe
         }
 
         const validatedData = PaymentSchema.parse(rawData)
+
+        // Tenant isolation: verify user can access this invoice
+        await requireTenantAccess('invoice', validatedData.invoiceId)
 
         // Retry loop for optimistic locking
         let lastError: unknown
@@ -150,6 +158,10 @@ export async function createPayment(formData: FormData): Promise<PaymentActionRe
     } catch (error: unknown) {
         console.error('createPayment error:', error)
 
+        if (error instanceof TenantAccessError || error instanceof UnauthorizedError) {
+            return { success: false, error: error.message }
+        }
+
         if (error instanceof z.ZodError) {
             return { success: false, error: getZodErrorMessage(error) }
         }
@@ -173,6 +185,9 @@ export async function createPayment(formData: FormData): Promise<PaymentActionRe
 export async function deletePayment(id: string): Promise<PaymentActionResult> {
     try {
         await requireAuth()
+
+        // Tenant isolation: verify user can access this payment
+        await requireTenantAccess('payment', id)
 
         // Retry loop for optimistic locking
         let lastError: unknown
@@ -262,6 +277,10 @@ export async function deletePayment(id: string): Promise<PaymentActionResult> {
         return { success: false, error: 'Eşzamanlı işlem hatası, lütfen tekrar deneyin.' }
     } catch (error) {
         console.error('deletePayment error:', error)
+
+        if (error instanceof TenantAccessError || error instanceof UnauthorizedError) {
+            return { success: false, error: error.message }
+        }
 
         if (error instanceof Error && error.message === 'PAYMENT_NOT_FOUND') {
             return { success: false, error: 'Ödeme bulunamadı.' }

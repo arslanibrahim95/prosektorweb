@@ -8,7 +8,7 @@ import {
     requireCompanyAccess,
     TenantAccessError,
     UnauthorizedError
-} from '@/lib/tenant-guard'
+} from '@/lib/guards/tenant-guard'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 import { ActivityType, CompanyStatus } from '@prisma/client'

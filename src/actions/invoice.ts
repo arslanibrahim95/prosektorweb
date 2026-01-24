@@ -7,7 +7,13 @@ import { logAudit } from '@/lib/audit'
 import { getErrorMessage, getZodErrorMessage, isPrismaUniqueConstraintError, validatePagination } from '@/lib/action-types'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
-import { getUserCompanyId } from '@/lib/guards/tenant-guard'
+import {
+    getUserCompanyId,
+    requireTenantAccess,
+    requireCompanyAccess,
+    TenantAccessError,
+    UnauthorizedError
+} from '@/lib/guards/tenant-guard'
 import { InvoiceStatus } from '@prisma/client'
 
 // ==========================================
@@ -297,6 +303,9 @@ export async function updateInvoiceStatus(id: string, status: string): Promise<I
     try {
         await requireAuth()
 
+        // Tenant isolation: verify user can access this invoice
+        await requireTenantAccess('invoice', id)
+
         const StatusSchema = z.nativeEnum(InvoiceStatus)
         const parsed = StatusSchema.safeParse(status)
         if (!parsed.success) {
@@ -320,6 +329,9 @@ export async function updateInvoiceStatus(id: string, status: string): Promise<I
         return { success: true, data: invoice }
     } catch (error) {
         console.error('updateInvoiceStatus error:', error)
+        if (error instanceof TenantAccessError || error instanceof UnauthorizedError) {
+            return { success: false, error: error.message }
+        }
         return { success: false, error: 'Durum güncellenirken bir hata oluştu.' }
     }
 }
@@ -331,6 +343,9 @@ export async function updateInvoiceStatus(id: string, status: string): Promise<I
 export async function deleteInvoice(id: string): Promise<InvoiceActionResult> {
     try {
         await requireAuth()
+
+        // Tenant isolation: verify user can access this invoice
+        await requireTenantAccess('invoice', id)
 
         const invoice = await prisma.invoice.findUnique({
             where: { id },
@@ -352,6 +367,9 @@ export async function deleteInvoice(id: string): Promise<InvoiceActionResult> {
         return { success: true }
     } catch (error) {
         console.error('deleteInvoice error:', error)
+        if (error instanceof TenantAccessError || error instanceof UnauthorizedError) {
+            return { success: false, error: error.message }
+        }
         return { success: false, error: 'Fatura silinirken bir hata oluştu.' }
     }
 }

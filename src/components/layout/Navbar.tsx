@@ -3,6 +3,7 @@
 import React, { useState } from 'react'
 import Link from 'next/link'
 import { Menu, X } from 'lucide-react'
+import { Container } from '@/components/ui/Container'
 
 interface NavbarProps {
     variant?: 'landing' | 'inner'
@@ -30,15 +31,15 @@ export function Navbar({ variant = 'landing', onOpenLogin }: NavbarProps) {
 
     return (
         <nav className="fixed top-0 left-0 right-0 z-50 bg-white/70 backdrop-blur-xl border-b border-white/20 shadow-sm supports-[backdrop-filter]:bg-white/60">
-            <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-                <Link href="/" className="flex items-center gap-2 group">
+            <Container className="h-16 flex items-center justify-between">
+                <Link href="/" className="flex items-center gap-2 group leading-none">
                     <span className="text-2xl font-bold tracking-tighter text-neutral-900 group-hover:text-brand-600 transition-colors">
                         psw
                     </span>
                 </Link>
 
                 {/* Desktop Menu */}
-                <div className="hidden md:flex items-center gap-8 text-[15px] font-medium text-neutral-600">
+                <div className="hidden md:flex items-center gap-8 text-[15px] font-medium text-neutral-600 leading-none">
                     <Link href={getLink('#neden-biz')} className="hover:text-brand-600 transition-colors">Neden Biz?</Link>
                     <Link href={getLink('#nasil-calisiriz')} className="hover:text-brand-600 transition-colors">Nasıl Çalışırız?</Link>
                     <Link href={getLink('#fiyatlandirma')} className="hover:text-brand-600 transition-colors">Fiyatlandırma</Link>
@@ -50,21 +51,21 @@ export function Navbar({ variant = 'landing', onOpenLogin }: NavbarProps) {
                 {/* Direct Login Link */}
                 <button
                     onClick={handleLoginClick}
-                    className="hidden md:block px-5 py-2 bg-brand-600 text-white rounded-md text-sm font-semibold shadow-sm hover:bg-brand-700 transition-all hover:shadow-md active:bg-brand-800"
+                    className="hidden md:flex items-center justify-center px-5 py-2 bg-brand-600 text-white rounded-md text-sm font-semibold shadow-sm hover:bg-brand-700 transition-all hover:shadow-md active:bg-brand-800 leading-none"
                 >
                     Giriş Yap
                 </button>
 
                 {/* Mobile Menu Toggle */}
                 <button
-                    className="md:hidden p-2 text-neutral-600"
+                    className="md:hidden p-2 text-neutral-600 flex items-center justify-center leading-none"
                     onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                     aria-label={mobileMenuOpen ? "Menüyü kapat" : "Menüyü aç"}
                     aria-expanded={mobileMenuOpen}
                 >
                     {mobileMenuOpen ? <X /> : <Menu />}
                 </button>
-            </div>
+            </Container>
 
             {/* Mobile Menu Dropdown */}
             {mobileMenuOpen && (

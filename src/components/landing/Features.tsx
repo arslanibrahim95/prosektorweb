@@ -1,12 +1,14 @@
 import { Briefcase, Eye, Clock, Target } from 'lucide-react'
 import SpotlightCard from '@/components/ui/SpotlightCard'
 
+import { Container } from '@/components/ui/Container'
+
 export function Features() {
     return (
         <>
             {/* Why Us Glass Cards */}
-            <section id="neden-biz" className="py-24 px-6 relative">
-                <div className="max-w-6xl mx-auto">
+            <section id="neden-biz" className="py-24 relative">
+                <Container>
                     <div className="text-center mb-20">
                         <h2 className="text-4xl font-bold font-serif mb-4 text-neutral-900">Neden Biz?</h2>
                         <p className="text-lg text-neutral-500 max-w-2xl mx-auto">Sektörün dinamiklerini biliyoruz, size hız ve kalite vadediyoruz.</p>
@@ -30,12 +32,12 @@ export function Features() {
                             </SpotlightCard>
                         ))}
                     </div>
-                </div>
+                </Container>
             </section>
 
             {/* How We Work (Nasıl Çalışırız?) */}
-            <section id="nasil-calisiriz" className="py-24 px-6 relative z-0">
-                <div className="max-w-7xl mx-auto">
+            <section id="nasil-calisiriz" className="py-24 relative z-0">
+                <Container>
                     <div className="text-center mb-16">
                         <h2 className="text-3xl font-bold mb-3 text-neutral-900">Nasıl Çalışırız?</h2>
                         <p className="text-lg text-neutral-500">Karmaşık süreçler yok. Net ve hızlı bir yol izleriz.</p>
@@ -55,7 +57,7 @@ export function Features() {
                             </div>
                         ))}
                     </div>
-                </div>
+                </Container>
             </section>
         </>
     )
