@@ -34,7 +34,7 @@ export function Hero() {
                             className="group relative px-10 py-5 bg-brand-600 text-white rounded-full text-lg font-bold shadow-lg shadow-brand-600/30 hover:shadow-brand-600/50 hover:-translate-y-1 transition-all duration-300 overflow-hidden"
                         >
                             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
-                            Web Sitemi İncele
+                            Ücretsiz Önizleme Başlat (7 gün)
                         </OpenModalButton>
                         <div className="flex items-center gap-2 text-sm font-medium text-neutral-500">
                             <Clock className="w-4 h-4" />

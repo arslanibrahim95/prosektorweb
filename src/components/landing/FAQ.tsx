@@ -10,7 +10,7 @@ export function FAQ() {
                 <div className="space-y-4">
                     {[
                         { q: "Bu web sitesini gerçekten ücretsiz mi görebiliyorum?", a: "Evet, OSGB’nize özel hazırladığımız çalışmayı 7 gün boyunca hiçbir ücret ödemeden inceleyebilirsiniz. Karar verdiğinizde ödeme aşamasına geçilir." },
-                        { q: "Web sitesi hazır mı, yoksa taslak mı gösteriyorsunuz?", a: "Size gönderdiğimiz önizleme kodu ile göreceğiniz site, logonuz ve temel bilgilerinizle giydirilmiş, yayına %90 hazır bir çalışmadır." },
+                        { q: "Web sitesi hazır mı, yoksa taslak mı gösteriyorsunuz?", a: "Size gönderdiğimiz önizleme kodu ile göreceğiniz site; logonuz, renkleriniz, iletişim bilgileriniz ve hizmetleriniz eklenmiş, yayına %90 hazır bir çalışmadır." },
                         { q: "İnceleme sürecinde düzenleme (revize) isteyebilir miyim?", a: "7 gün boyunca toplam 3 revize hakkınız vardır. Kapsam: metin düzenlemeleri, küçük görsel değişiklikleri, içerik hizalamaları." },
                         { q: "Satın alma sonrasında revize yapılabilir mi?", a: "Evet, ancak yayın sonrası yapılacak yeni sayfa ekleme veya yapısal değişiklik talepleri ek hizmet olarak ücretlendirilir." },
                         { q: "Ödeme nasıl yapılıyor?", a: "Kredi kartı ile güvenli ödeme altyapımız üzerinden veya banka havalesi seçeneği ile ödemenizi gerçekleştirebilirsiniz." }

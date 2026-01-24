@@ -136,7 +136,7 @@ export function ContactForm() {
                             />
                             <label htmlFor="kvkk" className="text-sm text-neutral-500 cursor-pointer select-none">
                                 KVKK onay formunu okudum, onaylıyorum.
-                                <span className="block text-xs text-neutral-400 mt-0.5">IP adresiniz yasal zorunluluk gereği kayıt altına alınmaktadır.</span>
+                                <span className="block text-xs text-neutral-400 mt-0.5">Yasal gereklilik nedeniyle IP bilgisi kayıt altına alınır.</span>
                             </label>
                         </div>
                         <div className="min-h-[20px]">

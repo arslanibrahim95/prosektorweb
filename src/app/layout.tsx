@@ -4,10 +4,10 @@ import { AuthProvider } from "@/components/AuthProvider";
 
 export const metadata: Metadata = {
   title: {
-    default: "ProSektorWeb | İş Sağlığı ve Güvenliği Blog",
+    default: "ProSektorWeb | OSGB Web Sitesi",
     template: "%s | ProSektorWeb"
   },
-  description: "Türkiye'nin en kapsamlı İSG blog platformu. 400'den fazla makale, güncel mevzuat bilgileri, risk yönetimi ve dijital dönüşüm rehberleri.",
+  description: "OSGB'niz için profesyonel web sitesi. 7 gün ücretsiz önizleme, tek fiyat ve tam sektör uyumu.",
   keywords: ["isg", "iş güvenliği", "iş sağlığı", "osgb", "risk analizi", "mevzuat", "6331"],
   authors: [{ name: "ProSektorWeb" }],
   creator: "ProSektorWeb",
@@ -16,8 +16,8 @@ export const metadata: Metadata = {
     locale: "tr_TR",
     url: "https://prosektorweb.com",
     siteName: "ProSektorWeb",
-    title: "ProSektorWeb | İş Sağlığı ve Güvenliği Blog",
-    description: "Türkiye'nin en kapsamlı İSG blog platformu",
+    title: "ProSektorWeb | OSGB Web Sitesi",
+    description: "OSGB'niz için profesyonel web sitesi",
   },
   twitter: {
     card: "summary_large_image",

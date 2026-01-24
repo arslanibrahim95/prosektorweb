@@ -62,7 +62,7 @@ export default function AdminLoginPage() {
                                         Giriş...
                                     </>
                                 ) : (
-                                    'Giriş'
+                                    'Yönetim Paneline Giriş'
                                 )}
                             </button>
                         </form>

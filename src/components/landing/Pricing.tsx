@@ -17,7 +17,7 @@ export function Pricing() {
                     <div className="relative p-10 rounded-3xl border border-white/60 bg-white/30 backdrop-blur-xl shadow-xl flex flex-col overflow-hidden hover:bg-white/50 transition-all duration-300">
                         <div className="absolute top-0 inset-x-0 h-1 bg-neutral-200" />
                         <h3 className="text-4xl font-serif font-bold mb-2 text-neutral-900">Aksiyon</h3>
-                        <p className="text-neutral-500 font-medium mb-8">Hızlı bir başlangıç için.</p>
+                        <p className="text-neutral-500 font-medium mb-8">Hızlı başlangıç. Fiyat sabit.</p>
                         <ul className="space-y-4 mb-8 flex-1">
                             {[
                                 "Tek Sayfa (One-Page) Tasarım",
@@ -46,7 +46,7 @@ export function Pricing() {
                         <div className="absolute top-4 right-4 px-3 py-1 bg-brand-100 text-brand-700 text-xs font-bold rounded-full">EDİTÖRÜN SEÇİMİ</div>
 
                         <h3 className="text-4xl font-serif font-bold mb-2 text-neutral-900">Vizyon</h3>
-                        <p className="text-brand-600 font-medium mb-8">Kurumsal ve geniş kapsamlı.</p>
+                        <p className="text-brand-600 font-medium mb-8">Kurumsal kapsam. Fiyat sabit.</p>
                         <ul className="space-y-4 mb-8 flex-1">
                             {[
                                 "Çok Sayfalı Kurumsal Yapı",

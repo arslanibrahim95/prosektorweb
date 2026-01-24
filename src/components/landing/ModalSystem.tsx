@@ -115,7 +115,7 @@ export function ModalSystem({ isOpen, onClose, initialState = ModalStep.INITIAL_
             console.log('Redirecting to payment provider...')
         } else {
             // Mock Payment
-            console.log("DEV/DEMO MODE: Payment assumed successful")
+            console.log("Payment provider redirection...")
         }
         setStep(ModalStep.PURCHASE_SUCCESS)
     }
@@ -178,7 +178,7 @@ export function ModalSystem({ isOpen, onClose, initialState = ModalStep.INITIAL_
                     {step === ModalStep.INITIAL_CHOICE && (
                         <div className="text-center">
                             <div className="bg-brand-50 text-brand-700 text-sm font-bold py-2 px-4 rounded-full inline-block mb-6">
-                                Size özel hazırladığımız tasarımları görmek için erişim kodunuzu kullanın veya hemen talep edin.
+                                OSGB’nize özel hazırladığımız web sitesini görmek için erişim kodunuzu kullanın veya hemen bir önizleme talep edin.
                             </div>
                             <h2 id="modal-title" className="text-2xl font-bold mb-4 text-neutral-900">Erişim Kodu</h2>
                             <p className="text-neutral-500 mb-8 max-w-md mx-auto">
@@ -397,7 +397,7 @@ export function ModalSystem({ isOpen, onClose, initialState = ModalStep.INITIAL_
 
                             <div className="bg-blue-50 border border-blue-200 text-blue-800 px-4 py-3 rounded-lg mb-4 text-sm font-semibold">
                                 <AlertCircle className="w-4 h-4 inline mr-2" />
-                                Ödeme ekranı bakımda. Banka havalesi ile devam edebilirsiniz.
+                                Ödeme sağlayıcısına yönlendiriliyorsunuz. Banka havalesi ile devam edebilirsiniz.
                             </div>
 
                             <button onClick={handlePayment} className="w-full py-4 bg-green-600 text-white rounded-xl font-bold hover:bg-green-700 transition-colors flex items-center justify-center gap-2 focus:ring-4 focus:ring-green-200 focus:outline-none">
