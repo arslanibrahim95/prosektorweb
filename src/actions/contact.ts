@@ -2,6 +2,7 @@
 
 import { prisma } from '@/lib/prisma'
 import { z } from 'zod'
+import { verifyIdempotency } from '@/lib/security/idempotency'
 import { headers } from 'next/headers'
 import DOMPurify from 'isomorphic-dompurify'
 import { getClientIp } from '@/lib/rate-limit'
@@ -21,6 +22,19 @@ export type ContactState = {
 }
 
 export async function submitContact(prevState: ContactState, formData: FormData): Promise<ContactState> {
+    const idempotencyKey = formData.get('idempotencyKey') as string
+
+    // Idempotency: Prevent double submission
+    if (idempotencyKey) {
+        const isNew = await verifyIdempotency(idempotencyKey)
+        if (!isNew) {
+            return {
+                success: false,
+                message: 'Bu mesaj zaten gönderildi. (Çift tıklama algılandı)'
+            }
+        }
+    }
+
     // 1. Get Security Context (IP & User Agent)
     const headersList = await headers()
     const ip = await getClientIp()

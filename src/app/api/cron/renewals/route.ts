@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { sendRenewalReminder } from '@/lib/email'
+import { logger } from '@/lib/logger'
 
 /**
  * Cron Job: Send renewal reminders for services expiring within 30 days
@@ -29,6 +30,9 @@ export async function GET(request: Request) {
     }
 
     try {
+        const jobId = crypto.randomUUID()
+        logger.info({ jobId, type: 'cron', name: 'renewals' }, 'Renewal cron job started')
+
         // Find services expiring within 30 days that haven't been reminded yet
         const thirtyDaysFromNow = new Date()
         thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30)
@@ -87,22 +91,32 @@ export async function GET(request: Request) {
                 results.push({ serviceName: service.name, success: true })
             } else {
                 failed++
+                logger.error({ jobId, serviceId: service.id, error: emailResult.error }, 'Failed to send reminder email')
                 results.push({ serviceName: service.name, success: false, error: emailResult.error })
             }
+        }
+
+        const stats = {
+            total: services.length,
+            sent,
+            failed
+        }
+
+        logger.info({ jobId, ...stats }, 'Renewal cron job completed')
+
+        if (failed > 0) {
+            // In a real scenario, we might want to alert Sentry explicitly here if failure rate is high
+            // Sentry.captureMessage('Cron job completed with failures', 'warning');
         }
 
         return NextResponse.json({
             success: true,
             message: `Renewal reminders processed`,
-            stats: {
-                total: services.length,
-                sent,
-                failed
-            },
+            stats,
             results
         })
     } catch (error) {
-        console.error('Cron renewals error:', error)
+        logger.error({ err: error, type: 'cron', name: 'renewals' }, 'Cron renewal job failed')
         return NextResponse.json(
             { success: false, error: 'Internal server error' },
             { status: 500 }

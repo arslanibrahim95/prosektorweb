@@ -29,6 +29,8 @@ npx prisma db push
 
 # 5. Next.js production build
 echo "🔨 Production build yapılıyor..."
+export NEXT_PUBLIC_RELEASE_VERSION=$(git rev-parse --short HEAD)
+echo "ℹ️ Release Version: $NEXT_PUBLIC_RELEASE_VERSION"
 npm run build
 
 # 6. PM2 ile uygulamayı yeniden başlat (eğer PM2 kullanıyorsanız)

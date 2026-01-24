@@ -3,6 +3,7 @@
 import { prisma } from '@/lib/prisma'
 import { auth } from '@/auth'
 import { TicketPriority, TicketCategory } from '@prisma/client'
+import { validatePagination } from '@/lib/action-types'
 
 async function getClientCompanyId(): Promise<string | null> {
     const session = await auth()
@@ -60,48 +61,104 @@ export async function getClientDashboardStats() {
     }
 }
 
-export async function getClientProjects() {
+export async function getClientProjects(page = 1, limit = 10) {
     const companyId = await getClientCompanyId()
-    if (!companyId) return []
+    if (!companyId) return { data: [], total: 0, pages: 0, currentPage: 1 }
 
-    return await prisma.webProject.findMany({
-        where: { companyId },
-        include: { domain: true },
-        orderBy: { updatedAt: 'desc' }
-    })
+    const { skip, limit: validatedLimit } = validatePagination(page, limit)
+
+    const [data, total] = await Promise.all([
+        prisma.webProject.findMany({
+            where: { companyId },
+            include: { domain: true },
+            orderBy: { updatedAt: 'desc' },
+            skip,
+            take: validatedLimit
+        }),
+        prisma.webProject.count({ where: { companyId } })
+    ])
+
+    return {
+        data,
+        total,
+        pages: Math.ceil(total / validatedLimit),
+        currentPage: page
+    }
 }
 
-export async function getClientInvoices() {
+export async function getClientInvoices(page = 1, limit = 10) {
     const companyId = await getClientCompanyId()
-    if (!companyId) return []
+    if (!companyId) return { data: [], total: 0, pages: 0, currentPage: 1 }
 
-    return await prisma.invoice.findMany({
-        where: { companyId },
-        orderBy: { issueDate: 'desc' },
-        include: { _count: { select: { payments: true } } }
-    })
+    const { skip, limit: validatedLimit } = validatePagination(page, limit)
+
+    const [data, total] = await Promise.all([
+        prisma.invoice.findMany({
+            where: { companyId },
+            orderBy: { issueDate: 'desc' },
+            include: { _count: { select: { payments: true } } },
+            skip,
+            take: validatedLimit
+        }),
+        prisma.invoice.count({ where: { companyId } })
+    ])
+
+    return {
+        data,
+        total,
+        pages: Math.ceil(total / validatedLimit),
+        currentPage: page
+    }
 }
 
-export async function getClientServices() {
+export async function getClientServices(page = 1, limit = 10) {
     const companyId = await getClientCompanyId()
-    if (!companyId) return []
+    if (!companyId) return { data: [], total: 0, pages: 0, currentPage: 1 }
 
-    return await prisma.service.findMany({
-        where: { companyId },
-        orderBy: { renewDate: 'asc' }
-    })
+    const { skip, limit: validatedLimit } = validatePagination(page, limit)
+
+    const [data, total] = await Promise.all([
+        prisma.service.findMany({
+            where: { companyId },
+            orderBy: { renewDate: 'asc' },
+            skip,
+            take: validatedLimit
+        }),
+        prisma.service.count({ where: { companyId } })
+    ])
+
+    return {
+        data,
+        total,
+        pages: Math.ceil(total / validatedLimit),
+        currentPage: page
+    }
 }
 
 // Support functions (Simplified wrapper around existing actions but scoped)
-export async function getClientTickets() {
+export async function getClientTickets(page = 1, limit = 10) {
     const companyId = await getClientCompanyId()
-    if (!companyId) return []
+    if (!companyId) return { data: [], total: 0, pages: 0, currentPage: 1 }
 
-    return await prisma.ticket.findMany({
-        where: { companyId },
-        orderBy: { updatedAt: 'desc' },
-        include: { _count: { select: { messages: true } } }
-    })
+    const { skip, limit: validatedLimit } = validatePagination(page, limit)
+
+    const [data, total] = await Promise.all([
+        prisma.ticket.findMany({
+            where: { companyId },
+            orderBy: { updatedAt: 'desc' },
+            include: { _count: { select: { messages: true } } },
+            skip,
+            take: validatedLimit
+        }),
+        prisma.ticket.count({ where: { companyId } })
+    ])
+
+    return {
+        data,
+        total,
+        pages: Math.ceil(total / validatedLimit),
+        currentPage: page
+    }
 }
 
 export async function createClientTicket(formData: FormData) {

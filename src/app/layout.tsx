@@ -1,6 +1,19 @@
 import type { Metadata } from "next";
+import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/components/AuthProvider";
+
+const inter = Inter({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-inter",
+});
+
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-playfair",
+});
 
 export const metadata: Metadata = {
   title: {
@@ -21,8 +34,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "ProSektorWeb",
-    description: "Türkiye'nin en kapsamlı İSG blog platformu",
+    title: "ProSektorWeb | OSGB Web Sitesi",
+    description: "OSGB'niz için profesyonel web sitesi. 7 gün ücretsiz önizleme, tek fiyat ve tam sektör uyumu.",
   },
   robots: {
     index: true,
@@ -41,7 +54,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="tr">
+    <html lang="tr" className={`${inter.variable} ${playfair.variable}`}>
       <body className="font-sans antialiased">
         <AuthProvider>
           {children}
@@ -50,3 +63,5 @@ export default function RootLayout({
     </html>
   );
 }
+
+

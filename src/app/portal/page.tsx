@@ -25,9 +25,12 @@ const statusConfig: Record<string, { label: string; color: string; bgColor: stri
 export default async function PortalDashboard() {
     const session = await auth()
     const stats = await getClientDashboardStats()
-    const services = await getClientServices()
-    const projects = await getClientProjects()
+    const servicesData = await getClientServices(1, 10)
+    const projectsData = await getClientProjects(1, 10)
     const profile = await getClientProfile()
+
+    const services = servicesData.data || []
+    const projects = projectsData.data || []
 
     const displayStats = stats || { activeProjects: 0, openTickets: 0, unpaidAmount: 0 }
     const clientName = profile?.name || session?.user?.name || 'Değerli Müşterimiz'

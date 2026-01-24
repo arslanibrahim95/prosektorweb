@@ -59,30 +59,35 @@ export function ModalSystem({ isOpen, onClose, initialState = ModalStep.INITIAL_
     // Timer state populated from Server Action
     const [expirationDate, setExpirationDate] = useState<Date | null>(null)
 
+    // Timer (Refactored for Security & Leak Prevention)
     useEffect(() => {
-        if (!isOpen) return
-        if (!expirationDate) return // Wait for login
+        if (!isOpen || !expirationDate) return
 
-        if ([ModalStep.DASHBOARD, ModalStep.PREVIEW_DETAIL, ModalStep.REACTIVATE_OFFER].includes(step)) {
-            const interval = setInterval(() => {
-                const now = new Date()
-                const distance = expirationDate.getTime() - now.getTime()
+        const activeSteps = [ModalStep.DASHBOARD, ModalStep.PREVIEW_DETAIL, ModalStep.REACTIVATE_OFFER]
+        if (!activeSteps.includes(step)) return
 
-                if (distance < 0) {
-                    clearInterval(interval)
-                    setStep(ModalStep.EXPIRED)
-                    return
-                }
+        const updateTimer = () => {
+            const now = new Date()
+            const distance = expirationDate.getTime() - now.getTime()
 
-                const days = Math.floor(distance / (1000 * 60 * 60 * 24))
-                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
-                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60))
-                const seconds = Math.floor((distance % (1000 * 60)) / 1000)
+            if (distance < 0) {
+                setStep(ModalStep.EXPIRED)
+                return
+            }
 
-                setTimeLeft(`${days.toString().padStart(2, '0')}:${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`)
-            }, 1000)
-            return () => clearInterval(interval)
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24))
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60))
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000)
+
+            setTimeLeft(`${days.toString().padStart(2, '0')}:${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`)
         }
+
+        // Initial call
+        updateTimer()
+
+        const interval = setInterval(updateTimer, 1000)
+        return () => clearInterval(interval)
     }, [step, isOpen, expirationDate])
 
     const handleLogin = () => {

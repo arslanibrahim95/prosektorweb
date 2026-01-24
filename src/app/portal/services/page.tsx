@@ -22,7 +22,7 @@ const billingCycleLabels: Record<string, string> = {
 }
 
 export default async function ServicesPage() {
-    const services = await getClientServices()
+    const { data: services } = await getClientServices(1, 50) // Fetch more for services list
 
     // Separate active and expired
     const activeServices = services.filter((s: any) => s.status === 'ACTIVE')

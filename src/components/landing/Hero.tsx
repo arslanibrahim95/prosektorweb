@@ -17,13 +17,9 @@ export function Hero() {
                         2026 Vizyonu İçin Hazır
                     </div>
 
-                    <BlurText
-                        text="OSGB'nize Özel Profesyonel Web Siteniz 24 Saatte Yayına Hazır."
-                        delay={50}
-                        animateBy="words"
-                        direction="top"
-                        className="text-5xl md:text-7xl font-bold font-serif leading-tight mb-8 text-neutral-900 tracking-tight drop-shadow-sm text-center justify-center"
-                    />
+                    <h1 className="text-5xl md:text-7xl font-bold font-serif leading-tight mb-8 text-neutral-900 tracking-tight drop-shadow-sm text-center justify-center animate-in fade-in zoom-in-95 duration-500">
+                        OSGB'nize Özel Profesyonel Web Siteniz 24 Saatte Yayına Hazır.
+                    </h1>
 
                     <p className="text-xl md:text-2xl text-neutral-600 max-w-2xl mx-auto mb-12 leading-relaxed font-light">
                         İSG sektörünü tanıyor, OSGB’lere özel web sitelerini önceden hazırlıyor ve doğru kurumlarla buluşturuyoruz.

@@ -118,8 +118,14 @@ const Particles: React.FC<ParticlesProps> = ({
 }) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const mouseRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
+    // Optimized: Manual throttling flag
+    const skipFrame = useRef(false);
 
     useEffect(() => {
+        // PERF-002: Check reduced motion preference
+        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (prefersReducedMotion) return; // Do not initialize WebGL if reduced motion is on
+
         const container = containerRef.current;
         if (!container) return;
 
@@ -200,6 +206,14 @@ const Particles: React.FC<ParticlesProps> = ({
 
         const update = (t: number) => {
             animationFrameId = requestAnimationFrame(update);
+
+            // PERF-002: Throttle to ~30fps on mobile or high load
+            if (skipFrame.current) {
+                skipFrame.current = false;
+                return;
+            }
+            skipFrame.current = true; // Skip next frame (simple 30fps cap)
+
             const delta = t - lastTime;
             lastTime = t;
             elapsed += delta * speed;

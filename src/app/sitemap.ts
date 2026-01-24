@@ -1,6 +1,7 @@
 import { MetadataRoute } from 'next'
+import { prisma } from '@/lib/prisma'
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const baseUrl = 'https://prosektorweb.com'
 
     // Static pages
@@ -19,8 +20,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
         },
     ]
 
-    // TODO: Add dynamic blog posts from database
-    // This would be replaced with actual DB query when connected
+    // Dynamic blog posts
+    const blogPosts = await prisma.blogPost.findMany({
+        where: { published: true },
+        select: { slug: true, updatedAt: true, createdAt: true },
+    })
 
-    return staticPages
+    const dynamicPages = blogPosts.map((post) => ({
+        url: `${baseUrl}/blog/${post.slug}`,
+        lastModified: post.updatedAt || post.createdAt,
+        changeFrequency: 'weekly' as const,
+        priority: 0.7,
+    }))
+
+    return [...staticPages, ...dynamicPages]
 }

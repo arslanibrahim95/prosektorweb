@@ -1,4 +1,5 @@
 import { auth } from '@/auth'
+import { getClientInvoices } from '@/actions/portal'
 import { prisma } from '@/lib/prisma'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
@@ -39,10 +40,7 @@ export default async function PortalInvoicesPage() {
         )
     }
 
-    const invoices = await prisma.invoice.findMany({
-        where: { companyId: user.companyId },
-        orderBy: { createdAt: 'desc' }
-    })
+    const { data: invoices } = await getClientInvoices(1, 50)
 
     // Calculate totals
     const pendingTotal = invoices

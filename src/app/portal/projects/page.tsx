@@ -1,4 +1,5 @@
 import { auth } from '@/auth'
+import { getClientProjects } from '@/actions/portal'
 import { prisma } from '@/lib/prisma'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
@@ -49,11 +50,7 @@ export default async function PortalProjectsPage() {
         )
     }
 
-    const projects = await prisma.webProject.findMany({
-        where: { companyId: user.companyId },
-        include: { domain: true },
-        orderBy: { createdAt: 'desc' }
-    })
+    const { data: projects } = await getClientProjects(1, 50)
 
     return (
         <div className="space-y-8">

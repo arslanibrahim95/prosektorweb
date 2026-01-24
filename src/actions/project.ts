@@ -4,10 +4,16 @@ import { prisma } from '@/lib/prisma'
 import { requireAuth } from '@/lib/auth-guard'
 import { auth } from '@/auth'
 import { logAudit } from '@/lib/audit'
-import { getErrorMessage, getZodErrorMessage } from '@/lib/action-types'
+import { getErrorMessage, getZodErrorMessage, validatePagination } from '@/lib/action-types'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
-import { getUserCompanyId } from '@/lib/guards/tenant-guard'
+import {
+    getUserCompanyId,
+    requireTenantAccess,
+    requireCompanyAccess,
+    TenantAccessError,
+    UnauthorizedError
+} from '@/lib/guards/tenant-guard'
 
 // ==========================================
 // TYPES
@@ -45,6 +51,9 @@ export async function createProject(formData: FormData): Promise<ProjectActionRe
 
         const validated = ProjectSchema.parse(rawData)
 
+        // Tenant isolation: verify user can create projects for this company
+        await requireCompanyAccess(validated.companyId)
+
         const project = await prisma.webProject.create({
             data: {
                 name: validated.name,
@@ -60,6 +69,9 @@ export async function createProject(formData: FormData): Promise<ProjectActionRe
         return { success: true, data: project }
     } catch (error: unknown) {
         console.error('createProject error:', error)
+        if (error instanceof TenantAccessError || error instanceof UnauthorizedError) {
+            return { success: false, error: error.message }
+        }
         if (error instanceof z.ZodError) {
             return { success: false, error: getZodErrorMessage(error) }
         }
@@ -67,10 +79,20 @@ export async function createProject(formData: FormData): Promise<ProjectActionRe
     }
 }
 
-export async function getProjects(search?: string, status?: string) {
+export async function getProjects(
+    options?: {
+        search?: string
+        status?: string
+        page?: number
+        limit?: number
+    }
+) {
+    const { search = '', status = '' } = options || {}
+    const { page, limit, skip } = validatePagination(options?.page, options?.limit)
+
     try {
         const session = await auth()
-        if (!session?.user) return []
+        if (!session?.user) return { data: [], total: 0, pages: 0, currentPage: 1 }
 
         const where: any = {}
 
@@ -80,7 +102,7 @@ export async function getProjects(search?: string, status?: string) {
                 where: { id: session.user.id },
                 select: { companyId: true }
             })
-            if (!user?.companyId) return []
+            if (!user?.companyId) return { data: [], total: 0, pages: 0, currentPage: 1 }
             where.companyId = user.companyId
         }
 
@@ -95,18 +117,29 @@ export async function getProjects(search?: string, status?: string) {
             where.status = status
         }
 
-        const projects = await prisma.webProject.findMany({
-            where,
-            include: {
-                company: { select: { id: true, name: true } },
-                domain: { select: { id: true, name: true } },
-            },
-            orderBy: { createdAt: 'desc' },
-        })
-        return projects
+        const [projects, total] = await Promise.all([
+            prisma.webProject.findMany({
+                where,
+                skip,
+                take: limit,
+                include: {
+                    company: { select: { id: true, name: true } },
+                    domain: { select: { id: true, name: true } },
+                },
+                orderBy: { createdAt: 'desc' },
+            }),
+            prisma.webProject.count({ where })
+        ])
+
+        return {
+            data: projects,
+            total,
+            pages: Math.ceil(total / limit),
+            currentPage: page,
+        }
     } catch (error) {
         console.error('getProjects error:', error)
-        return []
+        return { data: [], total: 0, pages: 0, currentPage: 1 }
     }
 }
 
@@ -142,6 +175,9 @@ export async function getProjectById(id: string) {
 export async function updateProject(id: string, formData: FormData): Promise<ProjectActionResult> {
     try {
         await requireAuth()
+
+        // Tenant isolation: verify user can access this project
+        await requireTenantAccess('project', id)
 
         const data: any = {}
 

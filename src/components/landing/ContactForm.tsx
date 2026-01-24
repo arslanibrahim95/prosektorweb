@@ -1,6 +1,6 @@
 'use client'
 
-import { useActionState, useRef, useEffect } from 'react'
+import { useActionState, useRef, useEffect, useState } from 'react'
 import { submitContact, ContactState } from '@/actions/contact'
 import { Loader2, CheckCircle, AlertCircle, RefreshCw } from 'lucide-react'
 
@@ -12,6 +12,13 @@ const initialState: ContactState = {
 export function ContactForm() {
     const [state, formAction, isPending] = useActionState(submitContact, initialState)
     const formRef = useRef<HTMLFormElement>(null)
+
+    const [idempotencyKey, setIdempotencyKey] = useState('')
+
+    // Generate new key on mount and after successful submission
+    useEffect(() => {
+        setIdempotencyKey(crypto.randomUUID())
+    }, [state.success])
 
     // Reset form fields when submission is successful or component mounts
     useEffect(() => {
@@ -53,6 +60,7 @@ export function ContactForm() {
                 </div>
             ) : (
                 <form ref={formRef} action={formAction} className="space-y-4">
+                    <input type="hidden" name="idempotencyKey" value={idempotencyKey} />
                     {/* Input fields remain same */}
                     <div>
                         <label htmlFor="name" className="block text-sm font-semibold text-neutral-700 mb-1">Ad Soyad</label>

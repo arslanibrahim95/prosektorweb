@@ -1,4 +1,5 @@
 import { auth } from '@/auth'
+import { getClientTickets } from '@/actions/portal'
 import { prisma } from '@/lib/prisma'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
@@ -46,13 +47,7 @@ export default async function PortalTicketsPage() {
         )
     }
 
-    const tickets = await prisma.ticket.findMany({
-        where: { companyId: user.companyId },
-        include: {
-            _count: { select: { messages: true } }
-        },
-        orderBy: { createdAt: 'desc' }
-    })
+    const { data: tickets } = await getClientTickets(1, 50)
 
     const openCount = tickets.filter(t => t.status === 'OPEN' || t.status === 'IN_PROGRESS').length
     const resolvedCount = tickets.filter(t => t.status === 'RESOLVED' || t.status === 'CLOSED').length
