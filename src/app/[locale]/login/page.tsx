@@ -7,6 +7,10 @@ import { Link } from '@/i18n/routing'
 import Particles from '@/components/ui/Particles'
 import { useTranslations } from 'next-intl'
 
+import { Button } from '@/components/ui/Button'
+import { Input } from '@/components/ui/Input'
+import { Label } from '@/components/ui/Label'
+
 export default function LoginPage() {
     const t = useTranslations('Login')
     const [error, setError] = useState<string | null>(null)
@@ -103,60 +107,46 @@ export default function LoginPage() {
                     {/* Form */}
                     <div className="p-8 bg-white">
                         <form onSubmit={handleSubmit} className="space-y-5">
-                            <div className="space-y-1">
-                                <label className="block text-sm font-semibold text-neutral-700">{t('email_label')}</label>
-                                <div className="relative">
-                                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400" />
-                                    <input
-                                        className="w-full pl-12 pr-4 py-3.5 bg-neutral-50 border border-neutral-200 rounded-xl focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none transition-all text-neutral-900 placeholder-neutral-400"
-                                        id="email"
-                                        type="email"
-                                        name="email"
-                                        placeholder="ornek@firma.com"
-                                        required
-                                    />
-                                </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="email">{t('email_label')}</Label>
+                                <Input
+                                    id="email"
+                                    type="email"
+                                    name="email"
+                                    placeholder="ornek@firma.com"
+                                    required
+                                    leadingIcon={<Mail className="w-5 h-5" />}
+                                />
                             </div>
 
-                            <div className="space-y-1">
-                                <label className="block text-sm font-semibold text-neutral-700">{t('password_label')}</label>
-                                <div className="relative">
-                                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400" />
-                                    <input
-                                        className="w-full pl-12 pr-4 py-3.5 bg-neutral-50 border border-neutral-200 rounded-xl focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none transition-all text-neutral-900"
-                                        id="password"
-                                        type="password"
-                                        name="password"
-                                        placeholder="••••••••"
-                                        required
-                                    />
-                                </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="password">{t('password_label')}</Label>
+                                <Input
+                                    id="password"
+                                    type="password"
+                                    name="password"
+                                    placeholder="••••••••"
+                                    required
+                                    leadingIcon={<Lock className="w-5 h-5" />}
+                                />
                             </div>
 
                             {error && (
-                                <div className="p-4 bg-red-50 text-red-600 text-sm rounded-xl flex items-center gap-3 border border-red-100">
+                                <div className="p-4 bg-red-50 text-red-600 text-sm rounded-xl flex items-center gap-3 border border-red-100 animate-in fade-in slide-in-from-top-2">
                                     <AlertCircle className="w-5 h-5 shrink-0" />
                                     <p>{error}</p>
                                 </div>
                             )}
 
-                            <button
+                            <Button
                                 type="submit"
-                                className="group w-full py-4 bg-gradient-to-r from-brand-600 to-brand-500 text-white rounded-xl font-bold shadow-lg shadow-brand-600/30 hover:shadow-brand-600/50 transition-all flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
-                                disabled={isPending}
+                                className="w-full py-7"
+                                variant="gradient"
+                                loading={isPending}
                             >
-                                {isPending ? (
-                                    <>
-                                        <Loader2 className="w-5 h-5 animate-spin" />
-                                        {t('loading')}
-                                    </>
-                                ) : (
-                                    <>
-                                        {t('submit')}
-                                        <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                                    </>
-                                )}
-                            </button>
+                                {t('submit')}
+                                {!isPending && <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />}
+                            </Button>
                         </form>
 
                         <div className="mt-8 pt-6 border-t border-neutral-100 text-center space-y-3">

@@ -37,8 +37,8 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
     const searchQuery = params.q || ''
     const statusFilter = params.status || ''
 
-    const [projects, stats] = await Promise.all([
-        getProjects(searchQuery, statusFilter),
+    const [{ data: projects }, stats] = await Promise.all([
+        getProjects({ search: searchQuery, status: statusFilter }),
         getProjectStats(),
     ])
 

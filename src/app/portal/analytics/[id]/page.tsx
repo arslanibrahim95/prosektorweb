@@ -11,5 +11,12 @@ export default async function AnalyticsDetailPage({ params }: { params: Promise<
         notFound()
     }
 
-    return <AnalyticsDetailClient project={project} dailyStats={dailyStats} />
+    const projectData = project ? {
+        ...project,
+        siteUrl: project.siteUrl ?? undefined,
+        previewUrl: project.previewUrl ?? undefined,
+        analytics: (project.analytics as any) ?? undefined
+    } : null
+
+    return <AnalyticsDetailClient project={projectData} dailyStats={dailyStats} />
 }

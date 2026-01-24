@@ -13,6 +13,8 @@ interface ContentEditorWrapperProps {
     status: string
 }
 
+import { Button } from '@/components/ui/Button'
+
 export function ContentEditorWrapper({
     contentId,
     initialContent,
@@ -57,35 +59,33 @@ export function ContentEditorWrapper({
                     İçerik
                 </h2>
                 {!isEditing ? (
-                    <button
+                    <Button
                         onClick={() => setIsEditing(true)}
-                        className="flex items-center gap-2 px-3 py-1.5 text-sm bg-white border border-neutral-200 text-neutral-600 rounded-lg hover:bg-neutral-50 transition-colors"
+                        variant="outline"
+                        size="sm"
                     >
                         <Edit2 className="w-3 h-3" />
                         Düzenle
-                    </button>
+                    </Button>
                 ) : (
                     <div className="flex items-center gap-2">
-                        <button
+                        <Button
                             onClick={handleCancel}
                             disabled={loading}
-                            className="flex items-center gap-2 px-3 py-1.5 text-sm text-neutral-600 hover:text-neutral-900 transition-colors"
+                            variant="ghost"
+                            size="sm"
                         >
                             <X className="w-3 h-3" />
                             İptal
-                        </button>
-                        <button
+                        </Button>
+                        <Button
                             onClick={handleSave}
-                            disabled={loading}
-                            className="flex items-center gap-2 px-3 py-1.5 text-sm bg-brand-600 text-white rounded-lg hover:bg-brand-700 transition-colors disabled:opacity-50"
+                            loading={loading}
+                            size="sm"
                         >
-                            {loading ? (
-                                <Loader2 className="w-3 h-3 animate-spin" />
-                            ) : (
-                                <Save className="w-3 h-3" />
-                            )}
+                            {!loading && <Save className="w-3 h-3" />}
                             Kaydet
-                        </button>
+                        </Button>
                     </div>
                 )}
             </div>
@@ -98,13 +98,10 @@ export function ContentEditorWrapper({
                         editable={true}
                     />
                 ) : (
-                    {/* ... */ }
-                ) : (
-                <div
-                    className="prose prose-neutral max-w-none"
-                    dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(content) }}
-                />
-                )}
+                    <div
+                        className="prose prose-neutral max-w-none"
+                        dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(content) }}
+                    />
                 )}
             </div>
         </div>

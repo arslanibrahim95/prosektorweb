@@ -12,9 +12,14 @@
     "test:e2e": "playwright test",
     "test:coverage": "vitest run --coverage"
   },
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
+  },
   "dependencies": {
     "@prisma/adapter-mariadb": "^7.2.0",
     "@prisma/client": "^7.2.0",
+    "@radix-ui/react-slot": "^1.2.4",
     "@react-pdf/renderer": "^4.3.2",
     "@sentry/nextjs": "^10.36.0",
     "@tiptap/extension-link": "^3.17.0",
@@ -24,6 +29,7 @@
     "@upstash/ratelimit": "^2.0.8",
     "@upstash/redis": "^1.36.1",
     "bcryptjs": "^3.0.3",
+    "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
     "dotenv": "^17.2.3",
@@ -34,7 +40,7 @@
     "mariadb": "^3.4.5",
     "motion": "^12.27.0",
     "next": "16.1.2",
-    "next-auth": "^5.0.0-beta.30",
+    "next-auth": "5.0.0-beta.30",
     "next-intl": "^4.7.0",
     "ogl": "^1.0.11",
     "openai": "^6.16.0",

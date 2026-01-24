@@ -26,17 +26,16 @@ export default async function PortalDashboard() {
     const session = await auth()
     const stats = await getClientDashboardStats()
     const servicesData = await getClientServices(1, 10)
-    const projectsData = await getClientProjects(1, 10)
+    const { data: projects } = await getClientProjects(1, 10)
     const profile = await getClientProfile()
 
     const services = servicesData.data || []
-    const projects = projectsData.data || []
 
     const displayStats = stats || { activeProjects: 0, openTickets: 0, unpaidAmount: 0 }
     const clientName = profile?.name || session?.user?.name || 'Değerli Müşterimiz'
 
     // Check for projects needing review
-    const projectsNeedingReview = projects.filter((p: any) => p.status === 'REVIEW')
+    const projectsNeedingReview = (projects || []).filter((p: any) => p.status === 'REVIEW')
 
     // Check for upcoming service renewals (within 30 days)
     const upcomingRenewals = services.filter((s: any) => {

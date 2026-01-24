@@ -25,7 +25,7 @@ npx prisma generate
 
 # 4. Veritabanı şemasını uygula (migration)
 echo "🗄️ Veritabanı şeması güncelleniyor..."
-npx prisma db push
+npx prisma migrate deploy
 
 # 5. Next.js production build
 echo "🔨 Production build yapılıyor..."

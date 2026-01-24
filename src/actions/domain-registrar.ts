@@ -122,12 +122,13 @@ export async function searchDomainsWithPricing(query: string): Promise<{
 // REGISTER DOMAIN
 // ==========================================
 
-export async function purchaseDomain(
+import { createSafeAction } from '@/lib/safe-action'
+
+const purchaseDomainHandler = async ({ domain, contactInfo, companyId }: {
     domain: string,
     contactInfo: {
         firstName: string
         lastName: string
-        organization?: string
         address: string
         city: string
         postalCode: string
@@ -136,93 +137,84 @@ export async function purchaseDomain(
         email: string
     },
     companyId?: string
-): Promise<RegistrationResult> {
-    try {
-        await requireAdmin()
+}) => {
+    await requireAdmin()
 
-        const cf = await getCloudflareService()
-        if (!cf) {
-            return { success: false, error: 'Cloudflare yapılandırılmamış' }
-        }
-
-        // Pre-flight Check: Verify availability and Premium status again
-        // "Fail Closed": If we can't verify price/status, do NOT proceed.
-        const availability = await cf.checkDomainAvailability(domain)
-        if (!availability.available) {
-            return { success: false, error: 'Alan adı artık müsait değil.' }
-        }
-
-        // Block Premium domains for safety unless we implement specific premium flow
-        if (availability.premium) {
-            return { success: false, error: 'Premium alan adları şu an otomatik satın alınamaz. Lütfen destek ile iletişime geçin.' }
-        }
-
-        // Register domain via Cloudflare
-        const result = await cf.registerDomain(domain, 1, contactInfo)
-
-        if (!result.success || !result.domain) {
-            return { success: false, error: result.error || 'Domain kaydı alınamadı' }
-        }
-
-        // Save to our database
-        const serverIp = getDefaultServerIp()
-        const tld = '.' + domain.split('.').slice(1).join('.')
-        const expiresAt = result.domain.expires_at
-            ? new Date(result.domain.expires_at)
-            : new Date(Date.now() + 365 * 24 * 60 * 60 * 1000) // Default 1 year
-
-        await prisma.domain.create({
-            data: {
-                name: domain,
-                extension: tld,
-                status: 'ACTIVE',
-                registrar: 'Cloudflare',
-                serverIp: serverIp || null,
-                registeredAt: new Date(),
-                expiresAt,
-                companyId: companyId || null,
-                notes: 'Cloudflare üzerinden satın alındı',
-            },
-        })
-
-        // Create DNS zone and standard records if we have a server IP
-        if (serverIp) {
-            try {
-                await cf.createZone(domain)
-                const zone = await cf.getZoneByName(domain)
-                if (zone) {
-                    await cf.createStandardWebsiteDns(zone.id, domain, serverIp)
-                }
-            } catch (e) {
-                console.log('DNS setup warning:', e)
-            }
-        }
-
-        // Log Domain Purchase
-        // Log Domain Purchase
-        const auditLib = await import('@/lib/audit')
-        const authLib = await import('@/auth')
-        const session = await authLib.auth()
-
-        await auditLib.createAuditLog({
-            action: 'DOMAIN_PURCHASE',
-            entity: 'Domain',
-            entityId: domain,
-            details: {
-                companyId,
-                registrar: 'Cloudflare',
-                price: 'Standard'
-            },
-            userId: session?.user?.id
-        })
-
-        revalidatePath('/admin/domains')
-        return { success: true, domain: result.domain }
-    } catch (error) {
-        console.error('purchaseDomain error:', error)
-        return { success: false, error: 'Satın alma hatası' }
+    const cf = await getCloudflareService()
+    if (!cf) {
+        throw new Error('Cloudflare yapılandırılmamış')
     }
+
+    // Pre-flight Check: Verify availability and Premium status again
+    const availability = await cf.checkDomainAvailability(domain)
+    if (!availability.available) {
+        throw new Error('Alan adı artık müsait değil.')
+    }
+
+    // Block Premium domains for safety
+    if (availability.premium) {
+        throw new Error('Premium alan adları şu an otomatik satın alınamaz.')
+    }
+
+    // Register domain via Cloudflare
+    const result = await cf.registerDomain(domain, 1, contactInfo)
+
+    if (!result.success || !result.domain) {
+        throw new Error(result.error || 'Domain kaydı alınamadı')
+    }
+
+    // Save to our database
+    const serverIp = getDefaultServerIp()
+    const tld = '.' + domain.split('.').slice(1).join('.')
+    const expiresAt = result.domain.expires_at
+        ? new Date(result.domain.expires_at)
+        : new Date(Date.now() + 365 * 24 * 60 * 60 * 1000)
+
+    await prisma.domain.create({
+        data: {
+            name: domain,
+            extension: tld,
+            status: 'ACTIVE',
+            registrar: 'Cloudflare',
+            serverIp: serverIp || null,
+            registeredAt: new Date(),
+            expiresAt,
+            companyId: companyId || null,
+            notes: 'Cloudflare üzerinden satın alındı',
+        },
+    })
+
+    // Create DNS zone
+    if (serverIp) {
+        try {
+            await cf.createZone(domain)
+            const zone = await cf.getZoneByName(domain)
+            if (zone) {
+                await cf.createStandardWebsiteDns(zone.id, domain, serverIp)
+            }
+        } catch (e) {
+            console.log('DNS setup warning:', e)
+        }
+    }
+
+    // Log Domain Purchase
+    const auditLib = await import('@/lib/audit')
+    const authLib = await import('@/auth')
+    const session = await authLib.auth()
+
+    await auditLib.createAuditLog({
+        action: 'DOMAIN_PURCHASE',
+        entity: 'Domain',
+        entityId: domain,
+        details: { companyId, registrar: 'Cloudflare', price: 'Standard' },
+        userId: session?.user?.id
+    })
+
+    revalidatePath('/admin/domains')
+    return result.domain
 }
+
+export const purchaseDomain = createSafeAction('purchaseDomain', purchaseDomainHandler)
 
 // ==========================================
 // GET TLD PRICING

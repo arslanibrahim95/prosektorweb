@@ -29,14 +29,34 @@ export function createSafeAction<TArgs, TResult>(
         const start = Date.now();
         const requestId = crypto.randomUUID();
 
-        // Pass essential context if available (mocking context for now, ideally derived from headers/auth)
+        // Pass essential context
         const context: ActionContext = { requestId };
+
+        // 1. Idempotency Check (P0)
+        let idempotencyKey: string | null = null;
+        if (args instanceof FormData) {
+            idempotencyKey = args.get('idempotencyKey') as string;
+        } else if (typeof args === 'object' && args !== null) {
+            idempotencyKey = (args as any).idempotencyKey;
+        }
+
+        if (idempotencyKey && process.env.UPSTASH_REDIS_REST_URL) {
+            try {
+                const { redis } = await import('./redis');
+                const cached = await redis.get(`idempotency:${actionName}:${idempotencyKey}`);
+                if (cached) {
+                    logger.info({ requestId, action: actionName, idempotencyKey }, `Idempotency hit for ${actionName}`);
+                    return cached as ActionResponse<TResult>;
+                }
+            } catch (err) {
+                logger.warn({ requestId, action: actionName, err }, 'Idempotency check failed (Redis error)');
+            }
+        }
 
         try {
             logger.info({
                 requestId,
                 action: actionName,
-                // args: JSON.stringify(args) // Avoid logging potentially sensitive args in prod
             }, `Action ${actionName} started`);
 
             const result = await handler(args, context);
@@ -48,19 +68,39 @@ export function createSafeAction<TArgs, TResult>(
                 duration
             }, `Action ${actionName} completed`);
 
-            return { success: true, data: result };
+            const response: ActionResponse<TResult> = {
+                success: true,
+                data: result,
+                meta: { requestId }
+            };
+
+            // 2. Cache result for idempotency (P0)
+            if (idempotencyKey && process.env.UPSTASH_REDIS_REST_URL) {
+                try {
+                    const { redis } = await import('./redis');
+                    await redis.set(`idempotency:${actionName}:${idempotencyKey}`, response, { ex: 86400 }); // 24h
+                } catch (err) {
+                    logger.warn({ requestId, err }, 'Failed to cache idempotency result');
+                }
+            }
+
+            return response;
 
         } catch (error) {
             const duration = Date.now() - start;
             let errorMessage = getErrorMessage(error);
+            let errorCode = 'INTERNAL_ERROR';
 
             // Handle specific error types
             if (error instanceof z.ZodError) {
                 errorMessage = getZodErrorMessage(error);
+                errorCode = 'VALIDATION_ERROR';
             } else if (isPrismaUniqueConstraintError(error)) {
                 errorMessage = 'Bu kayıt zaten mevcut (Tekrarlanan veri).';
+                errorCode = 'DUPLICATE_RECORD';
             } else if (error instanceof ActionError) {
                 errorMessage = error.message;
+                errorCode = error.code;
             } else {
                 // For unknown errors, log full details but return generic message to user
                 logger.error({
@@ -84,7 +124,24 @@ export function createSafeAction<TArgs, TResult>(
                 }
             }
 
-            return { success: false, error: errorMessage };
+            const errorResponse: ActionResponse<TResult> = {
+                success: false,
+                error: errorMessage,
+                code: errorCode,
+                meta: { requestId }
+            };
+
+            // Optional: Cache failures too? Usually good for transient errors
+            if (idempotencyKey && process.env.UPSTASH_REDIS_REST_URL) {
+                try {
+                    const { redis } = await import('./redis');
+                    await redis.set(`idempotency:${actionName}:${idempotencyKey}`, errorResponse, { ex: 3600 }); // 1h for errors
+                } catch (err) {
+                    logger.warn({ requestId, err }, 'Failed to cache idempotency error');
+                }
+            }
+
+            return errorResponse;
         }
     };
 }

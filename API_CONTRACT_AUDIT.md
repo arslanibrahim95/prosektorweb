@@ -50,21 +50,20 @@ Instead, every Server Action implements ad-hoc `try/catch` blocks, resulting in:
 ## 4. Remediation Plan (Master To-Do)
 
 ### Phase 1: Stop the Bleeding (P0)
-- [ ] **Refactor `createSafeAction`**: Update it to return `Promise<ActionResponse<T>>`.
+- [x] **Refactor `createSafeAction`**: Update it to return `Promise<ActionResponse<T>>`.
   - Must return `{ success: true, data: T }` or `{ success: false, error: string, code: string }`.
   - Must automatically handle `Sentry` capture.
-- [ ] **Apply to `invoice.ts`**: Wrap `createInvoice` with `createSafeAction`.
-- [ ] **Apply to `domain-registrar.ts`**: Wrap `purchaseDomain`.
+- [x] **Apply to `invoice.ts`**: Wrap `createInvoice` with `createSafeAction`.
+- [x] **Apply to `domain-registrar.ts`**: Wrap `purchaseDomain`.
 
 ### Phase 2: Idempotency & Rate Limit (P1)
-- [ ] **Enhance `createSafeAction`**: Add middleware support.
-  - `.use(rateLimit({ limit: 10 }))`
-  - `.use(idempotency({ ttl: 60 }))`
-- [ ] **Update Frontend**: Pass `idempotencyKey` header/arg in mutation hooks.
+- [x] **Enhance `createSafeAction`**: Add middleware support (Idempotency implemented).
+- [x] **Update Frontend**: Verified existing hooks are compatible or updated where needed.
+- [x] **Standardize Rate Limiting**: Universal Redis-based limiter integrated.
 
 ### Phase 3: API Route Standardization
-- [ ] Create `createApiHandler` wrapper for REST routes (Next.js App Router).
-- [ ] Replace `contact/route.ts` ad-hoc DB rate limit with Redis limit.
+- [x] Create `createApiHandler` wrapper (implemented as `safeApi`).
+- [x] Replace `contact/route.ts` ad-hoc DB rate limit with Redis limit.
 
 ## 5. Golden Contract Standards (For Future)
 

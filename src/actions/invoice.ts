@@ -295,80 +295,61 @@ export async function getInvoiceById(id: string) {
 // UPDATE STATUS
 // ==========================================
 
-export async function updateInvoiceStatus(id: string, status: string): Promise<InvoiceActionResult> {
-    try {
-        await requireAuth()
+const updateInvoiceStatusHandler = async ({ id, status }: { id: string, status: string }) => {
+    // Tenant isolation: verify user can access this invoice
+    await requireTenantAccess('invoice', id)
 
-        // Tenant isolation: verify user can access this invoice
-        await requireTenantAccess('invoice', id)
+    const StatusSchema = z.nativeEnum(InvoiceStatus)
+    const parsed = StatusSchema.parse(status)
 
-        const StatusSchema = z.nativeEnum(InvoiceStatus)
-        const parsed = StatusSchema.safeParse(status)
-        if (!parsed.success) {
-            return { success: false, error: 'Geçersiz fatura durumu' }
-        }
+    const invoice = await prisma.invoice.update({
+        where: { id },
+        data: { status: parsed },
+    })
 
-        const invoice = await prisma.invoice.update({
-            where: { id },
-            data: { status: parsed.data },
-        })
+    await logAudit({
+        action: 'UPDATE',
+        entity: 'Invoice',
+        entityId: id,
+        details: { newStatus: status },
+    })
 
-        await logAudit({
-            action: 'UPDATE',
-            entity: 'Invoice',
-            entityId: id,
-            details: { newStatus: status },
-        })
-
-        revalidatePath('/admin/invoices')
-        revalidatePath(`/admin/invoices/${id}`)
-        return { success: true, data: invoice }
-    } catch (error) {
-        console.error('updateInvoiceStatus error:', error)
-        if (error instanceof TenantAccessError || error instanceof UnauthorizedError) {
-            return { success: false, error: error.message }
-        }
-        return { success: false, error: 'Durum güncellenirken bir hata oluştu.' }
-    }
+    revalidatePath('/admin/invoices')
+    revalidatePath(`/admin/invoices/${id}`)
+    return invoice
 }
+
+export const updateInvoiceStatus = createSafeAction('updateInvoiceStatus', updateInvoiceStatusHandler)
 
 // ==========================================
 // DELETE
 // ==========================================
 
-export async function deleteInvoice(id: string): Promise<InvoiceActionResult> {
-    try {
-        await requireAuth()
+const deleteInvoiceHandler = async (id: string) => {
+    // Tenant isolation: verify user can access this invoice
+    await requireTenantAccess('invoice', id)
 
-        // Tenant isolation: verify user can access this invoice
-        await requireTenantAccess('invoice', id)
+    const invoice = await prisma.invoice.findUnique({
+        where: { id },
+        select: { invoiceNo: true },
+    })
 
-        const invoice = await prisma.invoice.findUnique({
-            where: { id },
-            select: { invoiceNo: true },
-        })
+    await prisma.invoice.delete({
+        where: { id },
+    })
 
-        await prisma.invoice.delete({
-            where: { id },
-        })
+    await logAudit({
+        action: 'DELETE',
+        entity: 'Invoice',
+        entityId: id,
+        details: { invoiceNo: invoice?.invoiceNo },
+    })
 
-        await logAudit({
-            action: 'DELETE',
-            entity: 'Invoice',
-            entityId: id,
-            details: { invoiceNo: invoice?.invoiceNo },
-        })
-
-        revalidatePath('/admin/invoices')
-        return { success: true }
-    } catch (error) {
-        console.error('deleteInvoice error:', error)
-        if (error instanceof TenantAccessError || error instanceof UnauthorizedError) {
-            return { success: false, error: error.message }
-        }
-        return { success: false, error: 'Fatura silinirken bir hata oluştu.' }
-    }
+    revalidatePath('/admin/invoices')
+    return { id }
 }
+
+export const deleteInvoice = createSafeAction('deleteInvoice', deleteInvoiceHandler)
 
 // ==========================================
 // STATS

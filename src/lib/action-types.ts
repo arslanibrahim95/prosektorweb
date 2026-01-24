@@ -14,8 +14,8 @@
  * return { success: false, error: 'Firma bulunamadı.' }
  */
 export type ActionResponse<T = unknown> =
-    | { success: true; data: T }
-    | { success: false; error: string }
+    | { success: true; data: T; meta?: { requestId: string } }
+    | { success: false; error: string; code?: string; meta?: { requestId: string } }
 
 /**
  * Paginated response type for list queries.

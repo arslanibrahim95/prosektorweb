@@ -82,6 +82,12 @@
   --ring: var(--colorBrandBackground);
   --radius: var(--radius-md);
 
+  /* --- Colors: Semantic --- */
+  --success: #10b981;
+  --success-foreground: #ffffff;
+  --warning: #f59e0b;
+  --warning-foreground: #ffffff;
+
   /* Shadcn/UI Specific Mappings */
   --secondary: var(--colorNeutralBackground3);
   --secondary-foreground: var(--colorNeutralForeground1);
@@ -113,6 +119,10 @@
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
 
   /* Fluent Specific Utilities */
   --color-fluent-brand: var(--colorBrandBackground);

@@ -25,15 +25,15 @@ const statusConfig: Record<string, { label: string; color: string; bgColor: stri
 export default async function PortalDashboard() {
     const session = await auth()
     const stats = await getClientDashboardStats()
-    const services = await getClientServices()
-    const projects = await getClientProjects()
+    const { data: services = [] } = await getClientServices()
+    const { data: projects } = await getClientProjects()
     const profile = await getClientProfile()
 
     const displayStats = stats || { activeProjects: 0, openTickets: 0, unpaidAmount: 0 }
     const clientName = profile?.name || session?.user?.name || 'Değerli Müşterimiz'
 
     // Check for projects needing review
-    const projectsNeedingReview = projects.filter((p: any) => p.status === 'REVIEW')
+    const projectsNeedingReview = (projects || []).filter((p: any) => p.status === 'REVIEW')
 
     // Check for upcoming service renewals (within 30 days)
     const upcomingRenewals = services.filter((s: any) => {

@@ -1,64 +1,47 @@
 import { auth } from '@/auth'
 import { prisma } from '@/lib/prisma'
-import { NextResponse } from 'next/server'
+import { safeApi } from '@/lib/safe-api'
 
-export async function POST(
-    request: Request,
-    { params }: { params: Promise<{ contentId: string }> }
-) {
-    try {
-        const session = await auth()
+export const POST = safeApi<{ success: true }, { contentId: string }>(async (request, { params }) => {
+    const session = await auth()
 
-        if (!session?.user?.id) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-        }
-
-        // CSRF Check
-        const { checkOrigin } = await import('@/lib/csrf')
-        if (!(await checkOrigin())) {
-            return NextResponse.json({ error: 'Invalid Origin' }, { status: 403 })
-        }
-
-        const { contentId } = await params
-
-        // Kullanıcının firma bilgisini al
-        const user = await prisma.user.findUnique({
-            where: { id: session.user.id },
-            select: { companyId: true }
-        })
-
-        if (!user?.companyId) {
-            return NextResponse.json({ error: 'No company' }, { status: 403 })
-        }
-
-        // İçeriği ve projeyi doğrula
-        const content = await prisma.generatedContent.findFirst({
-            where: {
-                id: contentId,
-                webProject: {
-                    companyId: user.companyId
-                }
-            }
-        })
-
-        if (!content) {
-            return NextResponse.json({ error: 'Content not found' }, { status: 404 })
-        }
-
-        // Reddet
-        await prisma.generatedContent.update({
-            where: { id: contentId },
-            data: {
-                status: 'REJECTED',
-            }
-        })
-
-        return NextResponse.json({ success: true })
-    } catch (error) {
-        console.error('Reject error:', error)
-        return NextResponse.json(
-            { error: 'Rejection failed' },
-            { status: 500 }
-        )
+    if (!session?.user?.id) {
+        throw new Error('Unauthorized')
     }
-}
+
+    const { contentId } = params
+
+    // Kullanıcının firma bilgisini al
+    const user = await prisma.user.findUnique({
+        where: { id: session.user.id },
+        select: { companyId: true }
+    })
+
+    if (!user?.companyId) {
+        throw new Error('No company found for user')
+    }
+
+    // İçeriği ve projeyi doğrula
+    const content = await prisma.generatedContent.findFirst({
+        where: {
+            id: contentId,
+            webProject: {
+                companyId: user.companyId
+            }
+        }
+    })
+
+    if (!content) {
+        throw new Error('Content not found or access denied')
+    }
+
+    // Reddet
+    await prisma.generatedContent.update({
+        where: { id: contentId },
+        data: {
+            status: 'REJECTED',
+        }
+    })
+
+    return { success: true }
+}, { checkCsrf: true })
