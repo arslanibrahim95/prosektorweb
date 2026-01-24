@@ -7,6 +7,7 @@ import { Prisma } from '@prisma/client'
 import Particles from '@/components/ui/Particles'
 import SpotlightCard from '@/components/ui/SpotlightCard'
 import { Pagination } from '@/components/blog/Pagination'
+import { BlogCardImage } from '@/components/blog/BlogCardImage'
 
 // Helper to format date
 const formatDate = (date: Date) => {
@@ -130,20 +131,11 @@ export default async function BlogPage({
                                     <SpotlightCard className="h-full border-neutral-200 p-0 overflow-hidden hover:shadow-xl transition-all duration-500" spotlightColor="rgba(220, 38, 38, 0.15)">
                                         {/* Image */}
                                         <div className="aspect-[16/10] relative overflow-hidden bg-neutral-100">
-                                            {post.coverImage ? (
-                                                <img
-                                                    src={post.coverImage}
-                                                    alt={post.title}
-                                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                                                />
-                                            ) : (
-                                                <div className="w-full h-full bg-gradient-to-br from-neutral-100 to-neutral-200 flex items-center justify-center group-hover:scale-105 transition-transform duration-700">
-                                                    <div className="text-neutral-300 flex flex-col items-center gap-2">
-                                                        <ImageIcon className="w-12 h-12" />
-                                                        <span className="text-xs font-bold uppercase tracking-widest opacity-50">ProSektorWeb</span>
-                                                    </div>
-                                                </div>
-                                            )}
+                                            <BlogCardImage
+                                                src={post.coverImage}
+                                                alt={post.title}
+                                                categoryName={post.category?.name || 'Genel'}
+                                            />
                                             <div className="absolute top-4 left-4">
                                                 <span className="px-3 py-1 bg-white/95 backdrop-blur-md text-brand-700 text-xs font-bold rounded-full shadow-sm ring-1 ring-black/5">
                                                     {post.category?.name || 'Genel'}
