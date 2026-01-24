@@ -56,27 +56,18 @@ export default async function BlogPage({
     const totalPages = Math.ceil(totalPosts / LIMIT)
 
     return (
-        <div className="min-h-screen bg-neutral-50 text-neutral-900 font-sans selection:bg-brand-100 selection:text-brand-900">
+        <div className="min-h-screen bg-transparent text-neutral-900 font-sans selection:bg-brand-100 selection:text-brand-900 relative overflow-hidden">
+            {/* Background Harmonization with Main Page */}
+            <div className="fixed top-[-20%] left-[-20%] w-[60%] h-[60%] bg-brand-200/60 blur-[150px] rounded-full -z-20 pointer-events-none mix-blend-multiply" />
+            <div className="fixed bottom-[-20%] right-[-20%] w-[50%] h-[50%] bg-blue-100/60 blur-[150px] rounded-full -z-20 pointer-events-none mix-blend-multiply" />
+            <div className="fixed inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] -z-10 pointer-events-none" />
+            <div className="fixed inset-0 bg-[url('/assets/noise.svg')] opacity-10 -z-10 pointer-events-none brightness-100 contrast-150" />
+
             {/* Navbar with inner variant */}
             <Navbar variant="inner" />
 
             {/* Header */}
-            <section className="pt-32 pb-16 px-6 bg-white border-b border-neutral-200 relative overflow-hidden">
-                {/* Particles Background */}
-                <div className="absolute inset-0 z-0 pointer-events-none opacity-60">
-                    <Particles
-                        particleColors={['#dc2626', '#ef4444', '#f87171']}
-                        particleCount={120}
-                        particleSpread={15}
-                        speed={0.08}
-                        particleBaseSize={100}
-                        moveParticlesOnHover={true}
-                        alphaParticles={false}
-                        disableRotation={false}
-                    />
-                </div>
-                {/* Gradient Overlay for Text Readability */}
-                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/50 to-white z-0 pointer-events-none" />
+            <section className="pt-32 pb-16 px-6 relative z-10">
 
 
                 <div className="max-w-6xl mx-auto text-center relative z-10">
