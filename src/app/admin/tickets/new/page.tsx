@@ -1,7 +1,8 @@
 import { prisma } from '@/lib/prisma'
 import { createTicket } from '@/actions/ticket'
 import Link from 'next/link'
-import { ChevronLeft, Save } from 'lucide-react'
+import { ChevronLeft, Loader2, Save } from 'lucide-react'
+import { TicketPriority, TicketCategory } from '@prisma/client'
 
 export default async function NewTicketPage() {
     const companies = await prisma.company.findMany({

@@ -1,5 +1,3 @@
-export const dynamic = 'force-dynamic'
-
 import { getPortfolios } from '@/actions/portfolio'
 import Link from 'next/link'
 import { ArrowRight, ExternalLink, Quote } from 'lucide-react'

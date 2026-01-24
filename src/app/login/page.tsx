@@ -93,7 +93,7 @@ export default function LoginPage() {
                             <h1 className="text-2xl font-bold text-white font-serif mb-2">Müşteri Paneli</h1>
                             <p className="text-brand-100 text-sm flex items-center justify-center gap-2">
                                 <Sparkles className="w-4 h-4" />
-                                Projelerinizi takip edin. Yalnızca müşteriler için.
+                                Projelerinizi takip edin
                             </p>
                         </div>
                     </div>

@@ -1,0 +1,40 @@
+name: Quality Assurance
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    name: Validation & Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Lint (ESLint)
+        run: npm run lint
+
+      # Build acts as a comprehensive Type Check
+      - name: Type Check (Build)
+        run: npm run build
+        env:
+          NEXT_PUBLIC_RELEASE_VERSION: ${{ github.sha }}
+          # Skip strict linting during build since we ran it separately (optional but good for speed)
+          NEXT_TELEMETRY_DISABLED: 1
+
+      - name: Unit Tests (Vitest)
+        run: npm run test:unit
+        # Ensure 'test:unit' script exists in package.json

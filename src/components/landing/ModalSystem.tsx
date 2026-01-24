@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect, useTransition } from 'react'
+import React, { useState, useEffect, useTransition, useRef } from 'react'
 import { X, Check, ArrowLeft, Lock, AlertCircle, CreditCard } from 'lucide-react'
 import { verifyClientAccess } from '@/actions/client-auth'
 
@@ -47,6 +47,8 @@ export function ModalSystem({ isOpen, onClose, initialState = ModalStep.INITIAL_
     const [osgbName, setOsgbName] = useState('Evren Ada OSGB')
     const [selectedDesign, setSelectedDesign] = useState<'Aksiyon' | 'Vizyon' | null>(null)
     const [isPending, startTransition] = useTransition()
+    const modalRef = useRef<HTMLDivElement>(null)
+    const previousFocusRef = useRef<HTMLElement | null>(null)
 
     // Login Inputs
     const [loginInputName, setLoginInputName] = useState('')
@@ -126,22 +128,60 @@ export function ModalSystem({ isOpen, onClose, initialState = ModalStep.INITIAL_
     }
 
     // Focus Trap & ESC Handler
+    // Focus Trap & ESC Handler
     useEffect(() => {
         if (!isOpen) return
+
+        previousFocusRef.current = document.activeElement as HTMLElement
+        document.body.style.overflow = 'hidden'
+
+        // Initial focus
+        setTimeout(() => {
+            const focusableElements = modalRef.current?.querySelectorAll(
+                'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+            )
+            if (focusableElements && focusableElements.length > 0) {
+                (focusableElements[0] as HTMLElement).focus()
+            } else {
+                modalRef.current?.focus()
+            }
+        }, 50)
 
         const handleKeyDown = (e: KeyboardEvent) => {
             if (e.key === 'Escape') {
                 onClose()
             }
+            if (e.key === 'Tab') {
+                const focusableElements = modalRef.current?.querySelectorAll(
+                    'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+                )
+                if (!focusableElements || focusableElements.length === 0) return
+
+                const firstElement = focusableElements[0] as HTMLElement
+                const lastElement = focusableElements[focusableElements.length - 1] as HTMLElement
+
+                if (e.shiftKey) {
+                    if (document.activeElement === firstElement) {
+                        lastElement.focus()
+                        e.preventDefault()
+                    }
+                } else {
+                    if (document.activeElement === lastElement) {
+                        firstElement.focus()
+                        e.preventDefault()
+                    }
+                }
+            }
         }
 
         document.addEventListener('keydown', handleKeyDown)
-        // Prevent body scroll
-        document.body.style.overflow = 'hidden'
 
         return () => {
             document.removeEventListener('keydown', handleKeyDown)
             document.body.style.overflow = 'unset'
+            if (previousFocusRef.current) {
+                previousFocusRef.current.focus()
+            }
         }
     }, [isOpen, onClose])
 
@@ -164,6 +204,7 @@ export function ModalSystem({ isOpen, onClose, initialState = ModalStep.INITIAL_
 
             {/* Modal Content */}
             <div
+                ref={modalRef}
                 className="relative bg-white w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200 h-auto max-h-[90vh] overflow-y-auto outline-none"
                 tabIndex={-1}
             >
@@ -203,7 +244,7 @@ export function ModalSystem({ isOpen, onClose, initialState = ModalStep.INITIAL_
                     {/* Login */}
                     {step === ModalStep.LOGIN && (
                         <div>
-                            <h2 className="text-2xl font-bold mb-6 text-neutral-900">Giriş Yap</h2>
+                            <h2 id="modal-title" className="text-2xl font-bold mb-6 text-neutral-900">Giriş Yap</h2>
                             <div className="space-y-4 mb-6">
                                 <div>
                                     <label htmlFor="loginName" className="block text-sm font-semibold text-neutral-700 mb-1">OSGB Adı</label>
@@ -247,7 +288,7 @@ export function ModalSystem({ isOpen, onClose, initialState = ModalStep.INITIAL_
                     {/* Request Intro */}
                     {step === ModalStep.REQUEST_INTRO && (
                         <div className="text-center">
-                            <h2 className="text-2xl font-bold mb-4 text-neutral-900">Kodunuz Yok mu?</h2>
+                            <h2 id="modal-title" className="text-2xl font-bold mb-4 text-neutral-900">Kodunuz Yok mu?</h2>
                             <p className="text-neutral-500 mb-8">
                                 Web siteniz için önizleme hazırlayalım, erişim kodunuzu size iletelim. En geç 24–72 saat içinde erişim kodunuz gönderilir.
                             </p>
@@ -261,24 +302,24 @@ export function ModalSystem({ isOpen, onClose, initialState = ModalStep.INITIAL_
                     {/* Request Form */}
                     {step === ModalStep.REQUEST_FORM && (
                         <div>
-                            <h2 className="text-2xl font-bold mb-2 text-neutral-900">Önizleme Talebi</h2>
+                            <h2 id="modal-title" className="text-2xl font-bold mb-2 text-neutral-900">Önizleme Talebi</h2>
                             <p className="text-sm text-neutral-500 mb-6">Erişim yalnızca OSGB yetkililerine açılır.</p>
                             <div className="space-y-4 mb-8">
                                 {/* Added Labels for A11y */}
                                 <div>
-                                    <label htmlFor="req_company" className="sr-only">OSGB Ticari Ünvanı</label>
+                                    <label htmlFor="req_company" className="block text-sm font-semibold text-neutral-700 mb-1">OSGB Ticari Ünvanı</label>
                                     <input id="req_company" type="text" placeholder="OSGB Ticari Ünvanı" className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none" />
                                 </div>
                                 <div>
-                                    <label htmlFor="req_name" className="sr-only">Yetkili Adı Soyadı</label>
+                                    <label htmlFor="req_name" className="block text-sm font-semibold text-neutral-700 mb-1">Yetkili Adı Soyadı</label>
                                     <input id="req_name" type="text" placeholder="Yetkili Adı Soyadı" className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none" />
                                 </div>
                                 <div>
-                                    <label htmlFor="req_email" className="sr-only">E-posta Adresi</label>
+                                    <label htmlFor="req_email" className="block text-sm font-semibold text-neutral-700 mb-1">E-posta Adresi</label>
                                     <input id="req_email" type="email" placeholder="E-posta Adresi" className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none" />
                                 </div>
                                 <div>
-                                    <label htmlFor="req_phone" className="sr-only">Cep Telefonu</label>
+                                    <label htmlFor="req_phone" className="block text-sm font-semibold text-neutral-700 mb-1">Cep Telefonu</label>
                                     <input id="req_phone" type="tel" placeholder="Cep Telefonu (WhatsApp için)" className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none" />
                                 </div>
                                 <div className="flex items-start gap-3">
@@ -299,7 +340,7 @@ export function ModalSystem({ isOpen, onClose, initialState = ModalStep.INITIAL_
                             <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
                                 <Check className="w-8 h-8" />
                             </div>
-                            <h2 className="text-2xl font-bold mb-4 text-green-700">Talebiniz Alındı</h2>
+                            <h2 id="modal-title" className="text-2xl font-bold mb-4 text-green-700">Talebiniz Alındı</h2>
                             <p className="text-neutral-500 mb-8">
                                 OSGB’niz için web sitesi önizleme talebiniz başarıyla alındı. Kodunuz WhatsApp veya e-posta yoluyla tarafınıza iletilecektir.
                             </p>
@@ -312,7 +353,7 @@ export function ModalSystem({ isOpen, onClose, initialState = ModalStep.INITIAL_
                     {/* Dashboard */}
                     {step === ModalStep.DASHBOARD && (
                         <div>
-                            <h2 className="text-2xl font-bold mb-2 text-neutral-900">Hoş geldiniz, <span className="text-brand-600">{osgbName}</span></h2>
+                            <h2 id="modal-title" className="text-2xl font-bold mb-2 text-neutral-900">Hoş geldiniz, <span className="text-brand-600">{osgbName}</span></h2>
                             <p className="text-neutral-500 mb-8">Firmanız için hazırlanan 2 farklı dijital kimliği inceleyebilirsiniz.</p>
 
                             <div className="grid grid-cols-2 gap-6 mb-8">
@@ -343,7 +384,7 @@ export function ModalSystem({ isOpen, onClose, initialState = ModalStep.INITIAL_
                     {step === ModalStep.PREVIEW_DETAIL && (
                         <div>
                             <div className="flex items-center justify-between mb-6">
-                                <h2 className="text-2xl font-bold text-neutral-900">{selectedDesign} Önizleme</h2>
+                                <h2 id="modal-title" className="text-2xl font-bold text-neutral-900">{selectedDesign} Önizleme</h2>
                             </div>
 
                             <div className="aspect-video bg-neutral-100 rounded-2xl border-2 border-dashed border-neutral-300 flex items-center justify-center mb-6">
@@ -362,7 +403,7 @@ export function ModalSystem({ isOpen, onClose, initialState = ModalStep.INITIAL_
                     {/* Ready */}
                     {step === ModalStep.READY_TO_PUBLISH && (
                         <div>
-                            <h2 className="text-2xl font-bold mb-4 text-neutral-900">Yayına Hazır</h2>
+                            <h2 id="modal-title" className="text-2xl font-bold mb-4 text-neutral-900">Yayına Hazır</h2>
                             <p className="text-neutral-500 mb-6">
                                 Seçtiğiniz tasarımı yayına almak üzeresiniz. Bu sayfa, size özel hazırlanan dijital kimliğin yayın sürecini başlatır.
                             </p>
@@ -379,7 +420,7 @@ export function ModalSystem({ isOpen, onClose, initialState = ModalStep.INITIAL_
                     {/* Payment */}
                     {step === ModalStep.PAYMENT && (
                         <div>
-                            <h2 className="text-2xl font-bold mb-6 text-neutral-900">Ödeme</h2>
+                            <h2 id="modal-title" className="text-2xl font-bold mb-6 text-neutral-900">Ödeme</h2>
                             <div className="bg-neutral-50 p-6 rounded-2xl border border-neutral-200 mb-8">
                                 <div className="flex items-center justify-between mb-4">
                                     <span className="text-neutral-600">Ürün</span>
@@ -417,7 +458,7 @@ export function ModalSystem({ isOpen, onClose, initialState = ModalStep.INITIAL_
                             <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
                                 <Check className="w-8 h-8" />
                             </div>
-                            <h2 className="text-2xl font-bold mb-4 text-green-700">Yayına Alındı!</h2>
+                            <h2 id="modal-title" className="text-2xl font-bold mb-4 text-green-700">Yayına Alındı!</h2>
                             <p className="text-neutral-500 mb-8">
                                 Web siteniz yayına alınma sırasına alınmıştır. Alan adı bağlantısı ve teknik kurulum için ekibimiz sizinle iletişime geçecektir.
                             </p>
@@ -433,7 +474,7 @@ export function ModalSystem({ isOpen, onClose, initialState = ModalStep.INITIAL_
                             <div className="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-6">
                                 <Lock className="w-8 h-8" />
                             </div>
-                            <h2 className="text-2xl font-bold mb-4 text-red-700">Süre Doldu</h2>
+                            <h2 id="modal-title" className="text-2xl font-bold mb-4 text-red-700">Süre Doldu</h2>
                             <p className="text-neutral-500 mb-6">
                                 Önizleme süresi sona erdiği için tasarımlar arşivlenmiştir.
                             </p>

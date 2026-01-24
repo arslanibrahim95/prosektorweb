@@ -17,7 +17,7 @@ import {
 } from 'lucide-react'
 
 interface ProjectsPageProps {
-    searchParams: Promise<{ q?: string, status?: string, page?: string }>
+    searchParams: Promise<{ q?: string, status?: string }>
 }
 
 const statusConfig: Record<string, { label: string, color: string, icon: any }> = {
@@ -37,17 +37,10 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
     const searchQuery = params.q || ''
     const statusFilter = params.status || ''
 
-    const page = Number(params.page) || 1
-    const limit = 10
-
-    const [projectsData, stats] = await Promise.all([
-        getProjects({ search: searchQuery, status: statusFilter, page, limit }),
+    const [projects, stats] = await Promise.all([
+        getProjects(searchQuery, statusFilter),
         getProjectStats(),
     ])
-
-    const projects = projectsData.data
-    const totalPages = projectsData.pages
-    const currentPage = projectsData.currentPage
 
     return (
         <div className="space-y-6">
@@ -151,96 +144,69 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
                     </Link>
                 </div>
             ) : (
-                <div className="space-y-4">
-                    <div className="grid gap-4">
-                        {projects.map((project) => {
-                            const status = statusConfig[project.status] || statusConfig.DRAFT
-                            const StatusIcon = status.icon
-                            return (
-                                <Link
-                                    key={project.id}
-                                    href={`/admin/projects/${project.id}`}
-                                    className="bg-white rounded-xl border border-neutral-200 p-6 hover:border-brand-300 hover:shadow-lg transition-all group"
-                                >
-                                    <div className="flex items-center justify-between">
-                                        <div className="flex items-center gap-4">
-                                            <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${status.color}`}>
-                                                <StatusIcon className="w-6 h-6" />
-                                            </div>
-                                            <div>
-                                                <div className="text-lg font-bold text-neutral-900 group-hover:text-brand-600 transition-colors">
-                                                    {project.name}
-                                                </div>
-                                                <div className="flex items-center gap-3 text-sm text-neutral-500 mt-1">
-                                                    <span className="flex items-center gap-1">
-                                                        <Building2 className="w-4 h-4" />
-                                                        {project.company.name}
-                                                    </span>
-                                                    {project.domain && (
-                                                        <span className="flex items-center gap-1">
-                                                            <Globe className="w-4 h-4" />
-                                                            {project.domain.name}
-                                                        </span>
-                                                    )}
-                                                </div>
-                                            </div>
+                <div className="grid gap-4">
+                    {projects.map((project) => {
+                        const status = statusConfig[project.status] || statusConfig.DRAFT
+                        const StatusIcon = status.icon
+                        return (
+                            <Link
+                                key={project.id}
+                                href={`/admin/projects/${project.id}`}
+                                className="bg-white rounded-xl border border-neutral-200 p-6 hover:border-brand-300 hover:shadow-lg transition-all group"
+                            >
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-4">
+                                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${status.color}`}>
+                                            <StatusIcon className="w-6 h-6" />
                                         </div>
-                                        <div className="flex items-center gap-4">
-                                            {project.price && (
-                                                <div className="text-right">
-                                                    <div className="text-lg font-bold text-neutral-900">
-                                                        ₺{project.price.toNumber().toLocaleString('tr-TR')}
-                                                    </div>
-                                                    <div className={`text-xs font-medium ${project.isPaid ? 'text-green-600' : 'text-orange-600'}`}>
-                                                        {project.isPaid ? 'Ödendi' : 'Bekliyor'}
-                                                    </div>
-                                                </div>
-                                            )}
-                                            <span className={`px-3 py-1 rounded-full text-sm font-bold ${status.color}`}>
-                                                {status.label}
-                                            </span>
-                                            {project.siteUrl && (
-                                                <a
-                                                    href={project.siteUrl}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    onClick={(e) => e.stopPropagation()}
-                                                    className="p-2 text-neutral-400 hover:text-brand-600 hover:bg-brand-50 rounded-lg transition-colors"
-                                                >
-                                                    <ExternalLink className="w-5 h-5" />
-                                                </a>
-                                            )}
+                                        <div>
+                                            <div className="text-lg font-bold text-neutral-900 group-hover:text-brand-600 transition-colors">
+                                                {project.name}
+                                            </div>
+                                            <div className="flex items-center gap-3 text-sm text-neutral-500 mt-1">
+                                                <span className="flex items-center gap-1">
+                                                    <Building2 className="w-4 h-4" />
+                                                    {project.company.name}
+                                                </span>
+                                                {project.domain && (
+                                                    <span className="flex items-center gap-1">
+                                                        <Globe className="w-4 h-4" />
+                                                        {project.domain.name}
+                                                    </span>
+                                                )}
+                                            </div>
                                         </div>
                                     </div>
-                                </Link>
-                            )
-                        })}
-                    </div>
-
-                    {/* Pagination Controls */}
-                    {totalPages > 1 && (
-                        <div className="flex justify-center gap-2 mt-8">
-                            {currentPage > 1 && (
-                                <Link
-                                    href={{ query: { ...params, page: currentPage - 1 } }}
-                                    className="px-4 py-2 bg-white border border-neutral-200 rounded-lg hover:bg-neutral-50 text-neutral-600"
-                                >
-                                    Önceki
-                                </Link>
-                            )}
-                            <div className="px-4 py-2 text-neutral-500">
-                                Sayfa {currentPage} / {totalPages}
-                            </div>
-                            {currentPage < totalPages && (
-                                <Link
-                                    href={{ query: { ...params, page: currentPage + 1 } }}
-                                    className="px-4 py-2 bg-white border border-neutral-200 rounded-lg hover:bg-neutral-50 text-neutral-600"
-                                >
-                                    Sonraki
-                                </Link>
-                            )}
-                        </div>
-                    )}
+                                    <div className="flex items-center gap-4">
+                                        {project.price && (
+                                            <div className="text-right">
+                                                <div className="text-lg font-bold text-neutral-900">
+                                                    ₺{project.price.toNumber().toLocaleString('tr-TR')}
+                                                </div>
+                                                <div className={`text-xs font-medium ${project.isPaid ? 'text-green-600' : 'text-orange-600'}`}>
+                                                    {project.isPaid ? 'Ödendi' : 'Bekliyor'}
+                                                </div>
+                                            </div>
+                                        )}
+                                        <span className={`px-3 py-1 rounded-full text-sm font-bold ${status.color}`}>
+                                            {status.label}
+                                        </span>
+                                        {project.siteUrl && (
+                                            <a
+                                                href={project.siteUrl}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                onClick={(e) => e.stopPropagation()}
+                                                className="p-2 text-neutral-400 hover:text-brand-600 hover:bg-brand-50 rounded-lg transition-colors"
+                                            >
+                                                <ExternalLink className="w-5 h-5" />
+                                            </a>
+                                        )}
+                                    </div>
+                                </div>
+                            </Link>
+                        )
+                    })}
                 </div>
             )}
         </div>

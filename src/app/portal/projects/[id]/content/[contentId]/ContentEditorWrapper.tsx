@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { ContentEditor } from '@/components/ui/ContentEditor'
 import { FileText, Save, X, Edit2, Loader2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { sanitizeHtml } from '@/lib/security/sanitize'
+import DOMPurify from 'isomorphic-dompurify'
 
 interface ContentEditorWrapperProps {
     contentId: string
@@ -98,9 +98,13 @@ export function ContentEditorWrapper({
                         editable={true}
                     />
                 ) : (
-                    <div className="bg-white p-8 rounded-xl border border-neutral-200 shadow-sm prose max-w-none">
-                        <div dangerouslySetInnerHTML={{ __html: sanitizeHtml(content) }} />
-                    </div>
+                    {/* ... */ }
+                ) : (
+                <div
+                    className="prose prose-neutral max-w-none"
+                    dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(content) }}
+                />
+                )}
                 )}
             </div>
         </div>

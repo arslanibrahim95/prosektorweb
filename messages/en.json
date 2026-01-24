@@ -1,0 +1,29 @@
+{
+    "Common": {
+        "title": "ProSektorWeb",
+        "loading": "Loading...",
+        "error": "An error occurred",
+        "save": "Save",
+        "cancel": "Cancel"
+    },
+    "Locale": {
+        "tr": "Turkish",
+        "en": "English"
+    },
+    "Login": {
+        "title": "Client Portal",
+        "description": "Track your projects. For clients only.",
+        "email_label": "Email Address",
+        "password_label": "Password",
+        "loading": "Signing in...",
+        "submit": "Sign In",
+        "no_account": "Don't have an account?",
+        "contact_us": "Contact us",
+        "back_home": "Back to Home",
+        "error_email": "Please enter a valid email address.",
+        "error_password_length": "Password must be at least 6 characters.",
+        "error_invalid": "Invalid email or password.",
+        "kvkk": "GDPR Compliant",
+        "ssl": "256-bit SSL"
+    }
+}

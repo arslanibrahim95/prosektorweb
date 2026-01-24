@@ -1,18 +1,16 @@
 import { PrismaClient } from '@prisma/client'
-import { mockDeep, mockReset, DeepMockProxy } from 'vitest-mock-extended'
-import { beforeEach, vi } from 'vitest'
+import { mockDeep, DeepMockProxy } from 'vitest-mock-extended'
+import { prisma } from '@/lib/prisma'
 
-// Create a mock of PrismaClient
-export const prismaMock = mockDeep<PrismaClient>()
-
-// Mock the prisma module
+// 1. Mock the prisma module
 vi.mock('@/lib/prisma', () => ({
-    prisma: prismaMock,
+    prisma: mockDeep<PrismaClient>(),
 }))
 
-// Reset mocks before each test
-beforeEach(() => {
-    mockReset(prismaMock)
-})
+// 2. Export the mocked instance for use in tests
+export const prismaMock = prisma as unknown as DeepMockProxy<PrismaClient>
 
-export type MockPrismaClient = DeepMockProxy<PrismaClient>
+// 3. Reset mocks before each test
+beforeEach(() => {
+    vi.clearAllMocks()
+})

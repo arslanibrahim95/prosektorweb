@@ -24,11 +24,8 @@ export default function HomePage() {
       <div className="min-h-screen bg-transparent text-neutral-900 font-sans selection:bg-brand-100 selection:text-brand-900 relative overflow-hidden">
 
         {/* Fluent "Aurora" Background Effect - Enhanced */}
-        {/* Optimized Static Gradient (Performance Fix) */}
-        <div className="fixed inset-0 pointer-events-none -z-20 overflow-hidden">
-          <div className="absolute -top-[10%] -left-[10%] w-[50%] h-[50%] rounded-full bg-brand-100/40 blur-3xl opacity-50 mix-blend-multiply" />
-          <div className="absolute top-[20%] -right-[10%] w-[40%] h-[60%] rounded-full bg-blue-100/40 blur-3xl opacity-50 mix-blend-multiply" />
-        </div>
+        <div className="fixed top-[-20%] left-[-20%] w-[60%] h-[60%] bg-brand-200/60 blur-[150px] rounded-full -z-20 pointer-events-none mix-blend-multiply" />
+        <div className="fixed bottom-[-20%] right-[-20%] w-[50%] h-[50%] bg-blue-100/60 blur-[150px] rounded-full -z-20 pointer-events-none mix-blend-multiply" />
 
         {/* Technical Grid Pattern */}
         <div className="fixed inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] -z-10 pointer-events-none" />

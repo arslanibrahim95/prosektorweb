@@ -1,7 +1,11 @@
 import NextAuth from "next-auth"
 import { authConfig } from "./auth.config"
+import createMiddleware from 'next-intl/middleware';
+import { routing } from '@/i18n/routing';
+import { NextRequest, NextResponse } from "next/server";
 
 const { auth } = NextAuth(authConfig)
+const intlMiddleware = createMiddleware(routing);
 
 export default auth((req) => {
     // [TODO-OBS-002] Middleware Request ID & Logging
@@ -17,11 +21,6 @@ export default auth((req) => {
         userAgent: req.headers.get('user-agent'),
     }
 
-    // Since middleware runs on Edge/Node depending on config, but NextAuth forces Node or Edge compat
-    // We will do a simple console.log JSON string which Pino can pick up in stdout or a dedicated transport if we attach one.
-    // However, in Vercel/Next middleware, using 'pino' directly might be heavy. 
-    // Best practice for Next.js Middleware observability is often just console.log JSON for ingestion or OpenTelemetry.
-    // For this P0 remediation, we stick to JSON console output which our infra should capture.
     console.log(JSON.stringify({
         ...logContext,
         level: 'info',
@@ -32,14 +31,8 @@ export default auth((req) => {
     const isLoggedIn = !!req.auth
     const userRole = req.auth?.user?.role
 
-    const isOnLogin = req.nextUrl.pathname.startsWith('/login')
-    const isOnAdmin = req.nextUrl.pathname.startsWith('/admin')
-    const isOnPortal = req.nextUrl.pathname.startsWith('/portal')
-
-    // Response helper to inject headers
-    const next = () => {
-        // Calculate duration for exit log (approximate since we return Response object)
-        // In real middleware chain we would tap into response.
+    // Helper for logging exit
+    const logExit = () => {
         const duration = Date.now() - requestStart
         console.log(JSON.stringify({
             ...logContext,
@@ -50,14 +43,68 @@ export default auth((req) => {
         }))
     }
 
+    // 1. API Protection (Skip Intl)
+    if (req.nextUrl.pathname.startsWith('/api')) {
+        // Public API routes
+        if (
+            req.nextUrl.pathname.startsWith('/api/auth') ||
+            req.nextUrl.pathname.startsWith('/api/contact') ||
+            req.nextUrl.pathname.startsWith('/api/webhooks')
+        ) {
+            logExit()
+            return null
+        }
+
+        // Require auth for all other API routes
+        if (!isLoggedIn) {
+            logExit()
+            return Response.json({ error: 'Unauthorized' }, { status: 401 })
+        }
+
+        // Admin-only API routes
+        if (req.nextUrl.pathname.startsWith('/api/admin') && userRole !== 'ADMIN') {
+            logExit()
+            return Response.json({ error: 'Forbidden' }, { status: 403 })
+        }
+
+        logExit()
+        return null
+    }
+
+    // 2. Intl Middleware (For Pages)
+    // We run this first to handle redirects (e.g. / -> /tr)
+    // If it returns a redirect, we follow it immediately.
+    const intlResponse = intlMiddleware(req);
+    if (intlResponse.headers.get('location')) {
+        logExit()
+        return intlResponse;
+    }
+
+    // 3. Auth Protection for Pages
+    // Determine the actual path (ignoring locale prefix for checks)
+    // E.g. /tr/admin -> /admin
+    const pathname = req.nextUrl.pathname;
+    const localeMatch = pathname.match(/^\/(tr|en)(\/|$)/);
+    const pathWithoutLocale = localeMatch
+        ? pathname.replace(/^\/(tr|en)/, '') || '/'
+        : pathname;
+
+    const isOnLogin = pathWithoutLocale.startsWith('/login')
+    const isOnAdmin = pathWithoutLocale.startsWith('/admin')
+    const isOnPortal = pathWithoutLocale.startsWith('/portal')
+
     // Public login page - redirect logged-in users
     if (isOnLogin && isLoggedIn) {
         if (userRole === 'CLIENT') {
-            next()
-            return Response.redirect(new URL('/portal', req.nextUrl))
+            logExit()
+            return Response.redirect(new URL('/portal', req.nextUrl)) // Auth middleware will handle keeping locale if we use relative? No, next-intl handles generic redirects better but here we force it.
+            // Ideally: return Response.redirect(new URL(`/${req.locale}/portal`, req.url))
+            // But req.locale is not available here easily (it's in intlResponse).
+            // We can assume default or extract from URL.
+            // For now, redirecting to /portal will trigger intlMiddleware again on next request to add locale.
         }
         if (userRole === 'ADMIN') {
-            next()
+            logExit()
             return Response.redirect(new URL('/admin', req.nextUrl))
         }
     }
@@ -65,7 +112,8 @@ export default auth((req) => {
     // Admin protection
     if (isOnAdmin) {
         if (!isLoggedIn || userRole !== 'ADMIN') {
-            next()
+            logExit()
+            // Redirect to login
             return Response.redirect(new URL('/login', req.nextUrl))
         }
     }
@@ -73,41 +121,17 @@ export default auth((req) => {
     // Portal protection
     if (isOnPortal) {
         if (!isLoggedIn || userRole !== 'CLIENT') {
-            next()
+            logExit()
             return Response.redirect(new URL('/login', req.nextUrl))
         }
     }
 
-    // API protection
-    if (req.nextUrl.pathname.startsWith('/api')) {
-        // Allow public API routes
-        if (
-            req.nextUrl.pathname.startsWith('/api/auth') ||
-            req.nextUrl.pathname.startsWith('/api/contact') ||
-            req.nextUrl.pathname.startsWith('/api/webhooks')
-        ) {
-            // Check CSP / Sentry permissions here if needed
-            next()
-            return null
-        }
-
-        // Require auth for all other API routes
-        if (!isLoggedIn) {
-            next()
-            return Response.json({ error: 'Unauthorized' }, { status: 401 })
-        }
-
-        // Admin-only API routes
-        if (req.nextUrl.pathname.startsWith('/api/admin') && userRole !== 'ADMIN') {
-            next()
-            return Response.json({ error: 'Forbidden' }, { status: 403 })
-        }
-    }
-
-    next()
-    return null
+    logExit()
+    // Return the response created by intl middleware (which contains rewrites/headers)
+    return intlResponse;
 })
 
 export const config = {
+    // Matcher excluding statics
     matcher: ['/((?!_next/static|_next/image|.*\\.png$|.*\\.ico$).*)'],
 }

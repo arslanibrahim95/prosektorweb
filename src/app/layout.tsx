@@ -1,26 +1,13 @@
 import type { Metadata } from "next";
-import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/components/AuthProvider";
 
-const inter = Inter({
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-inter",
-});
-
-const playfair = Playfair_Display({
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-playfair",
-});
-
 export const metadata: Metadata = {
   title: {
-    default: "ProSektorWeb | OSGB Web Sitesi",
+    default: "ProSektorWeb | İş Sağlığı ve Güvenliği Blog",
     template: "%s | ProSektorWeb"
   },
-  description: "OSGB'niz için profesyonel web sitesi. 7 gün ücretsiz önizleme, tek fiyat ve tam sektör uyumu.",
+  description: "Türkiye'nin en kapsamlı İSG blog platformu. 400'den fazla makale, güncel mevzuat bilgileri, risk yönetimi ve dijital dönüşüm rehberleri.",
   keywords: ["isg", "iş güvenliği", "iş sağlığı", "osgb", "risk analizi", "mevzuat", "6331"],
   authors: [{ name: "ProSektorWeb" }],
   creator: "ProSektorWeb",
@@ -29,13 +16,13 @@ export const metadata: Metadata = {
     locale: "tr_TR",
     url: "https://prosektorweb.com",
     siteName: "ProSektorWeb",
-    title: "ProSektorWeb | OSGB Web Sitesi",
-    description: "OSGB'niz için profesyonel web sitesi",
+    title: "ProSektorWeb | İş Sağlığı ve Güvenliği Blog",
+    description: "Türkiye'nin en kapsamlı İSG blog platformu",
   },
   twitter: {
     card: "summary_large_image",
-    title: "ProSektorWeb | OSGB Web Sitesi",
-    description: "OSGB'niz için profesyonel web sitesi. 7 gün ücretsiz önizleme, tek fiyat ve tam sektör uyumu.",
+    title: "ProSektorWeb",
+    description: "Türkiye'nin en kapsamlı İSG blog platformu",
   },
   robots: {
     index: true,
@@ -54,7 +41,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="tr" className={`${inter.variable} ${playfair.variable}`}>
+    <html lang="tr">
       <body className="font-sans antialiased">
         <AuthProvider>
           {children}
@@ -63,5 +50,3 @@ export default function RootLayout({
     </html>
   );
 }
-
-
