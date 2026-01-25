@@ -199,3 +199,46 @@ export async function generateMockAnalytics(projectId: string) {
 
     return analytics
 }
+
+export async function getTrackingScript(projectId: string) {
+    const companyId = await getClientCompanyId()
+    if (!companyId) return null
+
+    const project = await prisma.webProject.findFirst({
+        where: { id: projectId, companyId },
+        select: { id: true }
+    })
+
+    if (!project) return null
+
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://prosektorweb.com'
+    const endpoint = `${baseUrl}/api/analytics/collect`
+
+    const script = `<script defer>
+(function() {
+    var pid = '${project.id}';
+    var endpoint = '${endpoint}';
+    
+    function track(e, m) {
+        var data = { projectId: pid, event: e, metadata: m || {} };
+        if (window.fetch) {
+            fetch(endpoint, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data),
+                keepalive: true
+            }).catch(function(){});
+        }
+    }
+    
+    track('page_view', {
+        url: window.location.href,
+        referrer: document.referrer,
+        title: document.title,
+        device: /Mobile|Android/i.test(navigator.userAgent) ? 'mobile' : 'desktop'
+    });
+})();
+</script>`
+
+    return script
+}

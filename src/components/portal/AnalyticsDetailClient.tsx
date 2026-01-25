@@ -1,10 +1,11 @@
 'use client'
 
+import { useState } from 'react'
 import { TrafficChart, TrafficSources, PerformanceGauge } from '@/components/portal/AnalyticsCharts'
 import Link from 'next/link'
 import {
     ArrowLeft, Users, Eye, Clock, TrendingDown, RefreshCw, CheckCircle,
-    ExternalLink, Smartphone, Monitor, Tablet, Shield
+    ExternalLink, Smartphone, Monitor, Tablet, Shield, Zap
 } from 'lucide-react'
 
 interface TrafficSource {
@@ -56,9 +57,11 @@ interface Project {
 interface AnalyticsDetailClientProps {
     project: Project | null
     dailyStats: DailyStat[]
+    trackingCode?: string | null
 }
 
-export default function AnalyticsDetailClient({ project, dailyStats }: AnalyticsDetailClientProps) {
+export default function AnalyticsDetailClient(props: AnalyticsDetailClientProps) {
+    const { project, dailyStats } = props
     const analytics = project?.analytics
 
     if (!project) {
@@ -94,12 +97,54 @@ export default function AnalyticsDetailClient({ project, dailyStats }: Analytics
     // Top pages from JSON
     const topPages: TopPage[] = analytics?.topPages ?? []
 
-    // SSL Status
+    const [showTracking, setShowTracking] = useState(false)
+    const [copied, setCopied] = useState(false)
+
+    // ... existing ...
     const sslValid = analytics?.sslStatus === 'VALID'
     const sslExpiringSoon = analytics?.sslStatus === 'EXPIRING_SOON'
 
+    const copyToClipboard = () => {
+        if (props.trackingCode) {
+            navigator.clipboard.writeText(props.trackingCode)
+            setCopied(true)
+            setTimeout(() => setCopied(false), 2000)
+        }
+    }
+
     return (
         <div className="space-y-8">
+            {/* Tracking Modal */}
+            {showTracking && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" onClick={() => setShowTracking(false)}>
+                    <div className="bg-white rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl" onClick={e => e.stopPropagation()}>
+                        <div className="p-6 border-b border-neutral-100 flex justify-between items-center">
+                            <h3 className="text-xl font-bold font-serif">Kurulum: Takip Kodu</h3>
+                            <button onClick={() => setShowTracking(false)} className="text-neutral-400 hover:text-neutral-600">
+                                <ArrowLeft className="w-5 h-5 rotate-180" />
+                            </button>
+                        </div>
+                        <div className="p-6 space-y-4">
+                            <p className="text-neutral-600">
+                                Sitenizden veri toplamak için aşağıdaki kodu <code>&lt;head&gt;</code> etiketleri arasına ekleyin.
+                            </p>
+                            <div className="relative group">
+                                <pre className="bg-neutral-900 text-neutral-50 p-4 rounded-xl text-xs overflow-x-auto font-mono">
+                                    {props.trackingCode}
+                                </pre>
+                                <button
+                                    onClick={copyToClipboard}
+                                    className="absolute top-2 right-2 bg-white/10 hover:bg-white/20 text-white px-3 py-1.5 rounded-lg text-xs font-medium transition-colors flex items-center gap-2"
+                                >
+                                    {copied ? <CheckCircle className="w-3 h-3" /> : <RefreshCw className="w-3 h-3" />}
+                                    {copied ? 'Kopyalandı' : 'Kopyala'}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* Header */}
             <div className="flex items-start justify-between">
                 <div>
@@ -125,14 +170,27 @@ export default function AnalyticsDetailClient({ project, dailyStats }: Analytics
                     </div>
                 </div>
 
-                <div className="flex items-center gap-2 text-sm text-neutral-500">
-                    <RefreshCw className="w-4 h-4" />
-                    Son güncelleme: {analytics?.lastUpdated
-                        ? new Date(analytics.lastUpdated).toLocaleDateString('tr-TR', {
-                            day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit'
-                        })
-                        : '-'
-                    }
+                <div className="flex flex-col items-end gap-3">
+                    <div className="flex items-center gap-2">
+                        {props.trackingCode && (
+                            <button
+                                onClick={() => setShowTracking(true)}
+                                className="inline-flex items-center gap-2 bg-brand-600 hover:bg-brand-700 text-white px-4 py-2 rounded-xl text-sm font-medium transition-colors shadow-sm"
+                            >
+                                <Zap className="w-4 h-4" />
+                                Kurulum
+                            </button>
+                        )}
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-neutral-500">
+                        <RefreshCw className="w-4 h-4" />
+                        Son güncelleme: {analytics?.lastUpdated
+                            ? new Date(analytics.lastUpdated).toLocaleDateString('tr-TR', {
+                                day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit'
+                            })
+                            : '-'
+                        }
+                    </div>
                 </div>
             </div>
 

@@ -1,4 +1,4 @@
-import { getProjectAnalytics, getProjectDailyStats } from '@/actions/analytics'
+import { getProjectAnalytics, getProjectDailyStats, getTrackingScript } from '@/actions/analytics'
 import { notFound } from 'next/navigation'
 import AnalyticsDetailClient from '@/components/portal/AnalyticsDetailClient'
 
@@ -6,6 +6,7 @@ export default async function AnalyticsDetailPage({ params }: { params: Promise<
     const { id } = await params
     const project = await getProjectAnalytics(id)
     const dailyStats = await getProjectDailyStats(id)
+    const trackingCode = await getTrackingScript(id)
 
     if (!project) {
         notFound()
@@ -18,5 +19,5 @@ export default async function AnalyticsDetailPage({ params }: { params: Promise<
         analytics: (project.analytics as any) ?? undefined
     } : null
 
-    return <AnalyticsDetailClient project={projectData} dailyStats={dailyStats} />
+    return <AnalyticsDetailClient project={projectData} dailyStats={dailyStats} trackingCode={trackingCode} />
 }
