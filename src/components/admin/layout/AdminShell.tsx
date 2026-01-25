@@ -72,7 +72,8 @@ export function AdminShell({ children, userEmail }: AdminShellProps) {
                     {/* Mobile Close Button */}
                     <button
                         onClick={() => setIsSidebarOpen(false)}
-                        className="lg:hidden text-white/50 hover:text-white"
+                        className="lg:hidden text-white/50 hover:text-white rounded-lg focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:outline-none"
+                        aria-label="Menüyü kapat"
                     >
                         <X className="w-6 h-6" />
                     </button>
@@ -198,8 +199,9 @@ export function AdminShell({ children, userEmail }: AdminShellProps) {
                     <div className="flex items-center gap-4">
                         {/* Mobile Menu Button */}
                         <button
-                            className="lg:hidden p-2 -ml-2 text-neutral-500 hover:bg-neutral-100 rounded-lg"
+                            className="lg:hidden p-2 -ml-2 text-neutral-500 hover:bg-neutral-100 rounded-lg focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:outline-none"
                             onClick={() => setIsSidebarOpen(true)}
+                            aria-label="Menüyü aç"
                         >
                             <Menu className="w-6 h-6" />
                         </button>
@@ -209,14 +211,18 @@ export function AdminShell({ children, userEmail }: AdminShellProps) {
                             <input
                                 type="text"
                                 placeholder="Ara... (Firma, Çalışan, İşyeri)"
+                                aria-label="Arama yap"
                                 className="pl-10 pr-4 py-2 bg-neutral-100 border-0 rounded-lg text-sm w-80 focus:outline-none focus:ring-2 focus:ring-brand-500"
                             />
                         </div>
                     </div>
                     <div className="flex items-center gap-2 lg:gap-4">
-                        <button className="relative p-2 text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100 rounded-lg transition-colors">
+                        <button
+                            className="relative p-2 text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100 rounded-lg transition-colors focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:outline-none"
+                            aria-label="Bildirimler"
+                        >
                             <Bell className="w-5 h-5" />
-                            <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                            <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" aria-hidden="true"></span>
                         </button>
                         <div className="h-8 w-px bg-neutral-200 hidden lg:block"></div>
                         <div className="flex items-center gap-2">
