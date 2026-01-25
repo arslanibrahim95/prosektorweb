@@ -172,7 +172,7 @@ export async function getProjectById(id: string) {
     }
 }
 
-export async function updateProject(id: string, formData: FormData): Promise<ProjectActionResult> {
+export async function updateProject(id: string, formData: FormData, version?: number): Promise<ProjectActionResult> {
     try {
         await requireAuth()
 
@@ -218,8 +218,14 @@ export async function updateProject(id: string, formData: FormData): Promise<Pro
             }
         }
 
+        const where: any = { id }
+        if (typeof version === 'number') {
+            where.version = version
+            data.version = { increment: 1 }
+        }
+
         await prisma.webProject.update({
-            where: { id },
+            where,
             data,
         })
 
@@ -228,11 +234,14 @@ export async function updateProject(id: string, formData: FormData): Promise<Pro
         return { success: true }
     } catch (error) {
         console.error('updateProject error:', error)
+        if ((error as any).code === 'P2025') {
+            return { success: false, error: 'Kayıt başka bir kullanıcı tarafından değiştirilmiş. Lütfen sayfayı yenileyiniz.' }
+        }
         return { success: false, error: 'Güncelleme başarısız.' }
     }
 }
 
-export async function updateProjectStatus(id: string, status: string): Promise<ProjectActionResult> {
+export async function updateProjectStatus(id: string, status: string, version?: number): Promise<ProjectActionResult> {
     try {
         await requireAuth()
 
@@ -249,8 +258,14 @@ export async function updateProjectStatus(id: string, status: string): Promise<P
             data.completedAt = new Date()
         }
 
+        const where: any = { id }
+        if (typeof version === 'number') {
+            where.version = version
+            data.version = { increment: 1 }
+        }
+
         await prisma.webProject.update({
-            where: { id },
+            where,
             data,
         })
 
@@ -259,6 +274,9 @@ export async function updateProjectStatus(id: string, status: string): Promise<P
         return { success: true }
     } catch (error) {
         console.error('updateProjectStatus error:', error)
+        if ((error as any).code === 'P2025') {
+            return { success: false, error: 'Kayıt başka bir kullanıcı tarafından değiştirilmiş. Lütfen sayfayı yenileyiniz.' }
+        }
         return { success: false, error: 'Durum güncellenemedi.' }
     }
 }

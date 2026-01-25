@@ -292,28 +292,44 @@ export async function getInvoiceById(id: string) {
 // UPDATE STATUS
 // ==========================================
 
-const updateInvoiceStatusHandler = async ({ id, status }: { id: string, status: string }) => {
+const updateInvoiceStatusHandler = async ({ id, status, version }: { id: string, status: string, version?: number }) => {
     // Tenant isolation: verify user can access this invoice
     await requireTenantAccess('invoice', id)
 
     const StatusSchema = z.nativeEnum(InvoiceStatus)
     const parsed = StatusSchema.parse(status)
 
-    const invoice = await prisma.invoice.update({
-        where: { id },
-        data: { status: parsed },
-    })
+    try {
+        const where: any = { id }
+        if (typeof version === 'number') {
+            where.version = version
+        }
 
-    await logAudit({
-        action: 'UPDATE',
-        entity: 'Invoice',
-        entityId: id,
-        details: { newStatus: status },
-    })
+        const invoice = await prisma.invoice.update({
+            where,
+            data: {
+                status: parsed,
+                version: { increment: 1 }
+            },
+        })
 
-    revalidatePath('/admin/invoices')
-    revalidatePath(`/admin/invoices/${id}`)
-    return invoice
+        await logAudit({
+            action: 'UPDATE',
+            entity: 'Invoice',
+            entityId: id,
+            details: { newStatus: status, version: invoice.version },
+        })
+
+        revalidatePath('/admin/invoices')
+        revalidatePath(`/admin/invoices/${id}`)
+        return invoice
+    } catch (error) {
+        // Handle record not found (P2025) which implies version mismatch or deletion
+        if ((error as any).code === 'P2025') {
+            throw new Error('Kayıt başka bir kullanıcı tarafından değiştirilmiş. Lütfen sayfayı yenileyip tekrar deneyin.')
+        }
+        throw error
+    }
 }
 
 export const updateInvoiceStatus = createSafeAction('updateInvoiceStatus', updateInvoiceStatusHandler)

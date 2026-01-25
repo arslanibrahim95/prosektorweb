@@ -97,13 +97,21 @@ export async function createProposal(formData: any): Promise<ProposalFormState> 
     }
 }
 
-export async function updateProposalStatus(id: string, status: ProposalStatus) {
+export async function updateProposalStatus(id: string, status: ProposalStatus, version?: number) {
     try {
         await requireAuth()
 
+        const where: any = { id }
+        if (typeof version === 'number') {
+            where.version = version
+        }
+
         await prisma.proposal.update({
-            where: { id },
-            data: { status }
+            where,
+            data: {
+                status,
+                version: { increment: 1 }
+            }
         })
 
         await logAudit({
@@ -118,6 +126,9 @@ export async function updateProposalStatus(id: string, status: ProposalStatus) {
         return { success: true }
     } catch (error) {
         console.error('updateProposalStatus error:', error)
+        if ((error as any).code === 'P2025') {
+            return { success: false, error: 'Kayıt başka bir kullanıcı tarafından değiştirilmiş. Lütfen sayfayı yenileyiniz.' }
+        }
         return { success: false, error: 'Durum güncellenemedi.' }
     }
 }
