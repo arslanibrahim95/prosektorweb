@@ -12,6 +12,8 @@ declare module "next-auth" {
             companyId: string | null
             /** The user's database ID. */
             id: string
+            /** Whether the user is a system user (admin/staff). */
+            isSystemUser: boolean
         } & DefaultSession["user"]
     }
 
@@ -19,6 +21,7 @@ declare module "next-auth" {
         role: string
         companyId: string | null
         id?: string
+        isSystemUser?: boolean
     }
 }
 
@@ -31,5 +34,7 @@ declare module "next-auth/jwt" {
         companyId: string | null
         /** The user's database ID. */
         id: string
+        /** Whether the user is a system user (admin/staff). */
+        isSystemUser: boolean
     }
 }

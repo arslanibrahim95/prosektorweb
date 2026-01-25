@@ -278,10 +278,11 @@ enum UserRole {
   OFFICE
 }
 
-model BoardUser {
+model SystemUser {
   id             String   @id @default(uuid())
   email          String   @unique
   password       String   // Hashed Password
+  name           String?  // Display Name
   firstName      String?
   lastName       String?
   role           UserRole @default(OFFICE)

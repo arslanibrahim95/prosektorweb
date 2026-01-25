@@ -36,18 +36,37 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                 const { email, password } = parsedCredentials.data
                 const normalizedEmail = email.toLowerCase()
 
-                // 1. Check Database User
+                // 1. Check SystemUser (Admins/Staff)
+                const systemUser = await prisma.systemUser.findUnique({ where: { email: normalizedEmail } })
+                if (systemUser && systemUser.isActive) {
+                    const passwordsMatch = await bcrypt.compare(password, systemUser.password)
+                    if (passwordsMatch) {
+                        return {
+                            id: systemUser.id,
+                            name: systemUser.name || systemUser.firstName, // Fallback
+                            email: systemUser.email,
+                            role: systemUser.role, // "ADMIN", "DOCTOR", etc.
+                            companyId: null, // System users don't have companyId
+                            isSystemUser: true
+                        }
+                    }
+                }
+
+                // 2. Check Client User (Customers)
                 const user = await getUser(normalizedEmail)
                 if (user) {
                     const passwordsMatch = await bcrypt.compare(password, user.password)
 
                     if (passwordsMatch) {
+                        // Only allow CLIENT role here effectively
+                        // (After migration, ADMINs shouldn't be here, but for safety we use existing role)
                         return {
                             id: user.id,
                             name: user.name,
                             email: user.email,
-                            role: user.role,
-                            companyId: user.companyId
+                            role: user.role, // Should effectively be "CLIENT" mostly
+                            companyId: user.companyId,
+                            isSystemUser: false
                         }
                     }
                 }

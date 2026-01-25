@@ -12,6 +12,7 @@ export const authConfig = {
                 token.role = user.role
                 token.companyId = user.companyId
                 token.id = user.id!
+                token.isSystemUser = (user as any).isSystemUser || false
             }
             return token
         },
@@ -21,6 +22,8 @@ export const authConfig = {
                 session.user.role = token.role as string
                 session.user.companyId = token.companyId as string | null
                 session.user.id = token.id as string
+                // @ts-ignore
+                session.user.isSystemUser = token.isSystemUser as boolean
             }
             return session
         },
