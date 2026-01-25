@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma'
-import { createTicket } from '@/actions/ticket'
+import { createTicket } from '@/features/support/actions/tickets'
 import Link from 'next/link'
 import { ChevronLeft, Save } from 'lucide-react'
 

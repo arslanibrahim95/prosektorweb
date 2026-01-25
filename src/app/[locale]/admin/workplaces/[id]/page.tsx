@@ -1,9 +1,9 @@
-import { getWorkplaceById } from '@/actions/workplace'
+import { getWorkplace } from '@/features/crm/actions/workplaces'
 import { prisma } from '@/lib/prisma'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { ChevronLeft, Layers, Users, MapPin, Building2, Pencil, Trash2 } from 'lucide-react'
-import { WorkplaceForm } from '@/components/admin/workplace/WorkplaceForm'
+import { WorkplaceForm } from '@/features/crm/components/WorkplaceForm'
 
 interface WorkplaceDetailPageProps {
     params: Promise<{ id: string }>
@@ -17,7 +17,7 @@ const dangerClassMap: Record<string, { label: string, color: string }> = {
 
 export default async function WorkplaceDetailPage({ params }: WorkplaceDetailPageProps) {
     const { id } = await params
-    const workplace = await getWorkplaceById(id)
+    const workplace = await getWorkplace(id) as any
 
     if (!workplace) {
         notFound()
@@ -96,7 +96,7 @@ export default async function WorkplaceDetailPage({ params }: WorkplaceDetailPag
                         <div className="text-sm text-neutral-500">Kayıtlı Personel</div>
 
                         <div className="mt-4 space-y-2">
-                            {workplace.employees.slice(0, 5).map(emp => (
+                            {workplace.employees.slice(0, 5).map((emp: any) => (
                                 <Link
                                     key={emp.id}
                                     href={`/admin/employees/${emp.id}`}

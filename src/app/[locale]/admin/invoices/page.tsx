@@ -1,4 +1,4 @@
-import { getInvoices, getInvoiceStats } from '@/actions/invoice'
+import { getInvoices, getInvoiceStats } from '@/features/finance/actions/invoices'
 import Link from 'next/link'
 import {
     Plus,
@@ -40,13 +40,16 @@ const statusColors: Record<string, string> = {
 export default async function InvoicesPage({ searchParams }: InvoicesPageProps) {
     const params = await searchParams
     const search = params.search || ''
-    const status = params.status || 'all'
+    const status = params.status || undefined // 'all' filter removed from backend, pass undefined
     const page = parseInt(params.page || '1', 10)
 
-    const [{ invoices, total, pages, currentPage }, stats] = await Promise.all([
-        getInvoices({ search, status, page, limit: 10 }),
+    const [invoicesData, stats] = await Promise.all([
+        getInvoices(page, 10, search),
         getInvoiceStats(),
     ])
+
+    const { data: invoices, meta } = invoicesData
+    const { total, totalPages: pages, page: currentPage } = meta
 
     const formatCurrency = (amount: number | any) => {
         return new Intl.NumberFormat('tr-TR', {

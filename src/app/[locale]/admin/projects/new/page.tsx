@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { ChevronLeft } from 'lucide-react'
-import { NewProjectForm } from '@/components/admin/project/NewProjectForm'
+import { NewProjectForm } from '@/features/projects/components/NewProjectForm'
 import { prisma } from '@/lib/prisma'
 
 export default async function NewProjectPage() {

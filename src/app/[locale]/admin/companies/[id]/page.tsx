@@ -1,32 +1,14 @@
-import { getCompanyById } from '@/actions/company'
+import { getCompany } from '@/features/crm/actions/companies'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import {
-    ChevronLeft,
-    Edit,
-    Building2,
-    MapPin,
-    Phone,
-    Mail,
-    FileText,
-    Plus,
-    Layers,
-    Users,
-    Receipt,
-    MessageSquare,
-    User,
-    Star,
-    Trash2,
-    CheckCircle2,
-    Clock,
-    PhoneCall,
-    Calendar,
-    Target
+    ChevronLeft, Edit, Building2, MapPin, Phone, Mail, Globe, Calendar, Users, Briefcase, FileText, Receipt, Layers, MessageSquare
 } from 'lucide-react'
-import { CrmNotesSection } from '@/components/admin/crm/NotesSection'
-import { CrmContactsSection } from '@/components/admin/crm/ContactsSection'
-import { CrmActivitiesSection } from '@/components/admin/crm/ActivitiesSection'
-import { CrmStatusBadge } from '@/components/admin/crm/StatusBadge'
+import { PageHeader } from '@/components/admin/ui/PageHeader'
+import { CrmNotesSection } from '@/features/crm/components/NotesSection'
+import { CrmContactsSection } from '@/features/crm/components/ContactsSection'
+import { CrmActivitiesSection } from '@/features/crm/components/ActivitiesSection'
+import { CrmStatusBadge } from '@/features/crm/components/StatusBadge'
 
 interface CompanyDetailPageProps {
     params: Promise<{ id: string }>
@@ -46,7 +28,7 @@ const dangerClassLabels: Record<string, string> = {
 
 export default async function CompanyDetailPage({ params }: CompanyDetailPageProps) {
     const { id } = await params
-    const company = await getCompanyById(id)
+    const company = await getCompany(id) as any
 
     if (!company) {
         notFound()
@@ -104,7 +86,7 @@ export default async function CompanyDetailPage({ params }: CompanyDetailPagePro
                     {/* View As Button */}
                     <form action={async () => {
                         'use server'
-                        const { impersonateCompany } = await import('@/actions/admin-ops')
+                        const { impersonateCompany } = await import('@/features/system/actions/admin-ops')
                         await impersonateCompany(company.id)
                     }}>
                         <button className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-xl font-medium hover:bg-purple-700 transition-colors">
@@ -130,7 +112,7 @@ export default async function CompanyDetailPage({ params }: CompanyDetailPagePro
                         <Users className="w-4 h-4 text-purple-500" />
                     </div>
                     <div className="text-2xl font-bold text-neutral-900">
-                        {company.workplaces.reduce((sum, wp) => sum + wp._count.employees, 0)}
+                        {company.workplaces.reduce((sum: number, wp: any) => sum + wp._count.employees, 0)}
                     </div>
                 </div>
                 <div className="bg-white rounded-xl border border-neutral-200 p-4">
@@ -216,7 +198,7 @@ export default async function CompanyDetailPage({ params }: CompanyDetailPagePro
                         İşyerleri ({company.workplaces.length})
                     </h2>
                     <div className="space-y-3">
-                        {company.workplaces.map((workplace) => (
+                        {company.workplaces.map((workplace: any) => (
                             <div key={workplace.id} className="p-4 bg-neutral-50 rounded-xl flex items-center justify-between">
                                 <div className="flex items-center gap-4">
                                     <div className={`w-3 h-3 rounded-full ${workplace.dangerClass === 'VERY_DANGEROUS' ? 'bg-red-500' :

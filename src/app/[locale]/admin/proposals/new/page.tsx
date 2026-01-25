@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma'
-import { ProposalBuilder } from '@/components/admin/proposal/ProposalBuilder'
+import { ProposalBuilder } from '@/features/crm/components/ProposalBuilder'
 import Link from 'next/link'
 import { ChevronLeft } from 'lucide-react'
 

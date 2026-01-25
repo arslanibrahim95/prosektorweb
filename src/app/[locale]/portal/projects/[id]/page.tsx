@@ -1,4 +1,4 @@
-import { getProjectById } from '@/actions/portal'
+import { getProjectById } from '@/features/auth/actions/portal'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, ExternalLink, Globe, Calendar, CheckCircle, Clock, AlertCircle, FileText, Settings } from 'lucide-react'

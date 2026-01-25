@@ -1,339 +1,383 @@
-import { prisma } from '@/lib/prisma'
-import { getClientAnalyticsSummary } from '@/actions/analytics'
+import { getAdminDashboardStats, getRecentActivities, RecentActivity } from '@/features/system/actions/dashboard'
 import Link from 'next/link'
+import * as motion from "motion/react-client"
 import {
-    Building2,
-    Users,
-    Layers,
-    MessageSquare,
-    FileText,
-    TrendingUp,
-    TrendingDown,
-    AlertTriangle,
-    Clock,
-    ArrowRight,
-    Plus,
-    Eye,
-    CheckCircle2,
-    XCircle,
-    Activity,
-    Server,
-    Database,
-    Globe,
-    Shield
+    Building2, Users, Layers, MessageSquare, FileText,
+    TrendingUp, TrendingDown, AlertTriangle, Clock,
+    ArrowRight, Plus, Eye, Database, Server, Globe, Shield,
+    DollarSign, Briefcase, Activity as ActivityIcon,
+    Wallet, CreditCard, PieChart
 } from 'lucide-react'
 import SpotlightCard from '@/components/ui/SpotlightCard'
 import { GradientButton } from '@/components/ui/GradientButton'
-
-import { unstable_cache } from 'next/cache'
-
-const getDashboardStats = unstable_cache(
-    async () => {
-        try {
-            const [companies, workplaces, employees, unreadMessages, totalMessages, blogPosts] = await Promise.all([
-                prisma.company.count(),
-                prisma.workplace.count(),
-                prisma.employee.count(),
-                prisma.contactMessage.count({ where: { read: false } }),
-                prisma.contactMessage.count(),
-                prisma.blogPost.count(),
-            ])
-            return {
-                companies,
-                workplaces,
-                employees,
-                unreadMessages,
-                totalMessages,
-                blogPosts,
-                error: false
-            }
-        } catch (e) {
-            console.error("Dashboard Stats Error:", e)
-            return {
-                companies: 0, workplaces: 0, employees: 0,
-                unreadMessages: 0, totalMessages: 0, blogPosts: 0,
-                error: true
-            }
-        }
-    },
-    ['admin-dashboard-stats'],
-    { revalidate: 60, tags: ['dashboard-stats'] }
-)
+import { DashboardChart } from '@/features/system/components/DashboardChart'
 
 export default async function SuperAdminDashboard() {
-    const data = await getDashboardStats()
-    const analyticsSummary = await getClientAnalyticsSummary()
-    let stats = data
-    let dbError = data.error
+    const stats = await getAdminDashboardStats()
+    const recentActivities = await getRecentActivities(8)
 
-    // Yüzdelik hesaplamaları (şimdilik mock)
-    const trends = {
-        companies: { value: '+12%', positive: true },
-        employees: { value: '+8%', positive: true },
-        messages: { value: '-5%', positive: false },
+    // Quick currency formatter
+    const formatCurrency = (amount: number) =>
+        new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY', maximumFractionDigits: 0 }).format(amount)
+
+    const container = {
+        hidden: { opacity: 0 },
+        show: {
+            opacity: 1,
+            transition: {
+                staggerChildren: 0.1
+            }
+        }
+    }
+
+    const item = {
+        hidden: { opacity: 0, y: 20 },
+        show: { opacity: 1, y: 0 }
     }
 
     return (
-        <div className="space-y-8">
+        <div className="space-y-8 pb-10">
             {/* Page Header */}
-            <div className="flex items-center justify-between">
+            <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="flex flex-col md:flex-row md:items-center justify-between gap-4"
+            >
                 <div>
-                    <h1 className="text-3xl font-bold text-neutral-900 font-serif">Super Admin Dashboard</h1>
-                    <p className="text-neutral-500 mt-1">Sistem genelinde genel bakış ve yönetim merkezi</p>
+                    <h1 className="text-4xl font-bold text-neutral-900 font-serif tracking-tight">Yönetim Paneli</h1>
+                    <p className="text-neutral-500 mt-1 flex items-center gap-2">
+                        <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                        Sistem genelinde canlı performans ve aktivite özeti
+                    </p>
                 </div>
                 <div className="flex items-center gap-3">
-                    <span className="text-sm text-neutral-500">
-                        {new Date().toLocaleDateString('tr-TR', {
-                            weekday: 'long',
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit'
-                        })}
+                    <span className="text-sm font-bold bg-white px-5 py-2.5 rounded-2xl border border-neutral-200 text-neutral-700 shadow-sm flex items-center gap-2">
+                        <Clock className="w-4 h-4 text-brand-500" />
+                        {new Date().toLocaleDateString('tr-TR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
                     </span>
                 </div>
-            </div>
+            </motion.div>
 
             {/* Database Error Alert */}
-            {dbError && (
-                <div className="p-4 bg-red-50 border border-red-200 rounded-2xl flex items-center gap-4">
-                    <div className="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center">
+            {stats.error && (
+                <motion.div
+                    initial={{ scale: 0.9, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    className="p-4 bg-red-50 border border-red-200 rounded-2xl flex items-center gap-4"
+                >
+                    <div className="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center shrink-0">
                         <AlertTriangle className="w-6 h-6 text-red-600" />
                     </div>
                     <div className="flex-1">
-                        <h3 className="font-bold text-red-800">Veritabanı Bağlantı Hatası</h3>
-                        <p className="text-sm text-red-600">Veritabanına erişilemiyor. İstatistikler güncel olmayabilir.</p>
+                        <h3 className="font-bold text-red-800">Veri Bağlantı Hatası</h3>
+                        <p className="text-sm text-red-600">Veritabanına erişilemiyor. Gösterilen veriler önbellekten gelmiş olabilir.</p>
                     </div>
-                    <GradientButton variant="primary" size="sm" onClick={() => window.location.reload()}>
-                        Yeniden Dene
-                    </GradientButton>
-                </div>
+                </motion.div>
             )}
 
-            {/* Main Stats Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {/* Firmalar */}
-                <SpotlightCard className="hover:shadow-lg transition-shadow group border-neutral-200" spotlightColor="rgba(59, 130, 246, 0.2)">
-                    <div className="flex items-start justify-between mb-4">
-                        <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/30">
-                            <Building2 className="w-7 h-7 text-white" />
+            {/* FINANCIAL PULSE */}
+            <motion.div
+                variants={container}
+                initial="hidden"
+                animate="show"
+                className="grid grid-cols-1 md:grid-cols-3 gap-6"
+            >
+                <motion.div variants={item}>
+                    <SpotlightCard className="border-neutral-200 bg-white" spotlightColor="rgba(34, 197, 94, 0.1)">
+                        <div className="flex items-start justify-between mb-4">
+                            <div className="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center text-green-600">
+                                <Wallet className="w-6 h-6" />
+                            </div>
+                            <span className="text-[10px] font-black uppercase tracking-wider bg-green-100 text-green-700 px-2 py-1 rounded-lg">Ciro</span>
                         </div>
-                        <div className={`flex items-center gap-1 text-sm font-medium ${trends.companies.positive ? 'text-green-600' : 'text-red-600'}`}>
-                            {trends.companies.positive ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
-                            {trends.companies.value}
+                        <div className="text-3xl font-bold text-neutral-900 mb-1 leading-none">{formatCurrency(stats.totalRevenue)}</div>
+                        <div className="text-xs font-bold text-neutral-400 uppercase tracking-widest">Tahsil Edilen Toplam</div>
+                    </SpotlightCard>
+                </motion.div>
+
+                <motion.div variants={item}>
+                    <SpotlightCard className="border-neutral-200 bg-white" spotlightColor="rgba(249, 115, 22, 0.1)">
+                        <div className="flex items-start justify-between mb-4">
+                            <div className="w-12 h-12 bg-orange-50 rounded-xl flex items-center justify-center text-orange-600">
+                                <CreditCard className="w-6 h-6" />
+                            </div>
+                            <span className="text-[10px] font-black uppercase tracking-wider bg-orange-100 text-orange-700 px-2 py-1 rounded-lg">Alacak</span>
+                        </div>
+                        <div className="text-3xl font-bold text-neutral-900 mb-1 leading-none">{formatCurrency(stats.outstandingReceivables)}</div>
+                        <div className="text-xs font-bold text-neutral-400 uppercase tracking-widest">Bekleyen Faturalar</div>
+                    </SpotlightCard>
+                </motion.div>
+
+                <motion.div variants={item}>
+                    <SpotlightCard className="border-neutral-200 bg-white" spotlightColor="rgba(59, 130, 246, 0.1)">
+                        <div className="flex items-start justify-between mb-4">
+                            <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center text-blue-600">
+                                <PieChart className="w-6 h-6" />
+                            </div>
+                            <span className="text-[10px] font-black uppercase tracking-wider bg-blue-100 text-blue-700 px-2 py-1 rounded-lg">Aylık Tahmin</span>
+                        </div>
+                        <div className="text-3xl font-bold text-neutral-900 mb-1 leading-none">{formatCurrency(stats.mrr)}</div>
+                        <div className="text-xs font-bold text-neutral-400 uppercase tracking-widest">MRR (Projeksiyon)</div>
+                    </SpotlightCard>
+                </motion.div>
+            </motion.div>
+
+            {/* CHART SECTION */}
+            <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 }}
+                className="bg-white rounded-3xl border border-neutral-200 p-8 shadow-sm overflow-hidden relative"
+            >
+                <div className="flex items-center justify-between mb-8">
+                    <div>
+                        <h3 className="text-xl font-bold text-neutral-900">Finansal Akış</h3>
+                        <p className="text-sm text-neutral-500">Son 6 aylık tahsilat ve alacak dengesi</p>
+                    </div>
+                    <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-2">
+                            <div className="w-3 h-3 bg-green-500 rounded-full" />
+                            <span className="text-xs font-bold text-neutral-600 uppercase">Tahsilat</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <div className="w-3 h-3 bg-orange-500 rounded-full" />
+                            <span className="text-xs font-bold text-neutral-600 uppercase">Bekleyen</span>
                         </div>
                     </div>
-                    <div className="text-4xl font-bold text-neutral-900 mb-1">{stats.companies}</div>
-                    <div className="text-sm text-neutral-500 mb-4">Toplam Firma</div>
-                    <Link href="/admin/companies" className="flex items-center gap-2 text-sm text-blue-600 font-medium group-hover:gap-3 transition-all">
-                        Detayları Gör <ArrowRight className="w-4 h-4" />
-                    </Link>
-                </SpotlightCard>
+                </div>
+                <DashboardChart data={stats.chartData} />
+            </motion.div>
 
-                {/* İşyerleri */}
-                <SpotlightCard className="hover:shadow-lg transition-shadow group border-neutral-200" spotlightColor="rgba(99, 102, 241, 0.2)">
-                    <div className="flex items-start justify-between mb-4">
-                        <div className="w-14 h-14 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-500/30">
-                            <Layers className="w-7 h-7 text-white" />
-                        </div>
-                    </div>
-                    <div className="text-4xl font-bold text-neutral-900 mb-1">{stats.workplaces}</div>
-                    <div className="text-sm text-neutral-500 mb-4">Aktif İşyeri</div>
-                    <Link href="/admin/workplaces" className="flex items-center gap-2 text-sm text-indigo-600 font-medium group-hover:gap-3 transition-all">
-                        Detayları Gör <ArrowRight className="w-4 h-4" />
-                    </Link>
-                </SpotlightCard>
+            {/* MAIN STATS GRID */}
+            <motion.div
+                variants={container}
+                initial="hidden"
+                animate="show"
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+            >
+                <StatsCard
+                    href="/admin/companies"
+                    icon={Building2}
+                    label="Firma"
+                    value={stats.companies}
+                    color="brand"
+                />
+                <StatsCard
+                    href="/admin/workplaces"
+                    icon={Layers}
+                    label="İşyeri"
+                    value={stats.workplaces}
+                    color="purple"
+                />
+                <StatsCard
+                    href="/admin/projects"
+                    icon={Briefcase}
+                    label="Proje"
+                    value={stats.pendingProjects}
+                    color="amber"
+                    badge="Süreçte"
+                />
+                <StatsCard
+                    href="/admin/tickets"
+                    icon={MessageSquare}
+                    label="Destek"
+                    value={stats.activeTickets}
+                    color="red"
+                    badge="Açık"
+                />
+            </motion.div>
 
-                {/* Çalışanlar */}
-                <SpotlightCard className="hover:shadow-lg transition-shadow group border-neutral-200" spotlightColor="rgba(168, 85, 247, 0.2)">
-                    <div className="flex items-start justify-between mb-4">
-                        <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg shadow-purple-500/30">
-                            <Users className="w-7 h-7 text-white" />
-                        </div>
-                        <div className={`flex items-center gap-1 text-sm font-medium ${trends.employees.positive ? 'text-green-600' : 'text-red-600'}`}>
-                            {trends.employees.positive ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
-                            {trends.employees.value}
-                        </div>
-                    </div>
-                    <div className="text-4xl font-bold text-neutral-900 mb-1">{stats.employees}</div>
-                    <div className="text-sm text-neutral-500 mb-4">Toplam Çalışan</div>
-                    <Link href="/admin/employees" className="flex items-center gap-2 text-sm text-purple-600 font-medium group-hover:gap-3 transition-all">
-                        Detayları Gör <ArrowRight className="w-4 h-4" />
-                    </Link>
-                </SpotlightCard>
-
-                {/* Mesajlar */}
-                <SpotlightCard className="hover:shadow-lg transition-shadow group border-neutral-200" spotlightColor="rgba(249, 115, 22, 0.2)">
-                    <div className="flex items-start justify-between mb-4">
-                        <div className="w-14 h-14 bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl flex items-center justify-center shadow-lg shadow-orange-500/30">
-                            <MessageSquare className="w-7 h-7 text-white" />
-                        </div>
-                        {stats.unreadMessages > 0 && (
-                            <span className="px-3 py-1 bg-orange-100 text-orange-600 text-xs font-bold rounded-full animate-pulse">
-                                {stats.unreadMessages} Yeni
-                            </span>
-                        )}
-                    </div>
-                    <div className="text-4xl font-bold text-neutral-900 mb-1">{stats.totalMessages}</div>
-                    <div className="text-sm text-neutral-500 mb-4">Toplam Mesaj</div>
-                    <Link href="/admin/messages" className="flex items-center gap-2 text-sm text-orange-600 font-medium group-hover:gap-3 transition-all">
-                        Mesajları Oku <ArrowRight className="w-4 h-4" />
-                    </Link>
-                </SpotlightCard>
-
-                {/* Site Analitiği (New) */}
-                <SpotlightCard className="hover:shadow-lg transition-shadow group border-neutral-200" spotlightColor="rgba(16, 185, 129, 0.2)">
-                    <div className="flex items-start justify-between mb-4">
-                        <div className="w-14 h-14 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-500/30">
-                            <TrendingUp className="w-7 h-7 text-white" />
-                        </div>
-                    </div>
-                    <div className="text-4xl font-bold text-neutral-900 mb-1">
-                        {analyticsSummary ? analyticsSummary.totalVisitors.toLocaleString('tr-TR') : '-'}
-                    </div>
-                    <div className="text-sm text-neutral-500 mb-4">Toplam Ziyaretçi</div>
-                    <Link href="/portal/analytics" className="flex items-center gap-2 text-sm text-emerald-600 font-medium group-hover:gap-3 transition-all">
-                        Analitik Raporu <ArrowRight className="w-4 h-4" />
-                    </Link>
-                </SpotlightCard>
-            </div>
-
-
-            {/* Dashboard Grid */}
+            {/* DASHBOARD CONTENT GRID */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Main Feed Column (2 Cols) */}
-                <div className="lg:col-span-2 space-y-6">
+
+                {/* LEFT COLUMN (2/3) - Activity */}
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.98 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.6 }}
+                    className="lg:col-span-2 space-y-6"
+                >
+                    <div className="bg-white rounded-3xl border border-neutral-200 overflow-hidden shadow-sm">
+                        <div className="p-6 border-b border-neutral-100 flex items-center justify-between bg-neutral-50/30">
+                            <h3 className="text-lg font-bold text-neutral-900 flex items-center gap-2">
+                                <ActivityIcon className="w-5 h-5 text-brand-600" />
+                                Son Aktiviteler
+                            </h3>
+                            <Link href="/admin/audit" className="text-xs font-bold text-brand-600 hover:text-brand-700 hover:underline uppercase tracking-wider">
+                                Tümünü Gör
+                            </Link>
+                        </div>
+                        <div className="divide-y divide-neutral-100">
+                            {recentActivities.length > 0 ? (
+                                recentActivities.map((activity, idx) => (
+                                    <ActivityItem key={activity.id} activity={activity} />
+                                ))
+                            ) : (
+                                <div className="p-16 text-center text-neutral-400">
+                                    <Clock className="w-10 h-10 mx-auto mb-3 opacity-20" />
+                                    <p className="text-sm font-medium">Henüz kayıtlı aktivite yok</p>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
                     {/* Quick Actions */}
-                    <div className="bg-white rounded-2xl border border-neutral-200 p-6">
-                        <div className="flex items-center justify-between mb-6">
-                            <h2 className="text-xl font-bold text-neutral-900">Hızlı İşlemler</h2>
-                        </div>
+                    <div className="bg-neutral-50 rounded-3xl border border-neutral-200 p-6">
+                        <h3 className="text-sm font-bold text-neutral-500 uppercase tracking-widest mb-4">Hızlı Erişim</h3>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                            <Link href="/admin/companies/new" className="flex flex-col items-center justify-center p-6 rounded-xl border border-neutral-100 bg-neutral-50/50 hover:bg-white hover:border-brand-200 hover:shadow-lg hover:-translate-y-1 transition-all group">
-                                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mb-3 group-hover:bg-blue-500 transition-colors">
-                                    <Plus className="w-6 h-6 text-blue-600 group-hover:text-white" />
-                                </div>
-                                <span className="text-sm font-bold text-neutral-700 group-hover:text-brand-700">Yeni Firma</span>
-                            </Link>
-                            <Link href="/admin/employees/new" className="flex flex-col items-center justify-center p-6 rounded-xl border border-neutral-100 bg-neutral-50/50 hover:bg-white hover:border-brand-200 hover:shadow-lg hover:-translate-y-1 transition-all group">
-                                <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mb-3 group-hover:bg-purple-500 transition-colors">
-                                    <Plus className="w-6 h-6 text-purple-600 group-hover:text-white" />
-                                </div>
-                                <span className="text-sm font-bold text-neutral-700 group-hover:text-brand-700">Yeni Çalışan</span>
-                            </Link>
-                            <Link href="/admin/blog/new" className="flex flex-col items-center justify-center p-6 rounded-xl border border-neutral-100 bg-neutral-50/50 hover:bg-white hover:border-brand-200 hover:shadow-lg hover:-translate-y-1 transition-all group">
-                                <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mb-3 group-hover:bg-green-500 transition-colors">
-                                    <FileText className="w-6 h-6 text-green-600 group-hover:text-white" />
-                                </div>
-                                <span className="text-sm font-bold text-neutral-700 group-hover:text-brand-700">Blog Yazısı</span>
-                            </Link>
-                            <Link href="/admin/messages" className="flex flex-col items-center justify-center p-6 rounded-xl border border-neutral-100 bg-neutral-50/50 hover:bg-white hover:border-brand-200 hover:shadow-lg hover:-translate-y-1 transition-all group">
-                                <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center mb-3 group-hover:bg-orange-500 transition-colors">
-                                    <Eye className="w-6 h-6 text-orange-600 group-hover:text-white" />
-                                </div>
-                                <span className="text-sm font-bold text-neutral-700 group-hover:text-brand-700">Mesajları Gör</span>
-                            </Link>
+                            <QuickAction href="/admin/companies/new" icon={Plus} label="Firma Ekle" color="brand" />
+                            <QuickAction href="/admin/users/new" icon={Users} label="Kullanıcı" color="purple" />
+                            <QuickAction href="/admin/invoices/new" icon={DollarSign} label="Fatura Kes" color="green" />
+                            <QuickAction href="/admin/tickets" icon={MessageSquare} label="Destek Paneli" color="red" />
                         </div>
                     </div>
+                </motion.div>
 
-                    {/* Recent Activity */}
-                    <div className="bg-white rounded-2xl border border-neutral-200 p-6">
-                        <div className="flex items-center justify-between mb-4">
-                            <h3 className="text-lg font-bold text-neutral-900">Son Aktiviteler</h3>
-                            <button className="text-sm text-brand-600 font-medium hover:underline">Tümünü Gör</button>
-                        </div>
-                        <div className="space-y-4">
-                            <div className="flex items-start gap-4 p-4 bg-neutral-50 rounded-xl">
-                                <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                                    <Clock className="w-5 h-5 text-blue-600" />
-                                </div>
-                                <div className="flex-1">
-                                    <div className="text-sm font-medium text-neutral-900">Sistem başlatıldı</div>
-                                    <div className="text-xs text-neutral-500">Dashboard yüklendi ve veritabanı bağlandı</div>
-                                </div>
-                                <span className="text-xs text-neutral-400">Az önce</span>
-                            </div>
-                            <div className="flex items-center justify-center py-8 text-neutral-400">
-                                <div className="text-center">
-                                    <Activity className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                                    <p className="text-sm">Henüz kayıtlı aktivite yok</p>
-                                    <p className="text-xs mt-1">Firma ve çalışan ekledikçe burada görünecek</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                {/* RIGHT COLUMN (1/3) - System & Mini */}
+                <motion.div
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.7 }}
+                    className="space-y-6"
+                >
+                    {/* System Health */}
+                    <div className="bg-neutral-900 rounded-3xl p-8 text-white shadow-2xl relative overflow-hidden group">
+                        <div className="absolute -top-10 -right-10 w-40 h-40 bg-brand-500/10 rounded-full blur-3xl group-hover:bg-brand-500/20 transition-all duration-700" />
 
-                {/* Right Sidebar (1 Col) */}
-                <div className="space-y-6">
-                    {/* System Status */}
-                    <div className="bg-white rounded-2xl border border-neutral-200 p-6">
-                        <div className="flex items-center justify-between mb-6">
-                            <h2 className="text-xl font-bold text-neutral-900">Sistem Durumu</h2>
-                            <span className="flex items-center gap-1.5 text-xs font-medium text-green-600">
+                        <div className="flex items-center justify-between mb-8">
+                            <h3 className="font-bold flex items-center gap-2 text-lg">
+                                <Server className="w-5 h-5 text-brand-400" />
+                                Sistem Durumu
+                            </h3>
+                            <div className="flex items-center gap-2 px-3 py-1 bg-green-500/10 rounded-full border border-green-500/20">
                                 <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-                                Tümü Aktif
-                            </span>
+                                <span className="text-xs font-bold text-green-400">ONLINE</span>
+                            </div>
                         </div>
-                        <div className="space-y-4">
-                            <div className="flex items-center gap-4 p-4 bg-neutral-50 rounded-xl">
-                                <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                                    <Database className="w-5 h-5 text-green-600" />
-                                </div>
-                                <div className="flex-1">
-                                    <div className="text-sm font-medium text-neutral-900">Veritabanı</div>
-                                    <div className="text-xs text-neutral-500">MySQL / MariaDB</div>
-                                </div>
-                                <CheckCircle2 className="w-5 h-5 text-green-500" />
-                            </div>
-                            <div className="flex items-center gap-4 p-4 bg-neutral-50 rounded-xl">
-                                <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                                    <Server className="w-5 h-5 text-green-600" />
-                                </div>
-                                <div className="flex-1">
-                                    <div className="text-sm font-medium text-neutral-900">API Servisi</div>
-                                    <div className="text-xs text-neutral-500">Next.js Server</div>
-                                </div>
-                                <CheckCircle2 className="w-5 h-5 text-green-500" />
-                            </div>
-                            <div className="flex items-center gap-4 p-4 bg-neutral-50 rounded-xl">
-                                <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                                    <Globe className="w-5 h-5 text-green-600" />
-                                </div>
-                                <div className="flex-1">
-                                    <div className="text-sm font-medium text-neutral-900">Web Sitesi</div>
-                                    <div className="text-xs text-neutral-500">prosektorweb.com</div>
-                                </div>
-                                <CheckCircle2 className="w-5 h-5 text-green-500" />
-                            </div>
-                            <div className="flex items-center gap-4 p-4 bg-neutral-50 rounded-xl">
-                                <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                                    <Shield className="w-5 h-5 text-green-600" />
-                                </div>
-                                <div className="flex-1">
-                                    <div className="text-sm font-medium text-neutral-900">SSL Sertifikası</div>
-                                    <div className="text-xs text-neutral-500">Let's Encrypt</div>
-                                </div>
-                                <CheckCircle2 className="w-5 h-5 text-green-500" />
+
+                        <div className="space-y-5">
+                            <HealthRow label="Veritabanı" status="Bağlı" active />
+                            <HealthRow label="API Latency" status="18ms" active />
+                            <HealthRow label="SSL Sertifikası" status="Geçerli" active />
+                            <div className="h-px bg-neutral-800 my-4" />
+                            <div className="flex items-center justify-between text-xs">
+                                <span className="text-neutral-500 font-bold uppercase tracking-widest">Sürüm</span>
+                                <span className="text-white font-mono bg-neutral-800 px-2 py-0.5 rounded">v2.4.0-stable</span>
                             </div>
                         </div>
                     </div>
 
-                    {/* Blog Stats */}
-                    <div className="bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-2xl p-6 text-white shadow-lg shadow-emerald-500/20">
-                        <div className="flex items-center justify-between mb-4">
-                            <FileText className="w-8 h-8 opacity-80" />
-                            <span className="text-xs font-medium bg-white/20 px-3 py-1 rounded-full">İçerik</span>
+                    {/* Blog Mini Stats */}
+                    <div className="bg-white rounded-3xl border border-neutral-200 p-8 shadow-sm group hover:border-brand-300 transition-all relative overflow-hidden">
+                        <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-opacity rotate-12">
+                            <FileText className="w-24 h-24" />
                         </div>
-                        <div className="text-4xl font-bold mb-1">{stats.blogPosts}</div>
-                        <div className="text-emerald-100 mb-4">Blog Yazısı</div>
-                        <div className="text-sm text-emerald-100 opacity-80">
-                            Sitede yayında olan toplam içerik sayısı
-                        </div>
+                        <div className="text-sm font-bold text-brand-600 uppercase tracking-widest mb-1">Cari Takip</div>
+                        <div className="text-4xl font-bold text-neutral-900 mb-6">{stats.blogPosts} <span className="text-lg font-normal text-neutral-400">İçerik</span></div>
+                        <Link href="/admin/blog" className="inline-flex items-center gap-2 text-sm font-bold text-brand-600 hover:gap-4 transition-all group/btn">
+                            İçerikleri Yönet
+                            <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
+                        </Link>
                     </div>
+                </motion.div>
+            </div>
+        </div>
+    )
+}
+
+// --- SUB-COMPONENTS ---
+
+function StatsCard({ href, icon: Icon, label, value, color, badge }: any) {
+    const colors: any = {
+        brand: "bg-brand-50 text-brand-600 group-hover:bg-brand-600",
+        purple: "bg-purple-50 text-purple-600 group-hover:bg-purple-600",
+        amber: "bg-amber-50 text-amber-600 group-hover:bg-amber-600",
+        red: "bg-red-50 text-red-600 group-hover:bg-red-600",
+    }
+
+    return (
+        <Link href={href} className="group">
+            <div className="bg-white p-6 rounded-3xl border border-neutral-200 group-hover:border-transparent group-hover:shadow-xl group-hover:shadow-neutral-200/50 transition-all h-full relative overflow-hidden">
+                <div className="flex items-center justify-between mb-4">
+                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-colors ${colors[color]} group-hover:text-white`}>
+                        <Icon className="w-6 h-6" />
+                    </div>
+                    {badge && (
+                        <span className="text-[10px] font-black uppercase tracking-wider bg-neutral-100 text-neutral-500 px-2 py-1 rounded-lg">
+                            {badge}
+                        </span>
+                    )}
+                </div>
+                <div className="text-3xl font-bold text-neutral-900 tracking-tight">{value}</div>
+                <p className="text-sm font-bold text-neutral-400 uppercase tracking-widest mt-1 group-hover:text-neutral-500 transition-colors">{label}</p>
+            </div>
+        </Link>
+    )
+}
+
+function ActivityItem({ activity }: { activity: RecentActivity }) {
+    const actionMap: any = {
+        CREATE: { color: 'bg-green-500', label: 'Yeni Kayıt' },
+        UPDATE: { color: 'bg-blue-500', label: 'Güncelleme' },
+        DELETE: { color: 'bg-red-500', label: 'Silme' },
+        LOGIN: { color: 'bg-purple-500', label: 'Giriş' },
+    }
+
+    const config = actionMap[activity.action] || { color: 'bg-neutral-400', label: activity.action }
+
+    return (
+        <div className="p-5 flex items-start gap-4 hover:bg-neutral-50/50 transition-colors group">
+            <div className="relative mt-1">
+                <div className={`w-3 h-3 rounded-full ${config.color} border-4 border-white shadow-sm ring-1 ring-neutral-200`} />
+                <div className="absolute top-3 left-1.5 w-0.5 h-12 bg-neutral-100 group-last:hidden" />
+            </div>
+            <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between gap-4 mb-0.5">
+                    <p className="text-sm font-bold text-neutral-800 truncate">
+                        {activity.entity} : <span className="font-normal text-neutral-500">{activity.details ? JSON.parse(JSON.stringify(activity.details)).name || activity.entity : activity.entity}</span>
+                    </p>
+                    <span className="text-[10px] font-black text-neutral-300 uppercase tracking-wider whitespace-nowrap">
+                        {new Date(activity.createdAt).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}
+                    </span>
+                </div>
+                <div className="flex items-center gap-2">
+                    <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${config.color.replace('bg-', 'text-').replace('500', '600')} bg-neutral-50`}>
+                        {config.label}
+                    </span>
+                    <span className="text-xs text-neutral-400 truncate">
+                        {activity.userEmail || 'Sistem'}
+                    </span>
                 </div>
             </div>
+        </div>
+    )
+}
+
+function QuickAction({ href, icon: Icon, label, color }: any) {
+    const colors: any = {
+        brand: "group-hover:bg-brand-600 group-hover:text-white text-brand-600 bg-brand-50",
+        purple: "group-hover:bg-purple-600 group-hover:text-white text-purple-600 bg-purple-50",
+        green: "group-hover:bg-green-600 group-hover:text-white text-green-600 bg-green-50",
+        red: "group-hover:bg-red-600 group-hover:text-white text-red-600 bg-red-50",
+    }
+
+    return (
+        <Link href={href} className="flex flex-col items-center justify-center p-5 bg-white border border-neutral-200 rounded-3xl hover:border-transparent hover:shadow-xl hover:shadow-neutral-200/50 transition-all group">
+            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-3 transition-all transform group-hover:scale-110 ${colors[color]}`}>
+                <Icon className="w-6 h-6" />
+            </div>
+            <span className="text-xs font-bold text-neutral-700 uppercase tracking-wider">{label}</span>
+        </Link>
+    )
+}
+
+function HealthRow({ label, status, active }: any) {
+    return (
+        <div className="flex items-center justify-between text-sm">
+            <span className="text-neutral-500 font-medium">{label}</span>
+            <span className={`${active ? 'text-green-400' : 'text-neutral-400'} font-bold font-mono text-xs uppercase tracking-widest`}>
+                {status}
+            </span>
         </div>
     )
 }

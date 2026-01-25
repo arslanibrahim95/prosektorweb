@@ -1,4 +1,4 @@
-import { getClientAnalytics, getClientAnalyticsSummary } from '@/actions/analytics'
+import { getClientAnalytics, getClientAnalyticsSummary } from '@/features/system/actions/analytics'
 import Link from 'next/link'
 import {
     Users, Eye, Clock, TrendingUp, Globe, Zap, Shield,
@@ -131,9 +131,9 @@ export default async function AnalyticsPage() {
                                                     <p className="text-xs text-neutral-500">Sayfa Görüntüleme</p>
                                                 </div>
                                                 <div className="text-right">
-                                                    <p className={`text-lg font-bold ${(analytics.pageSpeedScore || 0) >= 90 ? 'text-green-600' :
-                                                            (analytics.pageSpeedScore || 0) >= 50 ? 'text-amber-600' : 'text-red-600'
-                                                        }`}>
+                                                    <p className={`text - lg font - bold ${(analytics.pageSpeedScore || 0) >= 90 ? 'text-green-600' :
+                                                        (analytics.pageSpeedScore || 0) >= 50 ? 'text-amber-600' : 'text-red-600'
+                                                        } `}>
                                                         {analytics.pageSpeedScore || '-'}
                                                     </p>
                                                     <p className="text-xs text-neutral-500">PageSpeed</p>

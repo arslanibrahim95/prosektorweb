@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { getProposalByToken, approveProposalByToken } from '@/actions/proposal'
+import { getProposalByToken, approveProposalByToken } from '@/features/crm/actions/proposals'
 import { CheckCircle, XCircle, Loader2, FileText, Calendar, Building2 } from 'lucide-react'
 import Link from 'next/link'
 

@@ -1,4 +1,4 @@
-import { getRevenueData, getProjectStats, getInvoiceStats, getTicketStats } from '@/actions/report'
+import { getRevenueData, getProjectStats, getInvoiceStats, getTicketStats } from '@/features/system/actions/reports'
 import { RevenueChart } from '@/components/admin/reports/RevenueChart'
 import { ProjectPipeline } from '@/components/admin/reports/ProjectPipeline'
 import { PageHeader } from '@/components/admin/ui/PageHeader'

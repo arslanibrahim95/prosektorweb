@@ -1,7 +1,7 @@
-import { getApiConfigs } from '@/actions/domain'
+import { getApiConfigs } from '@/features/projects/actions/domains'
 import Link from 'next/link'
 import { ChevronLeft, Settings, Server, Key, Globe, Save } from 'lucide-react'
-import { ApiConfigForm } from '@/components/admin/domain/ApiConfigForm'
+import { ApiConfigForm } from '@/features/projects/components/ApiConfigForm'
 
 export default async function DomainSettingsPage() {
     const configs = await getApiConfigs()

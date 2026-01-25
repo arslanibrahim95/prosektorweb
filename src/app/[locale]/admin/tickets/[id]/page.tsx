@@ -1,4 +1,4 @@
-import { getTicketById, addMessage, updateTicketStatus } from '@/actions/ticket'
+import { getTicketById, addMessage, updateTicketStatus } from '@/features/support/actions/tickets'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { ChevronLeft, Send, User, ShieldCheck, Clock, CheckCircle } from 'lucide-react'

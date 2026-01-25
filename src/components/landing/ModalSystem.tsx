@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useTransition, useRef } from 'react'
 import { X, Check, ArrowLeft, Lock, AlertCircle, CreditCard } from 'lucide-react'
-import { verifyClientAccess } from '@/actions/client-auth'
+import { verifyClientAccess } from '@/features/auth/actions/client-auth'
 
 // Enum for better state management
 export enum ModalStep {

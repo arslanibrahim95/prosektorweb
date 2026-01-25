@@ -7,7 +7,7 @@
 
 import { useState } from 'react';
 import { Upload, Eye, Rocket, Loader2, CheckCircle2 } from 'lucide-react';
-import { exportSite, createPreview, deploySite } from '@/actions/deploy';
+import { exportSite, createPreview, deploySite } from '@/features/projects/actions/deploy';
 
 interface DeployButtonProps {
     projectId: string;
@@ -133,8 +133,8 @@ export function DeployButtons({ projectId, hasDomain, approvedCount }: DeployBut
             {result && (
                 <div
                     className={`flex items-center gap-2 p-3 rounded-lg text-sm ${result.type === 'success'
-                            ? 'bg-green-50 text-green-700'
-                            : 'bg-red-50 text-red-700'
+                        ? 'bg-green-50 text-green-700'
+                        : 'bg-red-50 text-red-700'
                         }`}
                 >
                     {result.type === 'success' && <CheckCircle2 className="w-4 h-4" />}

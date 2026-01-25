@@ -1,4 +1,4 @@
-import { getPortfolios } from '@/actions/portfolio'
+import { getPortfolios } from '@/features/projects/actions/portfolio'
 import { PageHeader } from '@/components/admin/ui/PageHeader'
 import Link from 'next/link'
 import { Plus, ExternalLink, Star, Eye, EyeOff, Image as ImageIcon } from 'lucide-react'

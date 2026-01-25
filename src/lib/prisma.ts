@@ -15,6 +15,8 @@ const softDeleteModels = {
     Invoice: prismaBase.invoice,
     WebProject: prismaBase.webProject,
     Payment: prismaBase.payment,
+    Domain: prismaBase.domain,
+    Workplace: prismaBase.workplace,
 } as const
 
 type SoftDeleteModelName = keyof typeof softDeleteModels

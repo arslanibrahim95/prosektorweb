@@ -38,7 +38,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
                 // 1. Check SystemUser (Admins/Staff)
                 const systemUser = await prisma.systemUser.findUnique({ where: { email: normalizedEmail } })
-                if (systemUser && systemUser.isActive) {
+                if (systemUser) {
+                    if (!systemUser.isActive) throw new Error('INACTIVE_ACCOUNT')
                     const passwordsMatch = await bcrypt.compare(password, systemUser.password)
                     if (passwordsMatch) {
                         return {
@@ -55,6 +56,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                 // 2. Check Client User (Customers)
                 const user = await getUser(normalizedEmail)
                 if (user) {
+                    if (user.deletedAt) throw new Error('INACTIVE_ACCOUNT')
                     const passwordsMatch = await bcrypt.compare(password, user.password)
 
                     if (passwordsMatch) {

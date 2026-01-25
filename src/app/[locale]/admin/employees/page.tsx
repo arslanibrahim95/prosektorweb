@@ -1,4 +1,4 @@
-import { getEmployees } from '@/actions/employee'
+import { getEmployees } from '@/features/crm/actions/employees'
 import Link from 'next/link'
 import { Plus, Search, Users, MapPin, Building2, Phone } from 'lucide-react'
 

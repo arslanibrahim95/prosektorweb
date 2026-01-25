@@ -1,4 +1,4 @@
-import { getProposals } from '@/actions/proposal'
+import { getProposals } from '@/features/crm/actions/proposals'
 import Link from 'next/link'
 import { Plus, ArrowUpRight, FileText } from 'lucide-react'
 import { PageHeader } from '@/components/admin/ui/PageHeader'

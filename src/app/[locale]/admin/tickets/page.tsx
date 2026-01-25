@@ -1,6 +1,6 @@
 export const dynamic = 'force-dynamic'
 
-import { getTickets } from '@/actions/ticket'
+import { getTickets } from '@/features/support/actions/tickets'
 import Link from 'next/link'
 import { Plus, MessageSquare, Clock, CheckCircle, AlertCircle } from 'lucide-react'
 import { PageHeader } from '@/components/admin/ui/PageHeader'

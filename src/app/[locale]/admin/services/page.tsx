@@ -1,4 +1,4 @@
-import { getServices, renewService, deleteService } from '@/actions/service'
+import { getServices, deleteService, renewService } from '@/features/finance/actions/services'
 import { Plus, RefreshCw, AlertTriangle, Calendar, Trash2 } from 'lucide-react'
 import { ServiceType } from '@prisma/client'
 import { PageHeader } from '@/components/admin/ui/PageHeader'
@@ -24,8 +24,8 @@ export default async function ServicesPage({ searchParams }: ServicesPageProps) 
     const params = await searchParams
     const query = params.q || ''
 
-    const { services: upcomingRenewals } = await getServices({ upcoming: true })
-    const { services } = await getServices({ search: query })
+    const upcomingRenewals = await getServices({ upcoming: true }) as any
+    const services = await getServices({ search: query }) as any
 
 
     return (

@@ -1,4 +1,4 @@
-import { getInvoiceById } from '@/actions/invoice'
+import { getInvoice } from '@/features/finance/actions/invoices'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import {
@@ -11,7 +11,7 @@ import {
     Banknote,
     CheckCircle2
 } from 'lucide-react'
-import { PaymentForm } from '@/components/admin/PaymentForm'
+import { PaymentForm } from '@/features/finance/components/PaymentForm'
 import { DownloadButton } from '@/components/pdf/DownloadButton'
 import { InvoiceDocument } from '@/components/pdf/InvoiceDocument'
 
@@ -44,7 +44,7 @@ const paymentMethodLabels: Record<string, string> = {
 
 export default async function InvoiceDetailPage({ params }: InvoiceDetailPageProps) {
     const { id } = await params
-    const invoice = await getInvoiceById(id)
+    const invoice = await getInvoice(id) as any
 
     if (!invoice) {
         notFound()
@@ -150,7 +150,7 @@ export default async function InvoiceDetailPage({ params }: InvoiceDetailPagePro
                             </div>
                         ) : (
                             <div className="space-y-3">
-                                {invoice.payments.map((payment) => (
+                                {invoice.payments.map((payment: any) => (
                                     <div key={payment.id} className="flex items-center justify-between p-4 bg-neutral-50 rounded-xl">
                                         <div className="flex items-center gap-4">
                                             <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">

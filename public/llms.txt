@@ -1,0 +1,22 @@
+# ProSektorWeb LLM Documentation
+
+# Project Overview
+ProSektorWeb is a digital agency platform providing web design, SEO, and software solutions.
+
+# Tech Stack
+- Framework: Next.js 14+ (App Router)
+- Language: TypeScript
+- Database: PostgreSQL (Prisma)
+- UI: Tailwind CSS, Shadcn UI
+- Auth: NextAuth.js
+- I18n: next-intl
+
+# Key Directories
+- /src/app: App router pages
+- /src/components: React components
+- /src/features: Feature-based modules (CRM, Finance, etc.)
+- /src/lib: Utilities and libraries
+
+# Content Guidelines
+- Tone: Professional, authoritative, yet accessible.
+- Languages: Turkish (primary), English (secondary).

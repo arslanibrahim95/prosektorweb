@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { ChevronLeft } from 'lucide-react'
-import { NewDomainForm } from '@/components/admin/domain/NewDomainForm'
+import { NewDomainForm } from '@/features/projects/components/NewDomainForm'
 import { prisma } from '@/lib/prisma'
 
 export default async function NewDomainPage() {

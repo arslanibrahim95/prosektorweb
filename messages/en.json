@@ -23,6 +23,8 @@
         "error_email": "Please enter a valid email address.",
         "error_password_length": "Password must be at least 6 characters.",
         "error_invalid": "Invalid email or password.",
+        "error_inactive": "Your account is inactive. Please contact support.",
+        "error_system": "System is not responding. Please try again later.",
         "kvkk": "GDPR Compliant",
         "ssl": "256-bit SSL"
     },

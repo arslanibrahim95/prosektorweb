@@ -1,4 +1,4 @@
-import { getProjectAnalytics, getProjectDailyStats, getTrackingScript } from '@/actions/analytics'
+import { getProjectAnalytics, getProjectDailyStats, getTrackingScript } from '@/features/system/actions/analytics'
 import { notFound } from 'next/navigation'
 import AnalyticsDetailClient from '@/components/portal/AnalyticsDetailClient'
 

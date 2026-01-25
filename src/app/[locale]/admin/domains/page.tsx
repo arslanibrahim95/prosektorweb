@@ -1,4 +1,4 @@
-import { getDomains, searchDomains, getDomainStats, DomainCheckResult } from '@/actions/domain'
+import { getDomains, getDomainStats } from '@/features/projects/actions/domains'
 import Link from 'next/link'
 import {
     Globe,
@@ -30,10 +30,12 @@ export default async function DomainsPage({ searchParams }: DomainsPageProps) {
     const params = await searchParams
     const searchQuery = params.q || params.search || ''
 
-    const [domains, stats] = await Promise.all([
-        getDomains(searchQuery),
+    const [domainsData, stats] = await Promise.all([
+        getDomains(1, 100, searchQuery), // TODO: Implement real pagination in UI
         getDomainStats(),
     ])
+
+    const { data: domains } = domainsData
 
     return (
         <div className="space-y-6">

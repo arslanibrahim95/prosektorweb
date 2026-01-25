@@ -1,4 +1,4 @@
-import { getClientDashboardStats, getClientServices, getClientProjects, getClientProfile } from '@/actions/portal'
+import { getClientDashboardStats, getClientServices, getClientProjects, getClientProfile } from '@/features/auth/actions/portal'
 import { auth } from '@/auth'
 import Link from 'next/link'
 import {

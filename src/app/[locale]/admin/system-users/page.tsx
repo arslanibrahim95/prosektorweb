@@ -1,10 +1,11 @@
-import { getSystemUsers } from '@/actions/system-users'
+import { getSystemUsers } from '@/features/system/actions/system-users'
 import Link from 'next/link'
-import { Plus, Users, Shield, Lock, Trash2 } from 'lucide-react'
-import { DeleteSystemUserButton } from '@/components/admin/system-users/DeleteButton'
+import { Plus, Users, Shield, Clock, Search, MoreVertical, Trash2 } from 'lucide-react'
+import { PageHeader } from '@/components/admin/ui/PageHeader'
+import { DeleteSystemUserButton } from '@/features/system/components/DeleteButton'
 
 export default async function SystemUsersPage() {
-    const users = await getSystemUsers()
+    const { data: users } = await getSystemUsers() as any
 
     return (
         <div className="space-y-6">

@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { ChevronLeft } from 'lucide-react'
-import { EmployeeForm } from '@/components/admin/employee/EmployeeForm'
+import { EmployeeForm } from '@/features/crm/components/EmployeeForm'
 import { prisma } from '@/lib/prisma'
 
 export default async function NewEmployeePage() {

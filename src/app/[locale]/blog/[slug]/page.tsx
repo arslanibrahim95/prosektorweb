@@ -8,7 +8,7 @@ import { Navbar } from '@/components/layout/Navbar'
 import { Footer } from '@/components/layout/Footer'
 import { prisma } from '@/lib/prisma'
 import TrustBadges from '@/components/ui/TrustBadges'
-import { BlogCTA } from '@/components/blog/BlogCTA'
+import { BlogCTA } from '@/features/content/components/BlogCTA'
 
 // --- Types ---
 type Props = {

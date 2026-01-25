@@ -1,4 +1,4 @@
-import { getInvoiceById } from '@/actions/portal'
+import { getInvoice } from '@/features/finance/actions/invoices'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, Receipt, CreditCard, Calendar, CheckCircle, Clock, AlertCircle } from 'lucide-react'
@@ -24,7 +24,7 @@ const paymentMethodLabels: Record<string, string> = {
 
 export default async function InvoiceDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params
-    const invoice = await getInvoiceById(id)
+    const invoice = await getInvoice(id)
 
     if (!invoice) {
         notFound()

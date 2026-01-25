@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
 import "../globals.css";
-import { AuthProvider } from "@/components/AuthProvider";
+import { AuthProvider } from "@/features/auth/components/AuthProvider";
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 
@@ -54,8 +54,14 @@ export async function generateMetadata({
       shortcut: '/favicon.ico',
       apple: '/favicon.ico',
     },
+    verification: {
+      google: 'IpXYWdgtYmLHngJAYrqcS2GYhdD11UuGxzecA8UNVuo',
+    },
   };
 }
+
+import { ThemeProvider } from "@/components/ThemeProvider";
+import { JsonLd } from "@/components/seo/JsonLd";
 
 export default async function RootLayout({
   children,
@@ -68,11 +74,30 @@ export default async function RootLayout({
   const messages = await getMessages();
 
   return (
-    <html lang={locale} className={`${inter.variable} ${playfair.variable}`}>
+    <html lang={locale} className={`${inter.variable} ${playfair.variable}`} suppressHydrationWarning>
       <body className="font-sans antialiased">
+        <JsonLd data={{
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          "name": "ProSektorWeb",
+          "url": "https://prosektorweb.com",
+          "logo": "https://prosektorweb.com/logo.png",
+          "contactPoint": {
+            "@type": "ContactPoint",
+            "telephone": "+90-555-123-4567",
+            "contactType": "customer service"
+          }
+        }} />
         <NextIntlClientProvider messages={messages}>
           <AuthProvider>
-            {children}
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange
+            >
+              {children}
+            </ThemeProvider>
           </AuthProvider>
         </NextIntlClientProvider>
       </body>

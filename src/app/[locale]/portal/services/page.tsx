@@ -1,4 +1,4 @@
-import { getClientServices } from '@/actions/portal'
+import { getClientServices } from '@/features/auth/actions/portal'
 import Link from 'next/link'
 import {
     Clock, Globe, Search, Wrench, Share2, Megaphone, Package,

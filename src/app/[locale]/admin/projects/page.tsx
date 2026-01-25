@@ -1,4 +1,4 @@
-import { getProjects, getProjectStats } from '@/actions/project'
+import { getProjects, getProjectStats } from '@/features/projects/actions/projects'
 import Link from 'next/link'
 import {
     Plus,
@@ -41,13 +41,14 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
     const limit = 10
 
     const [projectsData, stats] = await Promise.all([
-        getProjects({ search: searchQuery, status: statusFilter, page, limit }),
+        getProjects(page, limit, searchQuery, statusFilter),
         getProjectStats(),
     ])
 
-    const projects = projectsData.data
-    const totalPages = projectsData.pages
-    const currentPage = projectsData.currentPage
+    const { data: projects, meta } = projectsData
+    const totalPages = meta.totalPages
+    const currentPage = meta.page
+
 
     return (
         <div className="space-y-6">

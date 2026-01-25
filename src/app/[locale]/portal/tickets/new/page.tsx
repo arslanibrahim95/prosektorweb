@@ -4,7 +4,7 @@ import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { ChevronLeft, Send, Loader2 } from 'lucide-react'
-import { createClientTicket } from '@/actions/portal'
+import { createClientTicket } from '@/features/auth/actions/portal'
 
 export default function NewTicketPage() {
     const router = useRouter()

@@ -1,4 +1,4 @@
-import { getWorkplaces } from '@/actions/workplace'
+import { getWorkplaces } from '@/features/crm/actions/workplaces'
 import Link from 'next/link'
 import { Plus, Search, Layers, Building2, MapPin } from 'lucide-react'
 
@@ -15,7 +15,7 @@ const dangerClassMap: Record<string, { label: string, color: string }> = {
 export default async function WorkplacesPage({ searchParams }: WorkplacesPageProps) {
     const params = await searchParams
     const q = params.q || ''
-    const workplaces = await getWorkplaces(q)
+    const { data: workplaces } = await getWorkplaces(1, 100, q)
 
     return (
         <div className="space-y-6">

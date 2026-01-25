@@ -433,11 +433,18 @@ model Domain {
   serverIp    String?      // Yönlendirilecek IP
   sslEnabled  Boolean      @default(false)
   
+  // Fiyatlandırma
+  price       Decimal?     @db.Decimal(10, 2)
+  autoRenew   Boolean      @default(true)
+  
   // Notlar
   notes       String?      @db.Text
   
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
+  deletedAt     DateTime?     // Soft Delete
+
+  @@index([deletedAt])
 }
 
 // 6. Teklif Yönetimi
@@ -564,9 +571,17 @@ enum ProjectStatus {
   CANCELLED   // İptal
 }
 
+enum ProjectPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
 model WebProject {
   id          String        @id @default(uuid())
   name        String        // Proje adı (örn: Firma Adı Web Sitesi)
+  description String?       @db.Text
   
   // Firma bağlantısı
   companyId   String
@@ -575,14 +590,20 @@ model WebProject {
   // Domain bağlantısı (opsiyonel)
   domainId    String?
   domain      Domain?       @relation(fields: [domainId], references: [id], onDelete: SetNull)
+  
+  serviceId   String?
+  service     Service?      @relation(fields: [serviceId], references: [id], onDelete: SetNull)
   tasks       Task[]
   portfolio   Portfolio?
   analytics   SiteAnalytics?
   generatedContents GeneratedContent[]
   pipelineRuns PipelineRun[]
 
+  progress    Int           @default(0)
+  
   // Proje durumu
   status      ProjectStatus @default(DRAFT)
+  priority    ProjectPriority @default(MEDIUM)
   
   // Site bilgileri
   slug        String?       @unique // Demo access slug
@@ -806,20 +827,25 @@ model Service {
   companyId   String
   company     Company        @relation(fields: [companyId], references: [id], onDelete: Cascade)
   name        String
+  description String?        @db.Text
   type        ServiceType    @default(OTHER)
   price       Decimal        @db.Decimal(10, 2)
   currency    String         @default("TRY")
   billingCycle BillingCycle  @default(YEARLY)
   startDate   DateTime       @default(now())
   renewDate   DateTime
+  features    Json?
   status      ServiceStatus  @default(ACTIVE)
   isReminderSent Boolean     @default(false)
+  webProjects    WebProject[]
   createdAt   DateTime       @default(now())
   updatedAt   DateTime       @updatedAt
+  deletedAt   DateTime?      // Soft Delete
 
   @@index([companyId])
   @@index([status])
   @@index([renewDate])
+  @@index([deletedAt])
 }
 
 // ===============================

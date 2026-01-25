@@ -1,6 +1,6 @@
 export const dynamic = 'force-dynamic'
 
-import { getPortfolios } from '@/actions/portfolio'
+import { getPortfolios } from '@/features/projects/actions/portfolio'
 import Link from 'next/link'
 import { ArrowRight, ExternalLink, Quote } from 'lucide-react'
 import { Navbar } from '@/components/layout/Navbar'

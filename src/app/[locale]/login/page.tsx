@@ -38,16 +38,26 @@ export default function LoginPage() {
             return
         }
 
-        // Use NextAuth's native redirect - let it handle everything
-        await signIn('credentials', {
+        // Use NextAuth's native redirect: false to handle errors locally
+        const result = await signIn('credentials', {
             email,
             password,
-            redirect: true, // Let NextAuth handle redirect
+            redirect: false,
         })
 
-        // If we reach here, login failed
-        setError(t('error_invalid'))
-        setIsPending(false)
+        if (result?.error) {
+            if (result.error.includes('INACTIVE_ACCOUNT')) {
+                setError(t('error_inactive'))
+            } else if (result.error === 'CredentialsSignin') {
+                setError(t('error_invalid'))
+            } else {
+                setError(t('error_system'))
+            }
+            setIsPending(false)
+        } else {
+            // Success
+            window.location.href = '/' // Redirect manually on success
+        }
     }
 
     return (

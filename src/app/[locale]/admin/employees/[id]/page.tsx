@@ -1,9 +1,9 @@
-import { getEmployeeById } from '@/actions/employee'
+import { getEmployeeById } from '@/features/crm/actions/employees'
 import { prisma } from '@/lib/prisma'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { ChevronLeft, User, Building2, Calendar, Phone, Mail } from 'lucide-react'
-import { EmployeeForm } from '@/components/admin/employee/EmployeeForm'
+import { EmployeeForm } from '@/features/crm/components/EmployeeForm'
 
 interface EmployeeDetailPageProps {
     params: Promise<{ id: string }>

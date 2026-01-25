@@ -2,7 +2,7 @@ import React from 'react'
 import { Metadata } from 'next'
 import { NavbarWrapper } from '@/components/landing/NavbarWrapper'
 import { Footer } from '@/components/layout/Footer'
-import { ContactForm } from '@/components/landing/ContactForm'
+import { ContactForm } from '@/features/support/components/ContactForm'
 import { LandingProvider } from '@/components/landing/LandingContext'
 import { GlobalModal } from '@/components/landing/GlobalModal'
 import { Container } from '@/components/ui/Container'
@@ -12,6 +12,7 @@ import { Hero } from '@/components/landing/Hero'
 import { Features } from '@/components/landing/Features'
 import { Pricing } from '@/components/landing/Pricing'
 import { FAQ } from '@/components/landing/FAQ'
+import { JsonLd } from '@/components/seo/JsonLd'
 
 import { useTranslations } from 'next-intl'
 import { getTranslations } from 'next-intl/server'
@@ -30,6 +31,17 @@ export default async function HomePage() {
   return (
     <LandingProvider>
       <div className="min-h-screen bg-transparent text-neutral-900 font-sans selection:bg-brand-100 selection:text-brand-900 relative overflow-hidden">
+        <JsonLd data={{
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          "name": "ProSektorWeb",
+          "url": "https://prosektorweb.com",
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://prosektorweb.com/blog?search={search_term_string}",
+            "query-input": "required name=search_term_string"
+          }
+        }} />
 
         {/* Fluent "Aurora" Background Effect - Enhanced */}
         {/* Optimized Static Gradient (Performance Fix) */}

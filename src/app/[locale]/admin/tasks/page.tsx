@@ -1,6 +1,6 @@
-import { getTasks } from '@/actions/task'
+import { getTasks } from '@/features/system/actions/tasks'
 import { PageHeader } from '@/components/admin/ui/PageHeader'
-import { TaskBoard, type Task } from '@/components/admin/task/TaskBoard'
+import { TaskBoard, type Task } from '@/features/system/components/TaskBoard'
 import { Plus } from 'lucide-react'
 
 export default async function TasksPage() {

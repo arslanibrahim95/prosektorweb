@@ -5,7 +5,7 @@ import {
     LayoutDashboard, Layers, Receipt, Ticket, LogOut, Building2,
     Globe, FileText, Settings, Clock, CreditCard, BarChart3
 } from 'lucide-react'
-import { logoutAction } from '@/actions/auth'
+import { logoutAction } from '@/features/auth/actions/auth'
 import { prisma } from '@/lib/prisma'
 import Particles from '@/components/ui/Particles'
 
@@ -52,7 +52,7 @@ export default async function PortalLayout({
                     </div>
                     <form action={async () => {
                         'use server'
-                        const { exitImpersonation } = await import('@/actions/admin-ops')
+                        const { exitImpersonation } = await import('@/features/system/actions/admin-ops')
                         await exitImpersonation()
                     }}>
                         <button className="bg-white text-purple-600 px-3 py-1 rounded text-xs font-extrabold hover:bg-purple-50 transition-colors">

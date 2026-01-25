@@ -6,8 +6,8 @@ import { prisma } from '@/lib/prisma'
 import { Prisma } from '@prisma/client'
 import Particles from '@/components/ui/Particles'
 import SpotlightCard from '@/components/ui/SpotlightCard'
-import { Pagination } from '@/components/blog/Pagination'
-import { BlogCardImage } from '@/components/blog/BlogCardImage'
+import { Pagination } from '@/features/content/components/Pagination'
+import { BlogCardImage } from '@/features/content/components/BlogCardImage'
 
 // Helper to format date
 const formatDate = (date: Date) => {

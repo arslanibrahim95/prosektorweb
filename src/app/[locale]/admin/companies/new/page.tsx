@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { ChevronLeft } from 'lucide-react'
-import { CompanyForm } from '@/components/admin/CompanyForm'
+import { CompanyForm } from '@/features/crm/components/CompanyForm'
 
 export default function NewCompanyPage() {
     return (

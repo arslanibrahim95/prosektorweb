@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { ChevronLeft } from 'lucide-react'
-import { DomainSearchAndPurchase } from '@/components/admin/domain/DomainSearchAndPurchase'
+// import { searchDomain, purchaseDomain } from '@/features/projects/actions/domain-registrar' // searchDomain doesn't exist, unused here?
+import { DomainSearchAndPurchase } from '@/features/projects/components/DomainSearchAndPurchase'
 import { prisma } from '@/lib/prisma'
 
 export default async function DomainRegisterPage() {

@@ -1,19 +1,16 @@
-import { getCompanies, deleteCompany } from '@/actions/company'
+import { getCompanies } from '@/features/crm/actions/companies'
 import Link from 'next/link'
 import {
     Plus,
     Search,
     Building2,
-    MoreVertical,
     Eye,
     Edit,
-    Trash2,
     MapPin,
     Phone,
     Mail,
     ChevronLeft,
     ChevronRight,
-    AlertCircle
 } from 'lucide-react'
 
 interface CompaniesPageProps {
@@ -28,11 +25,8 @@ export default async function CompaniesPage({ searchParams }: CompaniesPageProps
     const search = params.search || ''
     const page = parseInt(params.page || '1', 10)
 
-    const { companies, total, pages, currentPage } = await getCompanies({
-        search,
-        page,
-        limit: 10,
-    })
+    const { data: companies, meta } = await getCompanies(page, 10, search)
+    const { total, totalPages: pages, page: currentPage } = meta
 
     return (
         <div className="space-y-6">
@@ -156,8 +150,8 @@ export default async function CompaniesPage({ searchParams }: CompaniesPageProps
                                     </td>
                                     <td className="px-6 py-4 text-center">
                                         <span className={`inline-flex px-3 py-1 rounded-full text-xs font-bold ${company.isActive
-                                                ? 'bg-green-100 text-green-700'
-                                                : 'bg-red-100 text-red-700'
+                                            ? 'bg-green-100 text-green-700'
+                                            : 'bg-red-100 text-red-700'
                                             }`}>
                                             {company.isActive ? 'Aktif' : 'Pasif'}
                                         </span>

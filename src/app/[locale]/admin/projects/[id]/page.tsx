@@ -1,4 +1,4 @@
-import { getProjectById } from '@/actions/project'
+import { getProject } from '@/features/projects/actions/projects'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import {
@@ -13,9 +13,9 @@ import {
     Link as LinkIcon,
     Sparkles
 } from 'lucide-react'
-import { ProjectStatusManager } from '@/components/admin/project/ProjectStatusManager'
-import { ProjectEditForm } from '@/components/admin/project/ProjectEditForm'
-import { ProjectOperations } from '@/components/admin/project/ProjectOperations'
+import { ProjectStatusManager } from '@/features/projects/components/ProjectStatusManager'
+import { ProjectEditForm } from '@/features/projects/components/ProjectEditForm'
+import { ProjectOperations } from '@/features/projects/components/ProjectOperations'
 
 interface ProjectDetailPageProps {
     params: Promise<{ id: string }>
@@ -35,7 +35,7 @@ const statusConfig: Record<string, { label: string, color: string }> = {
 
 export default async function ProjectDetailPage({ params }: ProjectDetailPageProps) {
     const { id } = await params
-    const project = await getProjectById(id)
+    const project = await getProject(id) as any
 
     if (!project) {
         notFound()

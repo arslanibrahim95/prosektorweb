@@ -1,4 +1,4 @@
-import { getProposalById, updateProposalStatus, generateApprovalToken, convertProposalToInvoice } from '@/actions/proposal'
+import { getProposal, updateProposalStatus, generateApprovalToken, convertProposalToInvoice } from '@/features/crm/actions/proposals'
 import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
 import { ChevronLeft, FileText, Calendar, Building2, Send, CheckCircle, XCircle, Receipt, LinkIcon, ExternalLink } from 'lucide-react'
@@ -20,7 +20,7 @@ const statusMap: Record<string, { label: string, color: string }> = {
 
 export default async function ProposalDetailPage({ params }: PageProps) {
     const { id } = await params
-    const proposal = await getProposalById(id)
+    const proposal = await getProposal(id)
 
     if (!proposal) notFound()
 

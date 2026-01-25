@@ -3,46 +3,26 @@ import { prisma } from '@/lib/prisma'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const baseUrl = 'https://prosektorweb.com'
+    const locales = ['tr', 'en']
 
-    // Static pages
-    const staticPages = [
-        {
-            url: baseUrl,
-            lastModified: new Date(),
-            changeFrequency: 'weekly' as const,
-            priority: 1,
-        },
-        {
-            url: `${baseUrl}/portfolio`,
-            lastModified: new Date(),
-            changeFrequency: 'monthly' as const,
-            priority: 0.8,
-        },
-        {
-            url: `${baseUrl}/blog`,
-            lastModified: new Date(),
-            changeFrequency: 'daily' as const,
-            priority: 0.9,
-        },
-        {
-            url: `${baseUrl}/cerez-politikasi`,
-            lastModified: new Date(),
-            changeFrequency: 'yearly' as const,
-            priority: 0.3,
-        },
-        {
-            url: `${baseUrl}/gizlilik-ve-kvkk`,
-            lastModified: new Date(),
-            changeFrequency: 'yearly' as const,
-            priority: 0.3,
-        },
-        {
-            url: `${baseUrl}/mesafeli-satis-sozlesmesi`,
-            lastModified: new Date(),
-            changeFrequency: 'yearly' as const,
-            priority: 0.3,
-        },
+    const routes = [
+        '',
+        '/portfolio',
+        '/blog',
+        '/cerez-politikasi',
+        '/gizlilik-ve-kvkk',
+        '/mesafeli-satis-sozlesmesi',
     ]
+
+    // Static pages with locales
+    const staticPages = routes.flatMap((route) =>
+        locales.map((locale) => ({
+            url: `${baseUrl}/${locale}${route}`,
+            lastModified: new Date(),
+            changeFrequency: route === '/blog' ? 'daily' as const : 'weekly' as const,
+            priority: route === '' ? 1 : 0.8,
+        }))
+    )
 
     // Dynamic blog posts
     const blogPosts = await prisma.blogPost.findMany({
@@ -50,12 +30,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         select: { slug: true, updatedAt: true, createdAt: true },
     })
 
-    const dynamicPages = blogPosts.map((post) => ({
-        url: `${baseUrl}/blog/${post.slug}`,
-        lastModified: post.updatedAt || post.createdAt,
-        changeFrequency: 'weekly' as const,
-        priority: 0.7,
-    }))
+    const dynamicPages = blogPosts.flatMap((post) =>
+        locales.map((locale) => ({
+            url: `${baseUrl}/${locale}/blog/${post.slug}`,
+            lastModified: post.updatedAt || post.createdAt,
+            changeFrequency: 'weekly' as const,
+            priority: 0.7,
+        }))
+    )
 
     return [...staticPages, ...dynamicPages]
 }

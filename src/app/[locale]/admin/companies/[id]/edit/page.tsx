@@ -1,8 +1,8 @@
-import { getCompanyById } from '@/actions/company'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { ChevronLeft } from 'lucide-react'
-import { CompanyForm } from '@/components/admin/CompanyForm'
+import { getCompany } from '@/features/crm/actions/companies'
+import { CompanyForm } from '@/features/crm/components/CompanyForm'
 
 interface CompanyEditPageProps {
     params: Promise<{ id: string }>
@@ -10,7 +10,7 @@ interface CompanyEditPageProps {
 
 export default async function CompanyEditPage({ params }: CompanyEditPageProps) {
     const { id } = await params
-    const company = await getCompanyById(id)
+    const company = await getCompany(id) as any
 
     if (!company) {
         notFound()

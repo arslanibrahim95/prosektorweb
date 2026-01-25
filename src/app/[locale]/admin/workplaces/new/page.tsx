@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { ChevronLeft } from 'lucide-react'
-import { WorkplaceForm } from '@/components/admin/workplace/WorkplaceForm'
+import { WorkplaceForm } from '@/features/crm/components/WorkplaceForm'
 import { prisma } from '@/lib/prisma'
 
 export default async function NewWorkplacePage() {

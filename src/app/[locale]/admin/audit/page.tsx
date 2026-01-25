@@ -1,10 +1,10 @@
-import { getAuditLogs } from '@/lib/audit'
+import { getAuditLogs } from '@/features/system/actions/audit'
+import { AuditAction } from '@prisma/client'
 import { formatDistanceToNow } from 'date-fns'
 import { tr } from 'date-fns/locale'
 import { FileText, Plus, Trash2, Edit, LogIn, LogOut } from 'lucide-react'
-import { AuditFilters } from '@/components/admin/audit/AuditFilters'
-import { AuditPagination } from '@/components/admin/audit/AuditPagination'
-import { AuditAction } from '@prisma/client'
+import { AuditFilters } from '@/features/system/components/AuditFilters'
+import { AuditPagination } from '@/features/system/components/AuditPagination'
 import { Suspense } from 'react'
 
 const ACTION_ICONS: Record<AuditAction, React.ComponentType<{ className?: string }>> = {
@@ -47,12 +47,13 @@ export default async function AuditPage({
     const entity = params.entity || undefined
     const action = isValidAuditAction(params.action) ? params.action : undefined
 
-    const { logs, total, pages, currentPage } = await getAuditLogs({
-        page,
+    const { data: logs, meta } = await getAuditLogs(page, 25, {
+        startDate: undefined, // TODO: Add date filters
+        endDate: undefined,
         entity,
         action,
-        limit: 25,
     })
+    const { total, totalPages: pages, page: currentPage } = meta
 
     return (
         <div className="space-y-6">

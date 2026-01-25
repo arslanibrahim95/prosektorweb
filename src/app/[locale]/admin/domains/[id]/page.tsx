@@ -1,4 +1,4 @@
-import { getDomainById } from '@/actions/domain'
+import { getDomain } from '@/features/projects/actions/domains'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import {
@@ -12,8 +12,8 @@ import {
     Trash2,
     Plus
 } from 'lucide-react'
-import { DnsRecordsSection } from '@/components/admin/domain/DnsRecordsSection'
-import { CloudflareActions } from '@/components/admin/domain/CloudflareActions'
+import { DnsRecordsSection } from '@/features/projects/components/DnsRecordsSection'
+import { CloudflareActions } from '@/features/projects/components/CloudflareActions'
 
 interface DomainDetailPageProps {
     params: Promise<{ id: string }>
@@ -28,12 +28,10 @@ const statusConfig: Record<string, { label: string, color: string }> = {
 
 export default async function DomainDetailPage({ params }: DomainDetailPageProps) {
     const { id } = await params
-    const domain = await getDomainById(id)
-
+    const domain = await getDomain(id) as any
     if (!domain) {
         notFound()
     }
-
     const status = statusConfig[domain.status] || statusConfig.PENDING
 
     return (

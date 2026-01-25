@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { ChevronLeft } from 'lucide-react'
-import { InvoiceForm } from '@/components/admin/InvoiceForm'
-import { generateInvoiceNo } from '@/actions/invoice'
+import { InvoiceForm } from '@/features/finance/components/InvoiceForm'
+import { generateInvoiceNo } from '@/features/finance/actions/invoices'
 import { prisma } from '@/lib/prisma'
 
 export default async function NewInvoicePage() {
