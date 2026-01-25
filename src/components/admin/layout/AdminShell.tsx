@@ -161,6 +161,10 @@ export function AdminShell({ children, userEmail }: AdminShellProps) {
                     <div className="px-3 py-2 mt-6 text-xs font-bold text-neutral-500 uppercase tracking-wider">
                         Sistem
                     </div>
+                    <Link href="/admin/system-users" onClick={handleNavigation} className={`flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all ${isActive('/admin/system-users') ? 'bg-white/10 text-white' : 'text-neutral-300 hover:bg-white/5 hover:text-white'}`}>
+                        <Users className="w-5 h-5" />
+                        Personel Yönetimi
+                    </Link>
                     <Link href="/admin/audit" onClick={handleNavigation} className={`flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all ${isActive('/admin/audit') ? 'bg-white/10 text-white' : 'text-neutral-300 hover:bg-white/5 hover:text-white'}`}>
                         <History className="w-5 h-5" />
                         İşlem Geçmişi

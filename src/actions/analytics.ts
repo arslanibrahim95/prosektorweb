@@ -12,11 +12,19 @@ async function getClientCompanyId(): Promise<string | null> {
 
 // Get analytics for all client's projects
 export async function getClientAnalytics() {
-    const companyId = await getClientCompanyId()
-    if (!companyId) return []
+    const session = await auth()
+    const companyId = session?.user?.companyId
+    const isAdmin = session?.user?.role === 'ADMIN'
+
+    if (!companyId && !isAdmin) return []
+
+    const where: any = { status: 'LIVE' }
+    if (!isAdmin && companyId) {
+        where.companyId = companyId
+    }
 
     const projects = await prisma.webProject.findMany({
-        where: { companyId, status: 'LIVE' },
+        where,
         include: {
             analytics: true,
             domain: { select: { name: true } }
@@ -92,12 +100,20 @@ export async function getProjectLeads(projectId: string, limit = 20) {
 
 // Get aggregated analytics summary for all projects
 export async function getClientAnalyticsSummary() {
-    const companyId = await getClientCompanyId()
-    if (!companyId) return null
+    const session = await auth()
+    const companyId = session?.user?.companyId
+    const isAdmin = session?.user?.role === 'ADMIN'
+
+    if (!companyId && !isAdmin) return null
+
+    const where: any = { status: 'LIVE' }
+    if (!isAdmin && companyId) {
+        where.companyId = companyId
+    }
 
     const analytics = await prisma.siteAnalytics.findMany({
         where: {
-            project: { companyId, status: 'LIVE' }
+            project: where
         }
     })
 

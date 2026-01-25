@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma'
+import { getClientAnalyticsSummary } from '@/actions/analytics'
 import Link from 'next/link'
 import {
     Building2,
@@ -61,6 +62,7 @@ const getDashboardStats = unstable_cache(
 
 export default async function SuperAdminDashboard() {
     const data = await getDashboardStats()
+    const analyticsSummary = await getClientAnalyticsSummary()
     let stats = data
     let dbError = data.error
 
@@ -177,6 +179,22 @@ export default async function SuperAdminDashboard() {
                     <div className="text-sm text-neutral-500 mb-4">Toplam Mesaj</div>
                     <Link href="/admin/messages" className="flex items-center gap-2 text-sm text-orange-600 font-medium group-hover:gap-3 transition-all">
                         Mesajları Oku <ArrowRight className="w-4 h-4" />
+                    </Link>
+                </SpotlightCard>
+
+                {/* Site Analitiği (New) */}
+                <SpotlightCard className="hover:shadow-lg transition-shadow group border-neutral-200" spotlightColor="rgba(16, 185, 129, 0.2)">
+                    <div className="flex items-start justify-between mb-4">
+                        <div className="w-14 h-14 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-500/30">
+                            <TrendingUp className="w-7 h-7 text-white" />
+                        </div>
+                    </div>
+                    <div className="text-4xl font-bold text-neutral-900 mb-1">
+                        {analyticsSummary ? analyticsSummary.totalVisitors.toLocaleString('tr-TR') : '-'}
+                    </div>
+                    <div className="text-sm text-neutral-500 mb-4">Toplam Ziyaretçi</div>
+                    <Link href="/portal/analytics" className="flex items-center gap-2 text-sm text-emerald-600 font-medium group-hover:gap-3 transition-all">
+                        Analitik Raporu <ArrowRight className="w-4 h-4" />
                     </Link>
                 </SpotlightCard>
             </div>
