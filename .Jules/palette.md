@@ -1,0 +1,3 @@
+## 2026-01-25 - Inconsistent Button Usage in Admin Layout
+**Learning:** The AdminShell layout uses raw HTML `<button>` elements for navigation controls (menu, close, notifications) instead of the reusable `Button` component from `src/components/ui`. This leads to missing default accessibility features like focus rings and loading states, requiring manual addition of ARIA labels and focus styles.
+**Action:** When working on layout components, check for raw interactive elements and ensure they have explicit `aria-label`s and `focus-visible` styles, as they might not inherit them from the design system components.
