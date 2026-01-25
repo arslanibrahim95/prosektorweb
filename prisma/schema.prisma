@@ -579,7 +579,8 @@ model WebProject {
   portfolio   Portfolio?
   analytics   SiteAnalytics?
   generatedContents GeneratedContent[]
-  
+  pipelineRuns PipelineRun[]
+
   // Proje durumu
   status      ProjectStatus @default(DRAFT)
   
@@ -611,6 +612,60 @@ model WebProject {
   @@index([domainId])
   @@index([status])
   @@index([deletedAt])
+}
+
+// ===============================
+// PIPELINE SYSTEM
+// ===============================
+
+enum PipelineStage {
+  INPUT
+  RESEARCH
+  DESIGN
+  CONTENT
+  SEO
+  BUILD
+  REVIEW
+  PUBLISH
+}
+
+enum PipelineStatus {
+  PENDING
+  RUNNING
+  COMPLETED
+  FAILED
+  SKIPPED
+}
+
+model PipelineRun {
+  id            String         @id @default(uuid())
+  projectId     String
+  project       WebProject     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  currentStage  PipelineStage  @default(INPUT)
+  status        PipelineStatus @default(PENDING)
+
+  // Stage results stored as JSON
+  stages        Json?          // Stage results with input/output/errors
+  progress      Int            @default(0) // Percentage 0-100
+
+  // Vibe coding mode (manual/interactive)
+  vibeMode      Boolean        @default(false)
+
+  // Timing
+  startedAt     DateTime?
+  completedAt   DateTime?
+
+  // Error tracking
+  error         String?        @db.Text
+  errorCode     String?
+
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  @@index([projectId])
+  @@index([status])
+  @@index([currentStage])
 }
 
 // ===============================

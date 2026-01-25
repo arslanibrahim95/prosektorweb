@@ -42,7 +42,6 @@ export default function LoginPage() {
         await signIn('credentials', {
             email,
             password,
-            callbackUrl: '/portal',
             redirect: true, // Let NextAuth handle redirect
         })
 
