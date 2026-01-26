@@ -10,14 +10,20 @@ export interface InputProps
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
     ({ className, type, error, leadingIcon, ...props }, ref) => {
         return (
-            <div className="relative w-full">
+            <div className="relative w-full group">
                 {leadingIcon && (
-                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400 group-focus-within:text-brand-500 transition-colors">
+                    <div className={cn(
+                        "absolute left-4 top-1/2 -translate-y-1/2 transition-colors",
+                        error
+                            ? "text-red-400 group-focus-within:text-red-500"
+                            : "text-neutral-400 group-focus-within:text-brand-500"
+                    )}>
                         {leadingIcon}
                     </div>
                 )}
                 <input
                     type={type}
+                    aria-invalid={!!error}
                     className={cn(
                         "flex h-12 w-full rounded-xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900/50 px-4 py-3.5 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-neutral-400 outline-none transition-all duration-smooth ease-smooth disabled:cursor-not-allowed disabled:opacity-50",
                         leadingIcon && "pl-12",
