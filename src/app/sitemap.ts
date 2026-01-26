@@ -16,12 +16,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     // Static pages with locales
     const staticPages = routes.flatMap((route) =>
-        locales.map((locale) => ({
-            url: `${baseUrl}/${locale}${route}`,
-            lastModified: new Date(),
-            changeFrequency: route === '/blog' ? 'daily' as const : 'weekly' as const,
-            priority: route === '' ? 1 : 0.8,
-        }))
+        locales.map((locale) => {
+            const localePrefix = locale === 'tr' ? '' : `/${locale}`
+            return {
+                url: `${baseUrl}${localePrefix}${route}`,
+                lastModified: new Date(),
+                changeFrequency: route === '/blog' ? 'daily' as const : 'weekly' as const,
+                priority: route === '' ? 1 : 0.8,
+            }
+        })
     )
 
     // Dynamic blog posts
@@ -31,12 +34,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })
 
     const dynamicPages = blogPosts.flatMap((post) =>
-        locales.map((locale) => ({
-            url: `${baseUrl}/${locale}/blog/${post.slug}`,
-            lastModified: post.updatedAt || post.createdAt,
-            changeFrequency: 'weekly' as const,
-            priority: 0.7,
-        }))
+        locales.map((locale) => {
+            const localePrefix = locale === 'tr' ? '' : `/${locale}`
+            return {
+                url: `${baseUrl}${localePrefix}/blog/${post.slug}`,
+                lastModified: post.updatedAt || post.createdAt,
+                changeFrequency: 'weekly' as const,
+                priority: 0.7,
+            }
+        })
     )
 
     return [...staticPages, ...dynamicPages]
