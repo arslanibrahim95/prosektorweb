@@ -1,3 +1,15 @@
+/**
+ * @file src/lib/cache.ts
+ * @description Core caching infrastructure implementing Cache-Aside pattern.
+ * @invariants L2 Redis is the source of truth for shared state. L1 Memory is ephermal optimization.
+ * @dependencies redis.ts, logger.ts
+ */
+/**
+ * @file src/lib/cache.ts
+ * @description Core caching infrastructure implementing Cache-Aside pattern.
+ * @invariants L2 Redis is the source of truth for shared state. L1 Memory is ephermal optimization.
+ * @dependencies redis.ts, logger.ts
+ */
 import { redis } from '@/lib/redis'
 import { logger } from '@/lib/logger'
 

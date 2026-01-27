@@ -1,3 +1,8 @@
+/**
+ * @file src/lib/redis.ts
+ * @description Upstash Redis client singleton and distributed lock utilities.
+ * @invariants Uses REST API (stateless). Retry logic handled by SDK.
+ */
 import { Redis } from '@upstash/redis'
 import { logger } from '@/lib/logger'
 

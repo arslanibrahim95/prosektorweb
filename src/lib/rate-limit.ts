@@ -1,3 +1,8 @@
+/**
+ * @file src/lib/rate-limit.ts
+ * @description Sliding Window rate limiter using Redis.
+ * @invariants Falls open (allows traffic) if Redis is down, unless configured otherwise.
+ */
 import { redis } from '@/lib/redis'
 import { logger } from '@/lib/logger'
 import { Ratelimit } from '@upstash/ratelimit'

@@ -1,89 +1,50 @@
-# ProSektorWeb - İş Sağlığı ve Güvenliği Yönetim Sistemi
+# ProSektorWeb
 
-OSGB'lere özel profesyonel web çözümleri ve yönetim paneli.
+OSGB (İş Sağlığı ve Güvenliği) firmaları için profesyonel operasyon ve CRM yönetim platformu.
 
-## 🚀 Hızlı Kurulum
-
-Bu projenin kurulumu workspace kök dizinindeki `scripts/setup.sh` ile otomatikleştirilmiştir. 
-
-Lütfen ana dizindeki [README](../README.md) dosyasını inceleyin.
-
-## 📦 Production Deployment
+## 🚀 Hızlı Başlangıç
 
 ```bash
-# Sunucuda deploy için
-./deploy.sh
+# 1. Bağımlılıkları Yükle
+npm install
 
-# Veya manuel:
-npm ci --only=production
+# 2. Çevresel Değişkenleri Ayarla
+cp .env.example .env
+
+# 3. Veritabanını Başlat (Docker/Local)
 npx prisma generate
 npx prisma db push
-npm run build
-npm start
+
+# 4. Geliştirme Sunucusunu Başlat
+npm run dev
+# -> http://localhost:3000
 ```
 
-## 🔐 Admin Paneli
+## ⚙️ Konfigürasyon (.env)
 
-- URL: `/admin`
-- Varsayılan: `.env` dosyasındaki `ADMIN_EMAIL` ve `ADMIN_PASSWORD`
+| Değişken | Zorunlu | Açıklama |
+| :--- | :---: | :--- |
+| `DATABASE_URL` | ✅ | MySQL/MariaDB bağlantı URL'i |
+| `AUTH_SECRET` | ✅ | NextAuth için rastgele 32-bit hash string |
+| `UPSTASH_REDIS_REST_URL` | ✅ | Redis HTTP API URL (Önbellekleme için) |
+| `UPSTASH_REDIS_REST_TOKEN` | ✅ | Redis AUTH Token |
+| `OPENAI_API_KEY` | ❌ | AI İçerik üretimi için API anahtarı |
 
-## 📁 Proje Yapısı
+## 🛠️ Sık Kullanılan Komutlar
 
-```
-prosektorweb/
-├── src/
-│   ├── app/           # Next.js App Router
-│   │   ├── [locale]/  # Localized routes (tr/en)
-│   │   │   ├── admin/ # Admin Panel
-│   │   │   ├── portal/# Client Portal
-│   │   │   └── blog/  # Public Blog
-│   │   └── api/       # Stateless API Routes
-│   ├── components/    # Atomic Design System (ui/*)
-│   ├── actions/       # Server Actions (SafeActions)
-│   ├── lib/           # Infrastructure & Utilities
-├── prisma/            # Database Schema & Migrations
-├── docs/              # Operations & Runbook
-└── public/            # Static Assets
-```
+- **Test:** `npm run test:unit` (Birim testleri çalıştırır - Vitest)
+- **Lint:** `npm run lint` (Kod standartlarını denetler)
+- **Build:** `npm run build` (Production için optimize eder)
+- **Deploy:** `./server-sync.sh` (Sunucu senkronizasyonu)
 
-## 🛠️ Teknolojiler
+## 🚨 Sorun Giderme
 
-- **Framework:** Next.js 16.1.2 (App Router + Turbopack)
-- **Database:** MySQL/MariaDB + Prisma ORM
-- **Auth:** NextAuth.js v5 (Beta)
-- **Localization:** next-intl
-- **Styling:** Tailwind CSS 4
-- **Observability:** Pino + Sentry
+1.  **Veritabanı Hatası (P1001/P1002):** `.env` içindeki `DATABASE_URL`'in erişilebilir olduğunu kontrol edin (VPN/Firewall).
+2.  **Redis Hatası:** `UPSTASH_REDIS_REST_URL` eksik ise Rate Limit ve Cache devre dışı kalır veya hata fırlatır.
+3.  **Hydration Mismatch:** Browser eklentileri HTML'i bozuyor olabilir. Gizli sekmede deneyin.
 
-## 📞 Destek
+## 📚 Dokümantasyon
 
-hello@prosektorweb.com
-
----
-
-## 🛠️ Sunucu Modernizasyonu ve DevOps
-
-Sistemi modernize etmek, güvenliği artırmak ve Claude Code ile uyumlu bir dağıtım hattı kurmak için yapılan geliştirmeler:
-
-### 1. Entegrasyon ve Dağıtım Hattı
-- **Merkezi Site Yöneticisi:** `/root/generated_sites/` klasörünü tarayan ve yeni siteleri aaPanel'e otomatik ekleyen `site_manager.py` geliştirildi.
-- **Claude Code Entegrasyonu:** `manifest.json` tabanlı standart konfigürasyon arayüzü.
-- **Otomatik DNS & Nginx:** Dinamik domain yönetimi, otomatik DNS Zone ve Nginx router yapılandırması.
-
-### 2. Güvenlik ve Tip Güvenliği
-- **ActionResponse:** Tüm server action'lar için merkezi tip sistemi (`src/lib/action-types.ts`).
-- **Type Safety Cleanup:** `error: any` yerine `error: unknown` kullanımı ve güvenli hata yakalama.
-- **Build Fixes:** Next.js 16 / Turbopack uyumluluğu ve Zod entegrasyonu güncellendi.
-
-### 3. DevOps ve Veritabanı
-- **Audit Log:** Kritik işlemler için veritabanı seviyesinde audit log sistemi.
-- **Server Sync Script:** GitHub değişikliklerini sunucuya çeken, build alan ve PM2'yi restart eden `./server-sync.sh` scripti.
-
-### 📂 Dosya Yapısı (Sunucu Tarafı)
-- `/root/site_manager.py`: Ana dağıtım scripti.
-- `/root/server-sync.sh`: Tek tık deploy.
-- `/root/router/`: Merkezi PHP router ve Nginx şablonları.
-
-> [!TIP]
-> Sunucu tarafındaki kod değişiklikleri için sadece `./server-sync.sh` çalıştırmanız build ve restart dahil tüm süreci bitirir.
-
+- **Mimarisi:** [ARCHITECTURE.md](./ARCHITECTURE.md)
+- **Log Standartları:** [docs/logging.md](./docs/logging.md)
+- **Katkı Kuralları:** [CONTRIBUTING.md](./CONTRIBUTING.md)

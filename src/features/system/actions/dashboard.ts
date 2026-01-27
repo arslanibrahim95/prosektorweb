@@ -1,3 +1,9 @@
+/**
+ * @file src/features/system/actions/dashboard.ts
+ * @description Data aggregation for the Admin Dashboard.
+ * @invariants HEAVILY CACHED. Real-time data is not guaranteed here (5m TTL).
+ * @dependencies Redis Cache, Prisma
+ */
 'use server'
 
 import { prisma } from '@/lib/prisma'

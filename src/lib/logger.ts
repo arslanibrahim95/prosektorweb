@@ -1,3 +1,9 @@
+/**
+ * @file src/lib/logger.ts
+ * @description Centralized structured logging configuration (Pino).
+ * @invariants Production logs MUST be JSON. PII MUST be redacted.
+ * @config Adjusts levels based on NODE_ENV.
+ */
 import pino from 'pino';
 
 const isProduction = process.env.NODE_ENV === 'production';
