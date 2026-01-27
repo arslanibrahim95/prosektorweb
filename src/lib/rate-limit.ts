@@ -1,4 +1,5 @@
 import { redis } from '@/lib/redis'
+import { logger } from '@/lib/logger'
 import { Ratelimit } from '@upstash/ratelimit'
 import { headers } from 'next/headers'
 
@@ -56,7 +57,7 @@ export async function checkRateLimit(
 
     try {
         if (!process.env.UPSTASH_REDIS_REST_URL) {
-            console.warn('Redis not configured, bypassing rate limit')
+            logger.warn({ identifier: finalIdentifier }, 'Redis not configured, bypassing rate limit')
             // For security-critical endpoints, don't bypass - fail closed
             if (failClosed) {
                 return { success: false, reset: new Date(Date.now() + 60000) }
@@ -85,7 +86,7 @@ export async function checkRateLimit(
         }
 
     } catch (error) {
-        console.error('Rate limit error:', error)
+        logger.error({ error, identifier: finalIdentifier }, 'Rate limit error')
 
         // Fail Closed: Block request on error (security-critical endpoints like auth)
         // Fail Open: Allow request on error (availability over security)

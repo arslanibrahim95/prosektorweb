@@ -7,6 +7,7 @@ import { getErrorMessage, getZodErrorMessage, isPrismaUniqueConstraintError, val
 import { z } from 'zod'
 import { getUserCompanyId, requireTenantAccess } from '@/lib/guards/tenant-guard'
 import { invalidateCache } from '@/lib/cache'
+import { logger } from '@/lib/logger'
 import { AuditAction, InvoiceStatus, PaymentMethod } from '@prisma/client'
 
 export interface InvoiceInput {
@@ -52,7 +53,7 @@ async function logActivity(action: AuditAction, entity: string, entityId: string
             }
         })
     } catch (e) {
-        console.error('Audit Log Failed:', e)
+        logger.error({ error: e }, 'Audit Log Failed')
     }
 }
 
@@ -122,7 +123,7 @@ export async function getInvoices(page: number = 1, limit: number = 20, search?:
             }
         }
     } catch (e) {
-        console.error('getInvoices Error:', e)
+        logger.error({ error: e, page, limit, search }, 'getInvoices Error')
         return { data: [], meta: { total: 0, page: 1, limit: 20, totalPages: 0 } }
     }
 }
@@ -334,7 +335,7 @@ export async function createPayment(formData: FormData): Promise<ActionResult> {
         revalidatePath(`/admin/invoices/${invoiceId}`)
         return { success: true }
     } catch (e) {
-        console.error("Payment Error:", e)
+        logger.error({ error: e, invoiceId: formData.get('invoiceId') }, "Payment Error")
         return { success: false, error: 'Ödeme kaydedilemedi' }
     }
 }

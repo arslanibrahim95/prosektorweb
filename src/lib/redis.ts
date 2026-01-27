@@ -1,4 +1,5 @@
 import { Redis } from '@upstash/redis'
+import { logger } from '@/lib/logger'
 
 export const redis = new Redis({
     url: process.env.UPSTASH_REDIS_REST_URL || '',
@@ -16,7 +17,7 @@ export async function acquireLock(key: string, ttl: number = 10): Promise<boolea
         const result = await redis.set(`lock:${key}`, 'locked', { nx: true, ex: ttl })
         return result === 'OK'
     } catch (error) {
-        console.error('Redis Lock Error:', error)
+        logger.error({ error, key }, 'Redis Lock Error')
         return false // Fail safe
     }
 }
@@ -28,6 +29,6 @@ export async function releaseLock(key: string): Promise<void> {
     try {
         await redis.del(`lock:${key}`)
     } catch (error) {
-        console.error('Redis Unlock Error:', error)
+        logger.error({ error, key }, 'Redis Unlock Error')
     }
 }
