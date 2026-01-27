@@ -110,18 +110,8 @@ export default async function SuperAdminDashboard() {
                     </SpotlightCard>
                 </motion.div>
 
-                <motion.div variants={item}>
-                    <SpotlightCard className="border-neutral-200 bg-white" spotlightColor="rgba(59, 130, 246, 0.1)">
-                        <div className="flex items-start justify-between mb-4">
-                            <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center text-blue-600">
-                                <PieChart className="w-6 h-6" />
-                            </div>
-                            <span className="text-[10px] font-black uppercase tracking-wider bg-blue-100 text-blue-700 px-2 py-1 rounded-lg">Aylık Tahmin</span>
-                        </div>
-                        <div className="text-3xl font-bold text-neutral-900 mb-1 leading-none">{formatCurrency(stats.mrr)}</div>
-                        <div className="text-xs font-bold text-neutral-400 uppercase tracking-widest">MRR (Projeksiyon)</div>
-                    </SpotlightCard>
-                </motion.div>
+                {/* REMOVED: Monthly MRR Projection (Advanced) */}
+
             </motion.div>
 
             {/* CHART SECTION */}
@@ -189,101 +179,21 @@ export default async function SuperAdminDashboard() {
                 />
             </motion.div>
 
-            {/* DASHBOARD CONTENT GRID */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-                {/* LEFT COLUMN (2/3) - Activity */}
-                <motion.div
-                    initial={{ opacity: 0, scale: 0.98 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.6 }}
-                    className="lg:col-span-2 space-y-6"
-                >
-                    <div className="bg-white rounded-3xl border border-neutral-200 overflow-hidden shadow-sm">
-                        <div className="p-6 border-b border-neutral-100 flex items-center justify-between bg-neutral-50/30">
-                            <h3 className="text-lg font-bold text-neutral-900 flex items-center gap-2">
-                                <ActivityIcon className="w-5 h-5 text-brand-600" />
-                                Son Aktiviteler
-                            </h3>
-                            <Link href="/admin/audit" className="text-xs font-bold text-brand-600 hover:text-brand-700 hover:underline uppercase tracking-wider">
-                                Tümünü Gör
-                            </Link>
-                        </div>
-                        <div className="divide-y divide-neutral-100">
-                            {recentActivities.length > 0 ? (
-                                recentActivities.map((activity, idx) => (
-                                    <ActivityItem key={activity.id} activity={activity} />
-                                ))
-                            ) : (
-                                <div className="p-16 text-center text-neutral-400">
-                                    <Clock className="w-10 h-10 mx-auto mb-3 opacity-20" />
-                                    <p className="text-sm font-medium">Henüz kayıtlı aktivite yok</p>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-
-                    {/* Quick Actions */}
-                    <div className="bg-neutral-50 rounded-3xl border border-neutral-200 p-6">
-                        <h3 className="text-sm font-bold text-neutral-500 uppercase tracking-widest mb-4">Hızlı Erişim</h3>
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                            <QuickAction href="/admin/companies/new" icon={Plus} label="Firma Ekle" color="brand" />
-                            <QuickAction href="/admin/users/new" icon={Users} label="Kullanıcı" color="purple" />
-                            <QuickAction href="/admin/invoices/new" icon={DollarSign} label="Fatura Kes" color="green" />
-                            <QuickAction href="/admin/tickets" icon={MessageSquare} label="Destek Paneli" color="red" />
-                        </div>
-                    </div>
-                </motion.div>
-
-                {/* RIGHT COLUMN (1/3) - System & Mini */}
-                <motion.div
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.7 }}
-                    className="space-y-6"
-                >
-                    {/* System Health */}
-                    <div className="bg-neutral-900 rounded-3xl p-8 text-white shadow-2xl relative overflow-hidden group">
-                        <div className="absolute -top-10 -right-10 w-40 h-40 bg-brand-500/10 rounded-full blur-3xl group-hover:bg-brand-500/20 transition-all duration-700" />
-
-                        <div className="flex items-center justify-between mb-8">
-                            <h3 className="font-bold flex items-center gap-2 text-lg">
-                                <Server className="w-5 h-5 text-brand-400" />
-                                Sistem Durumu
-                            </h3>
-                            <div className="flex items-center gap-2 px-3 py-1 bg-green-500/10 rounded-full border border-green-500/20">
-                                <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-                                <span className="text-xs font-bold text-green-400">ONLINE</span>
-                            </div>
-                        </div>
-
-                        <div className="space-y-5">
-                            <HealthRow label="Veritabanı" status="Bağlı" active />
-                            <HealthRow label="API Latency" status="18ms" active />
-                            <HealthRow label="SSL Sertifikası" status="Geçerli" active />
-                            <div className="h-px bg-neutral-800 my-4" />
-                            <div className="flex items-center justify-between text-xs">
-                                <span className="text-neutral-500 font-bold uppercase tracking-widest">Sürüm</span>
-                                <span className="text-white font-mono bg-neutral-800 px-2 py-0.5 rounded">v2.4.0-stable</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Blog Mini Stats */}
-                    <div className="bg-white rounded-3xl border border-neutral-200 p-8 shadow-sm group hover:border-brand-300 transition-all relative overflow-hidden">
-                        <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-opacity rotate-12">
-                            <FileText className="w-24 h-24" />
-                        </div>
-                        <div className="text-sm font-bold text-brand-600 uppercase tracking-widest mb-1">Cari Takip</div>
-                        <div className="text-4xl font-bold text-neutral-900 mb-6">{stats.blogPosts} <span className="text-lg font-normal text-neutral-400">İçerik</span></div>
-                        <Link href="/admin/blog" className="inline-flex items-center gap-2 text-sm font-bold text-brand-600 hover:gap-4 transition-all group/btn">
-                            İçerikleri Yönet
-                            <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
-                        </Link>
-                    </div>
-                </motion.div>
+            {/* QUICK ACTIONS (Hero for Mid-Level) */}
+            <div className="bg-neutral-50 rounded-3xl border border-neutral-200 p-8 shadow-sm text-center">
+                <h3 className="text-lg font-bold text-neutral-900 mb-6 font-serif">Hızlı İşlemler</h3>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
+                    <QuickAction href="/admin/invoices/new" icon={DollarSign} label="Fatura Kes" color="green" />
+                    <QuickAction href="/admin/companies/new" icon={Plus} label="Firma Ekle" color="brand" />
+                    <QuickAction href="/admin/tickets" icon={MessageSquare} label="Destek Talebi" color="red" />
+                    <QuickAction href="/admin/users/new" icon={Users} label="Kullanıcı Davet Et" color="purple" />
+                </div>
             </div>
+
         </div>
+    )
+}
+        </div >
     )
 }
 
