@@ -243,11 +243,13 @@ export async function generatePageContent(
         let tokensUsed: number | undefined;
 
         if (USE_PYTHON_PIPELINE) {
-            // Python Pipeline (claude-code-maestro) kullan
+            // Python Pipeline (claude-code-maestro)
+            // WHY: Python ecosystem has better Agent/Maestro libraries. We spawn a child process to leverage them until JS ecosystem catches up.
             // WRAPPED: Resilient execution with retry
             const pyRes = await executeWithRetry(
                 () => generateWithPythonPipeline(contentType, companyInfo),
-                { name: 'python_pipeline', timeoutMs: 120000, maxAttempts: 1 } // Retrying heavy spawn is risky, keep 1 attempt but protect with timeout
+                { name: 'python_pipeline', timeoutMs: 120000, maxAttempts: 1 }
+                // WHY: Retrying a heavy 2-minute process is risky for server load. We prefer to fail fast after 1 attempt times out.
             );
 
             if (!pyRes.ok) {

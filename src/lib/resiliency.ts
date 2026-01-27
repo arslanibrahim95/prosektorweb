@@ -41,7 +41,7 @@ export async function executeWithRetry<T>(
 
     while (attempt <= maxAttempts) {
         try {
-            // Create a timeout promise
+            // WHY: We create a manual timeout because native fetch/axios timeouts can be flaky or non-existent for hanging sockets.
             const timeoutPromise = new Promise<never>((_, reject) => {
                 setTimeout(() => reject(new Error('Operation timed out')), timeoutMs);
             });
