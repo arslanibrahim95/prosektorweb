@@ -9,7 +9,7 @@ import { logger } from "@/lib/logger"
 const { auth } = NextAuth(authConfig)
 const intlMiddleware = createMiddleware(routing);
 
-import { checkRateLimit } from "@/lib/rate-limit"
+import { checkRateLimit, RATE_LIMIT_TIERS } from "@/lib/rate-limit"
 
 export default auth(async (req) => {
     // [TODO-OBS-002] Middleware Request ID & Logging
@@ -48,9 +48,27 @@ export default auth(async (req) => {
         }
     }
 
-    // General API limit
+    // 0. Bot & Abuse Protection
+    const userAgent = req.headers.get('user-agent') || ''
+
+    // 0.1 Block Empty User-Agent (Common in simple scripts)
+    if (!userAgent) {
+        logExit()
+        return new NextResponse('Bad Request: User-Agent required', { status: 400 })
+    }
+
+    // 0.2 Block Known Bad Bots
+    const BAD_BOTS = ['GPTBot', 'AhrefsBot', 'SemrushBot', 'DotBot', 'MJ12bot', 'Bytespider', 'ClaudeBot', 'anthropic-ai']
+    if (BAD_BOTS.some(bot => userAgent.includes(bot))) {
+        logExit()
+        return new NextResponse('Forbidden: Bot access denied', { status: 403 })
+    }
+
+
+    // 0.4 Rate Limit: Specific API Limits
     if (req.nextUrl.pathname.startsWith('/api')) {
-        const { success } = await checkRateLimit(`api:${ip}`, { limit: 100, windowSeconds: 60 })
+        const { limit, window } = RATE_LIMIT_TIERS.API
+        const { success } = await checkRateLimit(`api:${ip}`, { limit, windowSeconds: window })
         if (!success) {
             logExit()
             return Response.json({ error: 'Too Many Requests' }, { status: 429 })

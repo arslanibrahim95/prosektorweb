@@ -9,6 +9,10 @@ import { logger } from '@/lib/logger'
 export const redis = new Redis({
     url: process.env.UPSTASH_REDIS_REST_URL || '',
     token: process.env.UPSTASH_REDIS_REST_TOKEN || '',
+    retry: {
+        retries: 1, // Minimize retries for latency sensitivity
+        backoff: (retryCount) => Math.exp(retryCount) * 50,
+    }
 })
 
 /**

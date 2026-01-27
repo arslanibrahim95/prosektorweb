@@ -42,6 +42,15 @@ export interface RateLimitOptions {
     failClosed?: boolean
 }
 
+
+export const RATE_LIMIT_TIERS = {
+    GLOBAL: { limit: 500, window: 60 },     // Absolute flood ceiling
+    PAGE: { limit: 50, window: 10 },        // Burst protection for HTML pages
+    API: { limit: 100, window: 60 },         // Standard API usage
+    AUTH: { limit: 10, window: 60 },         // Strict login/auth protection
+    BOT: { limit: 5, window: 60 }            // Very strict for suspicious IPs
+} as const
+
 // Memory cache for extreme performance (optional, good for high-traffic)
 const cache = new Map()
 
