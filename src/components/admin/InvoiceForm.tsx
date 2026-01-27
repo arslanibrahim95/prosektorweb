@@ -1,7 +1,7 @@
 'use client'
 
 import { useActionState, useEffect, useState } from 'react'
-import { createInvoice, updateInvoiceStatus, ActionResult } from '@/actions/invoices'
+import { createInvoice, updateInvoiceStatus, ActionResult } from '@/features/finance/actions/invoices'
 import { useRouter } from 'next/navigation'
 import { Loader2, AlertCircle, Receipt, Building2, Calendar, Calculator } from 'lucide-react'
 
@@ -24,6 +24,7 @@ export function InvoiceForm({ companies, initialInvoiceNo }: InvoiceFormProps) {
     const router = useRouter()
     const [subtotal, setSubtotal] = useState<number>(0)
     const [taxRate, setTaxRate] = useState<number>(20)
+    const [idempotencyKey] = useState(() => window.crypto.randomUUID())
 
     const taxAmount = subtotal * (taxRate / 100)
     const total = subtotal + taxAmount
@@ -50,6 +51,7 @@ export function InvoiceForm({ companies, initialInvoiceNo }: InvoiceFormProps) {
 
     return (
         <form action={action} className="space-y-6">
+            <input type="hidden" name="idempotencyKey" value={idempotencyKey} />
             {/* Error Message */}
             {!state.success && state.error && (
                 <div className="p-4 bg-red-50 border border-red-200 rounded-xl flex items-center gap-3 text-red-700">

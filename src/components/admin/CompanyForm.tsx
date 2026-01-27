@@ -1,7 +1,7 @@
 'use client'
 
 import { useActionState, useEffect } from 'react'
-import { createCompany, updateCompany, ActionResult as CompanyActionResult } from '@/actions/companies'
+import { createCompany, updateCompany, ActionResult as CompanyActionResult } from '@/features/crm/actions/companies'
 import { useRouter } from 'next/navigation'
 import { Loader2, AlertCircle, Building2 } from 'lucide-react'
 

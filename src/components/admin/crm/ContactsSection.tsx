@@ -1,7 +1,7 @@
 'use client'
 
 import { useActionState, useState } from 'react'
-import { createContact, deleteContact, CrmActionResult } from '@/actions/crm'
+import { createContact, deleteContact, CrmActionResult } from '@/features/crm/actions/crm'
 import { Users, Plus, Star, Phone, Mail, Trash2, Loader2 } from 'lucide-react'
 
 interface Contact {

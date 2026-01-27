@@ -1,7 +1,7 @@
 'use client'
 
 import { useActionState, useState } from 'react'
-import { createNote, deleteNote, toggleNotePin, CrmActionResult } from '@/actions/crm'
+import { createNote, deleteNote, toggleNotePin, CrmActionResult } from '@/features/crm/actions/crm'
 import { MessageSquare, Plus, Pin, Trash2, Loader2 } from 'lucide-react'
 
 interface Note {

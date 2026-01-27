@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { createPreview, setupDomainEmail, triggerDeploy, OpsResult } from '@/actions/project-ops'
+import { createPreview, setupDomainEmail, triggerDeploy, OpsResult } from '@/features/projects/actions/project-ops'
 import {
     Loader2,
     Globe,

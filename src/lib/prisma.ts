@@ -1,12 +1,22 @@
 import { PrismaClient } from '@prisma/client'
 import { PrismaMariaDb } from '@prisma/adapter-mariadb'
+import mariadb from 'mariadb'
 
-const connectionString = process.env.DATABASE_URL!
-const adapter = new PrismaMariaDb(connectionString)
+const connectionString = process.env.DATABASE_URL!;
+// Adapter removed for native client stability
+// import mariadb from 'mariadb'
+// const pool = mariadb.createPool(connectionString)
+// const adapter = new PrismaMariaDb(pool)
+
+// BigInt Serialization for JSON
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+(BigInt.prototype as any).toJSON = function () {
+    return this.toString()
+}
 
 const globalForPrisma = globalThis as unknown as { prisma: PrismaClient }
 
-const prismaBase = globalForPrisma.prisma || new PrismaClient({ adapter })
+const prismaBase = globalForPrisma.prisma || new PrismaClient()
 
 // Type-safe soft delete model delegates
 const softDeleteModels = {

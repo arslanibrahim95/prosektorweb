@@ -56,17 +56,18 @@ export function GenerateButton({
                 <button
                     onClick={handleGenerate}
                     disabled={loading}
-                    className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-brand-600 to-brand-700 text-white rounded-xl font-medium hover:from-brand-700 hover:to-brand-800 transition-all shadow-lg shadow-brand-600/30 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex items-center gap-3 px-8 py-4 bg-gradient-to-br from-purple-600 via-brand-600 to-blue-600 text-white rounded-2xl font-bold hover:shadow-2xl hover:scale-[1.02] transition-all shadow-xl shadow-brand-600/30 disabled:opacity-70 disabled:cursor-not-allowed group relative overflow-hidden"
                 >
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
                     {loading ? (
                         <>
-                            <Loader2 className="w-5 h-5 animate-spin" />
-                            Üretiliyor...
+                            <Loader2 className="w-6 h-6 animate-spin" />
+                            Sihir Gerçekleşiyor...
                         </>
                     ) : (
                         <>
-                            <Sparkles className="w-5 h-5" />
-                            Tüm İçerikleri Üret
+                            <Sparkles className="w-6 h-6 animate-pulse" />
+                            Sihirli Site Üreticisi
                         </>
                     )}
                 </button>

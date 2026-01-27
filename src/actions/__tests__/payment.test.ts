@@ -6,7 +6,7 @@ vi.mock('@/lib/prisma', () => ({
     prisma: mockDeep(),
 }))
 
-import { createPayment } from '../payment'
+import { createPayment } from '@/features/finance/actions/payments'
 import { prisma } from '@/lib/prisma'
 
 const prismaMock = prisma as any

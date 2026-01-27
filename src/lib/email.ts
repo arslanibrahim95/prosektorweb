@@ -36,6 +36,11 @@ interface SendProposalEmailParams {
     total: string
 }
 
+interface SendPasswordResetEmailParams {
+    to: string
+    resetUrl: string
+}
+
 export async function sendProposalEmail({
     to,
     companyName,
@@ -179,6 +184,64 @@ export async function sendRenewalReminder({
         return { success: true, messageId: data?.id }
     } catch (error) {
         console.error('sendRenewalReminder error:', error)
+        return { success: false, error: 'E-posta gönderilemedi.' }
+    }
+}
+
+export async function sendPasswordResetEmail({
+    to,
+    resetUrl
+}: SendPasswordResetEmailParams) {
+    try {
+        const { data, error } = await resend.emails.send({
+            from: 'ProSektorWeb <noreply@prosektorweb.com>',
+            to: [to],
+            subject: 'Şifre Sıfırlama İsteği',
+            html: `
+                <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+                    <div style="background: linear-gradient(135deg, #3b82f6, #2563eb); padding: 30px; border-radius: 16px 16px 0 0; text-align: center;">
+                        <h1 style="color: white; margin: 0; font-size: 24px;">ProSektorWeb</h1>
+                        <p style="color: rgba(255,255,255,0.8); margin: 10px 0 0 0;">Şifre Sıfırlama</p>
+                    </div>
+
+                    <div style="background: white; padding: 30px; border: 1px solid #e5e7eb; border-top: none;">
+                        <p style="color: #374151; font-size: 16px; line-height: 1.6;">
+                            Hesabınız için şifre sıfırlama talebinde bulundunuz.
+                        </p>
+
+                        <p style="color: #6b7280; font-size: 14px; line-height: 1.6;">
+                            Şifrenizi sıfırlamak için aşağıdaki butona tıklayın. Bu link 1 saat süreyle geçerlidir.
+                        </p>
+
+                        <div style="text-align: center; margin: 30px 0;">
+                            <a href="${resetUrl}"
+                               style="display: inline-block; background: #2563eb; color: white; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 16px;">
+                                Şifremi Sıfırla
+                            </a>
+                        </div>
+
+                        <p style="color: #9ca3af; font-size: 12px; text-align: center;">
+                            Eğer bu talebi siz yapmadıysanız, bu e-postayı dikkate almayabilirsiniz.
+                        </p>
+                    </div>
+
+                    <div style="background: #f9fafb; padding: 20px; border-radius: 0 0 16px 16px; border: 1px solid #e5e7eb; border-top: none; text-align: center;">
+                        <p style="color: #9ca3af; font-size: 12px; margin: 0;">
+                            © 2026 ProSektorWeb. Tüm hakları saklıdır.
+                        </p>
+                    </div>
+                </div>
+            `
+        })
+
+        if (error) {
+            console.error('Resend error:', error)
+            return { success: false, error: error.message }
+        }
+
+        return { success: true, messageId: data?.id }
+    } catch (error) {
+        console.error('sendPasswordResetEmail error:', error)
         return { success: false, error: 'E-posta gönderilemedi.' }
     }
 }

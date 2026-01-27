@@ -670,16 +670,21 @@ export async function generateAndSaveQuote(
         const proposal = await prisma.proposal.create({
             data: {
                 companyId,
-                title: proposalData.title,
-                description: proposalData.description,
-                items: proposalData.items,
-                subtotal: proposalData.subtotal,
-                discount: proposalData.discount,
-                tax: proposalData.tax,
-                total: proposalData.total,
+                subject: proposalData.title,
+                subtotal: proposalData.subtotal.toString(),
+                taxAmount: proposalData.tax.toString(),
+                total: proposalData.total.toString(),
                 validUntil: proposalData.validUntil,
-                notes: proposalData.notes,
+                notes: `${proposalData.description}\n\n${proposalData.notes}`,
                 status: 'DRAFT',
+                items: {
+                    create: proposalData.items.map(item => ({
+                        description: `${item.name} - ${item.description}`,
+                        quantity: item.quantity,
+                        unitPrice: item.unitPrice,
+                        totalPrice: item.unitPrice * item.quantity,
+                    }))
+                }
             }
         })
 

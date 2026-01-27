@@ -9,6 +9,9 @@ import { getUserCompanyId, requireTenantAccess } from '@/lib/guards/tenant-guard
 import { invalidateCache } from '@/lib/cache'
 import { logger } from '@/lib/logger'
 import { AuditAction, InvoiceStatus, PaymentMethod } from '@prisma/client'
+import { Decimal } from 'decimal.js'
+import { redis } from '@/lib/redis'
+import { checkRateLimit, getClientIp } from '@/lib/rate-limit'
 
 export interface InvoiceInput {
     companyId: string
@@ -19,6 +22,7 @@ export interface InvoiceInput {
     taxRate: number
     description?: string
     notes?: string
+    idempotencyKey?: string
 }
 
 const InvoiceSchema = z.object({
@@ -30,6 +34,7 @@ const InvoiceSchema = z.object({
     taxRate: z.coerce.number().min(0).max(100).default(20),
     description: z.string().optional(),
     notes: z.string().optional(),
+    idempotencyKey: z.string().optional()
 })
 
 export interface ActionResult {
@@ -156,11 +161,32 @@ export async function createInvoice(input: InvoiceInput | FormData): Promise<Act
             taxRate: input.get('taxRate') as string || '20',
             description: input.get('description') as string,
             notes: input.get('notes') as string,
+            idempotencyKey: input.get('idempotencyKey') as string,
         } : input
 
         const validated = InvoiceSchema.parse(rawData)
-        const taxAmount = (validated.subtotal * validated.taxRate) / 100
-        const total = validated.subtotal + taxAmount
+
+        // 1. Rate Limiting
+        const ip = await getClientIp()
+        const limit = await checkRateLimit(`invoice_create:${ip}`, { limit: 5, windowSeconds: 60 })
+        if (!limit.success) return { success: false, error: 'Too Many Requests' }
+
+        // 2. Idempotency Check
+        if (validated.idempotencyKey) {
+            const existingInvoice = await prisma.invoice.findFirst({
+                where: { idempotencyKey: validated.idempotencyKey }
+            })
+            if (existingInvoice) {
+                logger.info({ key: validated.idempotencyKey, invoiceId: existingInvoice.id }, 'Idempotency Hit (DB)')
+                return { success: true, data: existingInvoice }
+            }
+        }
+
+        // Financial Math with Decimal.js
+        const subtotal = new Decimal(validated.subtotal)
+        const taxRate = new Decimal(validated.taxRate)
+        const taxAmount = subtotal.mul(taxRate).div(100)
+        const total = subtotal.plus(taxAmount)
 
         // Retry logic for invoice number generation
         for (let attempt = 0; attempt < 3; attempt++) {
@@ -173,16 +199,28 @@ export async function createInvoice(input: InvoiceInput | FormData): Promise<Act
 
                     return tx.invoice.create({
                         data: {
-                            ...validated,
+                            companyId: validated.companyId,
                             invoiceNo,
-                            taxAmount,
-                            total,
-                            status: 'PENDING'
+                            issueDate: validated.issueDate,
+                            dueDate: validated.dueDate,
+                            description: validated.description,
+                            notes: validated.notes,
+                            subtotal: subtotal.toString(),     // Prisma maps string/decimal correctly if schema uses Decimal
+                            taxRate: taxRate.toString(),
+                            taxAmount: taxAmount.toString(),
+                            total: total.toString(),
+                            status: 'PENDING',
+                            idempotencyKey: validated.idempotencyKey || null
                         }
                     })
                 })
 
-                await logActivity('CREATE', 'Invoice', invoice.id, { invoiceNo: invoice.invoiceNo, total })
+                // (Redis cache is redundant now but kept as second layer if needed, or removed)
+                // if (validated.idempotencyKey) {
+                //     await redis.set(`invoice:idempotency:${validated.idempotencyKey}`, invoice.id, { ex: 86400 })
+                // }
+
+                await logActivity('CREATE', 'Invoice', invoice.id, { invoiceNo: invoice.invoiceNo, total: total.toNumber() })
 
                 // Invalidate Cache
                 await invalidateCache('dashboard:admin:stats')
@@ -199,21 +237,37 @@ export async function createInvoice(input: InvoiceInput | FormData): Promise<Act
         throw new Error('Could not generate unique invoice number')
     } catch (e: any) {
         if (e instanceof z.ZodError) return { success: false, error: getZodErrorMessage(e) }
+        logger.error({ error: e }, 'Create Invoice Error')
         return { success: false, error: 'Fatura oluşturulamadı' }
     }
 }
 
-export async function updateInvoiceStatus(id: string, status: InvoiceStatus): Promise<ActionResult> {
+export async function updateInvoiceStatus(id: string, status: InvoiceStatus, expectedVersion?: number): Promise<ActionResult> {
     try {
         const session = await auth()
         if (session?.user?.role !== 'ADMIN') {
             return { success: false, error: 'Unauthorized' }
         }
 
-        const invoice = await prisma.invoice.update({
-            where: { id },
-            data: { status }
+        // Atomic update with version lock
+        const updateResult = await prisma.invoice.updateMany({
+            where: {
+                id,
+                ...(expectedVersion !== undefined ? { version: expectedVersion } : {})
+            },
+            data: {
+                status,
+                version: { increment: 1 }
+            }
         })
+
+        if (updateResult.count === 0) {
+            const exists = await prisma.invoice.findUnique({ where: { id }, select: { version: true } })
+            if (exists) {
+                return { success: false, error: 'Bu kayıt başka bir kullanıcı tarafından güncellenmiş. Lütfen sayfayı yenileyip tekrar deneyin. (Conflict)' }
+            }
+            return { success: false, error: 'Fatura bulunamadı.' }
+        }
 
         await logActivity('UPDATE', 'Invoice', id, { status })
 
@@ -281,61 +335,4 @@ export async function getInvoiceStats() {
     }
 }
 
-export async function createPayment(formData: FormData): Promise<ActionResult> {
-    try {
-        const session = await auth()
-        if (session?.user?.role !== 'ADMIN') {
-            return { success: false, error: 'Unauthorized' }
-        }
-
-        const invoiceId = formData.get('invoiceId') as string
-        const amount = parseFloat(formData.get('amount') as string)
-        const paymentDate = new Date(formData.get('paymentDate') as string)
-        const method = formData.get('method') as any
-        const reference = formData.get('reference') as string
-
-        // Create Payment
-        const payment = await prisma.payment.create({
-            data: {
-                invoiceId: invoiceId,
-                amount: amount as any,
-                method: formData.get('method') as PaymentMethod,
-                reference: formData.get('reference') as string,
-                notes: formData.get('notes') as string,
-                paymentDate: new Date(formData.get('paymentDate') as string)
-            } as any
-        })
-
-        // Update Invoice Paid Amount & Status
-        const invoice = await prisma.invoice.findUnique({ where: { id: invoiceId } })
-        if (invoice) {
-            const currentPaid = Number(invoice.paidAmount)
-            const newPaid = currentPaid + amount
-            const total = Number(invoice.total)
-
-            let newStatus: InvoiceStatus = 'PARTIAL'
-            if (newPaid >= total - 0.1) newStatus = 'PAID' // Float tolerance
-
-            await prisma.invoice.update({
-                where: { id: invoiceId },
-                data: {
-                    paidAmount: newPaid,
-                    status: newStatus
-                }
-            })
-        }
-
-        await logActivity('CREATE', 'Payment', payment.id, { invoiceId, amount })
-
-        // Invalidate Cache
-        await invalidateCache('dashboard:admin:stats')
-        await invalidateCache('reports:revenue:data')
-        await invalidateCache('reports:invoices:stats')
-
-        revalidatePath(`/admin/invoices/${invoiceId}`)
-        return { success: true }
-    } catch (e) {
-        logger.error({ error: e, invoiceId: formData.get('invoiceId') }, "Payment Error")
-        return { success: false, error: 'Ödeme kaydedilemedi' }
-    }
-}
+// createPayment removed - use createPayment from src/features/finance/actions/payments.ts

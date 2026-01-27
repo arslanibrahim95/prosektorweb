@@ -22,24 +22,27 @@ export type Task = {
 }
 
 export function TaskBoard({ initialTasks }: { initialTasks: Task[] }) {
-    // Optimistic UI could be added here, but for now we rely on server action revalidation
-    const tasks = initialTasks
+    const [optimisticTasks, setOptimisticTasks] = useState<Task[]>(initialTasks)
 
-    // Bolt Optimization: Group tasks by status once to avoid filtering in every render loop (O(N) vs O(N*Columns))
+    // Sync state when initialTasks change (from server)
+    useMemo(() => {
+        setOptimisticTasks(initialTasks)
+    }, [initialTasks])
+
     const tasksByStatus = useMemo(() => {
         const grouped: Record<string, Task[]> = {
             TODO: [],
             IN_PROGRESS: [],
             DONE: [],
-            ARCHIVED: [] // Ensure all keys exist
+            ARCHIVED: []
         }
-        tasks.forEach(task => {
+        optimisticTasks.forEach(task => {
             if (grouped[task.status]) {
                 grouped[task.status].push(task)
             }
         })
         return grouped
-    }, [tasks])
+    }, [optimisticTasks])
 
     const columns = [
         { id: 'TODO', title: 'Yapılacaklar', icon: Circle, color: 'text-neutral-500', bg: 'bg-neutral-50' },
@@ -47,13 +50,35 @@ export function TaskBoard({ initialTasks }: { initialTasks: Task[] }) {
         { id: 'DONE', title: 'Tamamlandı', icon: CheckCircle2, color: 'text-green-500', bg: 'bg-green-50' }
     ]
 
-    const handleStatusChange = async (taskId: string, newStatus: string) => {
-        await updateTaskStatus(taskId, newStatus)
+    const handleStatusChange = async (taskId: string, newStatus: Task['status']) => {
+        // Optimistic Update
+        const previousTasks = [...optimisticTasks]
+        setOptimisticTasks(prev =>
+            prev.map(t => t.id === taskId ? { ...t, status: newStatus } : t)
+        )
+
+        const result = await updateTaskStatus(taskId, newStatus)
+
+        if (!result?.success) {
+            // Revert on failure
+            setOptimisticTasks(previousTasks)
+            alert(result?.error || 'Durum güncellenemedi')
+        }
     }
 
     const handleDelete = async (taskId: string) => {
-        if (confirm('Bu görevi silmek istediğinize emin misiniz?')) {
-            await deleteTask(taskId)
+        if (!confirm('Bu görevi silmek istediğinize emin misiniz?')) return
+
+        // Optimistic Delete
+        const previousTasks = [...optimisticTasks]
+        setOptimisticTasks(prev => prev.filter(t => t.id !== taskId))
+
+        const result = await deleteTask(taskId)
+
+        if (!result?.success) {
+            // Revert on failure
+            setOptimisticTasks(previousTasks)
+            alert(result?.error || 'Silme işlemi başarısız')
         }
     }
 

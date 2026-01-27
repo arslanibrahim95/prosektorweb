@@ -191,7 +191,10 @@ export async function changeClientPassword(data: z.infer<typeof changePasswordSc
 
         await prisma.user.update({
             where: { id: userId },
-            data: { password: hashedPassword }
+            data: {
+                password: hashedPassword,
+                sessionVersion: { increment: 1 }
+            }
         })
 
         return { success: true }

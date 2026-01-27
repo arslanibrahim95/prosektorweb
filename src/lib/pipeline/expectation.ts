@@ -13,12 +13,16 @@ import {
   ResearchStageExpectation,
   DesignStageOutput,
   DesignStageExpectation,
+  ImagesStageOutput,
+  ImagesStageExpectation,
   ContentStageOutput,
   ContentStageExpectation,
   SeoStageOutput,
   SeoStageExpectation,
   BuildStageOutput,
   BuildStageExpectation,
+  UiUxStageOutput,
+  UiUxStageExpectation,
   ReviewStageOutput,
   ReviewStageExpectation,
   PublishStageOutput,
@@ -29,9 +33,11 @@ type ExpectationMap = {
   input: InputStageExpectation;
   research: ResearchStageExpectation;
   design: DesignStageExpectation;
+  images: ImagesStageExpectation;
   content: ContentStageExpectation;
   seo: SeoStageExpectation;
   build: BuildStageExpectation;
+  ui_ux: UiUxStageExpectation;
   review: ReviewStageExpectation;
   publish: PublishStageExpectation;
 };
@@ -40,9 +46,11 @@ type OutputMap = {
   input: InputStageOutput;
   research: ResearchStageOutput;
   design: DesignStageOutput;
+  images: ImagesStageOutput;
   content: ContentStageOutput;
   seo: SeoStageOutput;
   build: BuildStageOutput;
+  ui_ux: UiUxStageOutput;
   review: ReviewStageOutput;
   publish: PublishStageOutput;
 };
@@ -51,7 +59,7 @@ export class ExpectationGenerator {
   /**
    * Generate expectation for next stage based on current stage output
    */
-  generate<T extends PipelineStage>(
+  generate<T extends keyof OutputMap>(
     stage: T,
     output: OutputMap[T]
   ): ExpectationMap[T] {
@@ -62,12 +70,16 @@ export class ExpectationGenerator {
         return this.generateFromResearch(output as ResearchStageOutput) as ExpectationMap[T];
       case "design":
         return this.generateFromDesign(output as DesignStageOutput) as ExpectationMap[T];
+      case "images":
+        return this.generateFromImages(output as ImagesStageOutput) as ExpectationMap[T];
       case "content":
         return this.generateFromContent(output as ContentStageOutput) as ExpectationMap[T];
       case "seo":
         return this.generateFromSeo(output as SeoStageOutput) as ExpectationMap[T];
       case "build":
         return this.generateFromBuild(output as BuildStageOutput) as ExpectationMap[T];
+      case "ui_ux":
+        return this.generateFromUiUx(output as UiUxStageOutput) as ExpectationMap[T];
       case "review":
         return this.generateFromReview(output as ReviewStageOutput) as ExpectationMap[T];
       case "publish":
@@ -164,24 +176,62 @@ export class ExpectationGenerator {
    * Generate expectation after DESIGN stage
    */
   private generateFromDesign(output: DesignStageOutput): DesignStageExpectation {
-    const { typography } = output;
+    const { layout } = output;
 
-    // Calculate expected page count
-    const basePages = ["homepage", "about", "services", "contact"];
-    const pageCount = basePages.length;
-
-    // Determine content types based on layout
-    const contentTypes = ["hero", "features", "cta", "testimonials"];
-
-    // Estimate word count based on typography scale
-    let wordMultiplier = 1;
-    if (typography.scale === "spacious") {
-      wordMultiplier = 0.8;
-    } else if (typography.scale === "compact") {
-      wordMultiplier = 1.2;
+    // Estimate image count based on layout style
+    let imageCount = 4; // Base: hero, 3 feature icons
+    if (layout.heroType === "image" || layout.heroType === "video") {
+      imageCount += 2; // More hero variations
+    }
+    if (layout.style === "bold") {
+      imageCount += 3; // More illustrations
     }
 
-    const estimatedWordCount = Math.round(pageCount * 500 * wordMultiplier);
+    // Determine image types needed
+    const imageTypes = ["hero", "feature-icons"];
+    if (layout.heroType === "gradient") {
+      imageTypes.push("background-pattern");
+    }
+    if (layout.style !== "minimal") {
+      imageTypes.push("illustrations");
+    }
+
+    // Estimate generation time (2 seconds per image with Gemini Imagen)
+    const estimatedSeconds = imageCount * 2;
+    const estimatedGenerationTime = estimatedSeconds > 60
+      ? `${Math.ceil(estimatedSeconds / 60)} dakika`
+      : `${estimatedSeconds} saniye`;
+
+    return {
+      nextStage: "images",
+      expectedOutputs: {
+        imageCount,
+        imageTypes,
+        estimatedGenerationTime,
+      },
+    };
+  }
+
+  /**
+   * Generate expectation after IMAGES stage
+   */
+  private generateFromImages(output: ImagesStageOutput): ImagesStageExpectation {
+    const { totalImages } = output;
+
+    // Calculate expected page count based on image distribution
+    const pageCount = Math.max(4, Math.ceil(totalImages / 3));
+
+    // Determine content types based on generated images
+    const contentTypes = ["hero", "features", "cta"];
+    if (output.illustrations.length > 0) {
+      contentTypes.push("about-section");
+    }
+    if (output.backgroundImages.length > 0) {
+      contentTypes.push("testimonials");
+    }
+
+    // Estimate word count
+    const estimatedWordCount = pageCount * 500;
 
     return {
       nextStage: "content",
@@ -288,14 +338,15 @@ export class ExpectationGenerator {
   private generateFromBuild(output: BuildStageOutput): BuildStageExpectation {
     const { buildStats, lighthouse } = output;
 
-    // Determine review checks
-    const reviewChecks = [
-      "Icerik dogrulugu",
-      "Gorsel tutarlilik",
+    // Determine UI/UX checks
+    const uiuxChecks = [
+      "Lighthouse performans",
+      "Erisilebilirlik (a11y)",
       "Responsive tasarim",
-      "Form calismasi",
-      "Link kontrolu",
-      "SEO meta kontrol",
+      "Renk kontrast kontrolu",
+      "Typography hiyerarsisi",
+      "Form UX",
+      "Loading state'ler",
     ];
 
     // Identify potential issues based on build stats
@@ -331,11 +382,28 @@ export class ExpectationGenerator {
     qualityScore -= potentialIssues.length * 5;
 
     return {
-      nextStage: "review",
+      nextStage: "ui_ux",
       expectedOutputs: {
-        reviewChecks,
+        uiuxChecks,
         potentialIssues,
         qualityScore: Math.max(0, Math.min(100, qualityScore)),
+      },
+    };
+  }
+
+  /**
+   * Generate expectation after UI_UX stage
+   */
+  private generateFromUiUx(output: UiUxStageOutput): UiUxStageExpectation {
+    const criticalChecks = output.checks
+      .filter((c) => c.status === "fail")
+      .map((c) => c.name);
+
+    return {
+      nextStage: "review",
+      expectedOutputs: {
+        estimatedScore: output.overallScore,
+        criticalChecks,
       },
     };
   }

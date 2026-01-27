@@ -26,6 +26,7 @@ import {
 } from 'lucide-react'
 import { usePathname } from 'next/navigation'
 import { ThemeToggle } from '@/components/ThemeToggle'
+import { AdminBreadcrumbs } from './AdminBreadcrumbs'
 
 interface AdminShellProps {
     children: React.ReactNode
@@ -94,99 +95,84 @@ export function AdminShell({ children, userEmail }: AdminShellProps) {
                 </div>
 
                 {/* Navigation */}
-                <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
-                    {/* Ana Menü */}
-                    <div className="px-3 py-2 text-xs font-bold text-neutral-500 uppercase tracking-wider">
-                        Yönetim Paneli
+                <nav className="flex-1 p-4 space-y-8 overflow-y-auto custom-scrollbar">
+                    {/* OPERATIONAL WORKSPACE */}
+                    <div className="space-y-1">
+                        <div className="px-3 py-2 text-[10px] font-black text-neutral-500 uppercase tracking-[0.2em]">
+                            Operasyonel
+                        </div>
+                        <NavLink href="/admin" icon={LayoutDashboard} label="Dashboard" isActive={pathname === '/admin'} />
+                        <NavLink href="/admin/tasks" icon={FolderKanban} label="Görevler" isActive={isActive('/admin/tasks')} />
+                        <NavLink href="/admin/tickets" icon={Ticket} label="Destek Talepleri" isActive={isActive('/admin/tickets')} />
                     </div>
-                    <Link href="/admin" onClick={handleNavigation} className={`flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all shadow-sm ${isActive('/admin') && pathname === '/admin' ? 'bg-white/10 text-white' : 'text-neutral-300 hover:bg-white/5 hover:text-white'}`}>
-                        <LayoutDashboard className="w-5 h-5" />
-                        Dashboard
-                    </Link>
 
-                    {/* Generic Task Management */}
-                    <Link href="/admin/tasks" onClick={handleNavigation} className={`flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all shadow-sm ${isActive('/admin/tasks') ? 'bg-white/10 text-white' : 'text-neutral-300 hover:bg-white/5 hover:text-white'}`}>
-                        <FolderKanban className="w-5 h-5" />
-                        Görevler
-                    </Link>
-
-                    {/* Web Ajansı */}
-                    <div className="px-3 py-2 mt-6 text-xs font-bold text-neutral-500 uppercase tracking-wider">
-                        Web Ajansı
+                    {/* AI AGENCY WORKSPACE */}
+                    <div className="space-y-1">
+                        <div className="px-3 py-2 text-[10px] font-black text-brand-500 uppercase tracking-[0.2em] flex items-center gap-2">
+                            AI Ajansı
+                            <div className="w-1 h-1 bg-brand-500 rounded-full animate-pulse" />
+                        </div>
+                        <NavLink href="/admin/companies" icon={Users} label="Müşteri Portföyü" isActive={isActive('/admin/companies')} badge="CRM" />
+                        <NavLink href="/admin/projects" icon={LayoutDashboard} label="Web Projeleri" isActive={isActive('/admin/projects')} />
+                        <NavLink href="/admin/proposals" icon={FileText} label="Teklifler" isActive={isActive('/admin/proposals')} />
+                        <NavLink href="/admin/domains" icon={Globe} label="Domain Yönetimi" isActive={isActive('/admin/domains')} />
                     </div>
-                    <Link href="/admin/companies" onClick={handleNavigation} className={`flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all ${isActive('/admin/companies') ? 'bg-white/10 text-white' : 'text-neutral-300 hover:bg-white/5 hover:text-white'}`}>
-                        <Users className="w-5 h-5" />
-                        Müşteriler
-                        <span className="ml-auto text-xs bg-brand-500/20 text-brand-400 px-2 py-0.5 rounded-full">CRM</span>
-                    </Link>
-                    <Link href="/admin/proposals" onClick={handleNavigation} className={`flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all ${isActive('/admin/proposals') ? 'bg-white/10 text-white' : 'text-neutral-300 hover:bg-white/5 hover:text-white'}`}>
-                        <FileText className="w-5 h-5" />
-                        Teklifler
-                    </Link>
-                    <Link href="/admin/projects" onClick={handleNavigation} className={`flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all ${isActive('/admin/projects') ? 'bg-white/10 text-white' : 'text-neutral-300 hover:bg-white/5 hover:text-white'}`}>
-                        <LayoutDashboard className="w-5 h-5" />
-                        Web Projeleri
-                    </Link>
-                    <Link href="/admin/domains" onClick={handleNavigation} className={`flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all ${isActive('/admin/domains') ? 'bg-white/10 text-white' : 'text-neutral-300 hover:bg-white/5 hover:text-white'}`}>
-                        <Globe className="w-5 h-5" />
-                        Domain Yönetimi
-                    </Link>
 
-                    {/* Finans */}
-                    <div className="px-3 py-2 mt-6 text-xs font-bold text-neutral-500 uppercase tracking-wider">
-                        Finans
+                    {/* FINANCIAL WORKSPACE */}
+                    <div className="space-y-1">
+                        <div className="px-3 py-2 text-[10px] font-black text-emerald-500 uppercase tracking-[0.2em]">
+                            Finansal
+                        </div>
+                        <NavLink href="/admin/invoices" icon={Receipt} label="Faturalar" isActive={isActive('/admin/invoices')} />
+                        <NavLink href="/admin/services" icon={RefreshCw} label="Abonelikler" isActive={isActive('/admin/services')} />
                     </div>
-                    <Link href="/admin/invoices" onClick={handleNavigation} className={`flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all ${isActive('/admin/invoices') ? 'bg-white/10 text-white' : 'text-neutral-300 hover:bg-white/5 hover:text-white'}`}>
-                        <Receipt className="w-5 h-5" />
-                        Faturalar
-                    </Link>
-                    <Link href="/admin/services" onClick={handleNavigation} className={`flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all ${isActive('/admin/services') ? 'bg-white/10 text-white' : 'text-neutral-300 hover:bg-white/5 hover:text-white'}`}>
-                        <RefreshCw className="w-5 h-5" />
-                        Abonelikler
-                    </Link>
 
-                    {/* İçerik */}
-                    <div className="px-3 py-2 mt-6 text-xs font-bold text-neutral-500 uppercase tracking-wider">
-                        İçerik & Destek
+                    {/* SYSTEM WORKSPACE */}
+                    <div className="space-y-1">
+                        <div className="px-3 py-2 text-[10px] font-black text-neutral-500 uppercase tracking-[0.2em]">
+                            Sistem
+                        </div>
+                        <NavLink href="/admin/system-users" icon={Users} label="Personel" isActive={isActive('/admin/system-users')} />
+                        <NavLink href="/admin/audit" icon={History} label="İşlem Geçmişi" isActive={isActive('/admin/audit')} />
+                        <NavLink href="/admin/settings" icon={Settings} label="Ayarlar" isActive={isActive('/admin/settings')} />
                     </div>
-                    <Link href="/admin/messages" onClick={handleNavigation} className={`flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all ${isActive('/admin/messages') ? 'bg-white/10 text-white' : 'text-neutral-300 hover:bg-white/5 hover:text-white'}`}>
-                        <MessageSquare className="w-5 h-5" />
-                        Gelen Mesajlar
-                    </Link>
-                    <Link href="/admin/tickets" onClick={handleNavigation} className={`flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all ${isActive('/admin/tickets') ? 'bg-white/10 text-white' : 'text-neutral-300 hover:bg-white/5 hover:text-white'}`}>
-                        <Ticket className="w-5 h-5" />
-                        Destek Talepleri
-                    </Link>
-
-                    {/* Sistem */}
-                    <div className="px-3 py-2 mt-6 text-xs font-bold text-neutral-500 uppercase tracking-wider">
-                        Sistem
-                    </div>
-                    <Link href="/admin/system-users" onClick={handleNavigation} className={`flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all ${isActive('/admin/system-users') ? 'bg-white/10 text-white' : 'text-neutral-300 hover:bg-white/5 hover:text-white'}`}>
-                        <Users className="w-5 h-5" />
-                        Personel Yönetimi
-                    </Link>
-                    <Link href="/admin/audit" onClick={handleNavigation} className={`flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all ${isActive('/admin/audit') ? 'bg-white/10 text-white' : 'text-neutral-300 hover:bg-white/5 hover:text-white'}`}>
-                        <History className="w-5 h-5" />
-                        İşlem Geçmişi
-                    </Link>
-                    <Link href="/admin/settings" onClick={handleNavigation} className={`flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all ${isActive('/admin/settings') ? 'bg-white/10 text-white' : 'text-neutral-300 hover:bg-white/5 hover:text-white'}`}>
-                        <Settings className="w-5 h-5" />
-                        Ayarlar
-                    </Link>
                 </nav>
 
+                {/* PLATFORM HEALTH MONITOR */}
+                <div className="p-4 mx-4 mb-4 bg-white/5 rounded-2xl border border-white/5 backdrop-blur-md">
+                    <div className="flex items-center justify-between mb-3">
+                        <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider">Sistem Durumu</span>
+                        <div className="flex gap-1">
+                            <div className="w-1 h-1 bg-green-500 rounded-full" />
+                            <div className="w-1 h-1 bg-green-500 rounded-full" />
+                            <div className="w-1 h-1 bg-green-500 rounded-full" />
+                        </div>
+                    </div>
+                    <div className="space-y-2">
+                        <div className="flex items-center justify-between text-[11px]">
+                            <span className="text-neutral-500">API Gateway</span>
+                            <span className="text-green-400 font-mono">ONLINE</span>
+                        </div>
+                        <div className="flex items-center justify-between text-[11px]">
+                            <span className="text-neutral-500">AI Engine</span>
+                            <span className="text-green-400 font-mono">READY</span>
+                        </div>
+                        <div className="w-full bg-white/10 h-1 rounded-full overflow-hidden mt-2">
+                            <div className="bg-brand-500 h-full w-[85%]" />
+                        </div>
+                    </div>
+                </div>
+
                 {/* Footer Actions */}
-                <div className="p-4 border-t border-white/10 space-y-2">
-                    <a href="/" target="_blank" className="flex items-center gap-3 px-4 py-3 rounded-xl text-neutral-400 hover:text-white text-sm font-medium transition-colors">
-                        <ExternalLink className="w-4 h-4" />
-                        Siteyi Görüntüle
+                <div className="p-4 border-t border-white/10 flex items-center justify-between gap-2">
+                    <a href="/" target="_blank" className="p-3 bg-white/5 rounded-xl text-neutral-400 hover:text-white transition-colors" title="Siteyi Görüntüle">
+                        <ExternalLink className="w-5 h-5" />
                     </a>
 
-                    <form action="/api/auth/signout" method="POST">
-                        <button className="flex items-center gap-3 px-4 py-3 rounded-xl text-red-400 hover:bg-red-500/10 w-full text-left font-medium transition-colors">
+                    <form action="/api/auth/signout" method="POST" className="flex-1">
+                        <button className="flex items-center justify-center gap-3 px-4 py-3 rounded-xl text-red-400 hover:bg-red-500/10 w-full font-bold text-sm transition-colors">
                             <LogOut className="w-5 h-5" />
-                            Çıkış Yap
+                            Çıkış
                         </button>
                     </form>
                 </div>
@@ -232,9 +218,38 @@ export function AdminShell({ children, userEmail }: AdminShellProps) {
 
                 {/* Page Content */}
                 <main className="p-4 lg:p-8 flex-1 overflow-x-hidden">
+                    <AdminBreadcrumbs />
                     {children}
                 </main>
             </div>
         </div>
+    )
+}
+
+// --- SUB-COMPONENTS ---
+
+function NavLink({ href, icon: Icon, label, isActive, badge }: any) {
+    return (
+        <Link
+            href={href}
+            className={`
+                group flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all relative overflow-hidden
+                ${isActive
+                    ? 'bg-white/10 text-white'
+                    : 'text-neutral-400 hover:bg-white/5 hover:text-white'
+                }
+            `}
+        >
+            {isActive && (
+                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-brand-500 rounded-r-lg" />
+            )}
+            <Icon className={`w-5 h-5 transition-transform group-hover:scale-110 ${isActive ? 'text-brand-400' : 'text-neutral-500 transition-colors group-hover:text-brand-400'}`} />
+            <span className="flex-1 text-sm">{label}</span>
+            {badge && (
+                <span className="text-[10px] bg-brand-500/20 text-brand-400 px-2 py-0.5 rounded-full font-black uppercase tracking-tighter">
+                    {badge}
+                </span>
+            )}
+        </Link>
     )
 }

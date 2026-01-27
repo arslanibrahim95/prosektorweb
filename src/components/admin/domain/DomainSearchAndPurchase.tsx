@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { searchDomainsWithPricing, purchaseDomain, DomainSearchResult } from '@/actions/domain-registrar'
+import { searchDomainsWithPricing, purchaseDomain, DomainSearchResult } from '@/features/projects/actions/domain-registrar'
 import {
     Search,
     Globe,

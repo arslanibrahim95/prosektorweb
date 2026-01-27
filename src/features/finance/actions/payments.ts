@@ -12,6 +12,7 @@ import { logAudit } from '@/lib/audit'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 import { PaymentMethod } from '@prisma/client'
+import { Decimal } from 'decimal.js'
 
 // ==========================================
 // TYPES
@@ -34,6 +35,7 @@ const PaymentSchema = z.object({
     method: z.nativeEnum(PaymentMethod),
     reference: z.string().optional(),
     notes: z.string().optional(),
+    idempotencyKey: z.string().optional(),
 })
 
 // ==========================================
@@ -53,6 +55,7 @@ export async function createPayment(formData: FormData): Promise<PaymentActionRe
             method: formData.get('method') as string,
             reference: formData.get('reference') as string || undefined,
             notes: formData.get('notes') as string || undefined,
+            idempotencyKey: formData.get('idempotencyKey') as string || undefined,
         }
 
         const validatedData = PaymentSchema.parse(rawData)
@@ -65,29 +68,41 @@ export async function createPayment(formData: FormData): Promise<PaymentActionRe
         for (let attempt = 0; attempt < MAX_PAYMENT_RETRIES; attempt++) {
             try {
                 const result = await prisma.$transaction(async (tx) => {
-                    // Read current invoice state (manual deletedAt filter since tx lacks extension)
+                    // 1. Idempotency Check
+                    if (validatedData.idempotencyKey) {
+                        const existingPayment = await tx.payment.findUnique({
+                            where: { idempotencyKey: validatedData.idempotencyKey }
+                        })
+                        if (existingPayment) {
+                            return { payment: existingPayment, alreadyExists: true }
+                        }
+                    }
+
+                    // Read current invoice state
                     const invoice = await tx.invoice.findFirst({
                         where: { id: validatedData.invoiceId, deletedAt: null },
+                        select: { id: true, paidAmount: true, total: true, version: true }
                     })
 
                     if (!invoice) {
                         throw new Error('INVOICE_NOT_FOUND')
                     }
 
-                    const currentPaidAmount = Number(invoice.paidAmount)
-                    const total = Number(invoice.total)
-                    const newPaidAmount = currentPaidAmount + validatedData.amount
+                    const currentPaidAmount = new Decimal(invoice.paidAmount)
+                    const total = new Decimal(invoice.total)
+                    const amount = new Decimal(validatedData.amount)
+                    const newPaidAmount = currentPaidAmount.plus(amount)
 
                     // Validate payment doesn't exceed total
-                    if (newPaidAmount > total) {
+                    if (newPaidAmount.gt(total)) {
                         throw new Error('PAYMENT_EXCEEDS_TOTAL')
                     }
 
                     // Determine new status
                     let newStatus: 'PENDING' | 'PARTIAL' | 'PAID' = 'PENDING'
-                    if (newPaidAmount >= total) {
+                    if (newPaidAmount.gte(total)) {
                         newStatus = 'PAID'
-                    } else if (newPaidAmount > 0) {
+                    } else if (newPaidAmount.gt(0)) {
                         newStatus = 'PARTIAL'
                     }
 
@@ -95,24 +110,25 @@ export async function createPayment(formData: FormData): Promise<PaymentActionRe
                     const payment = await tx.payment.create({
                         data: {
                             invoiceId: validatedData.invoiceId,
-                            amount: validatedData.amount,
+                            amount: amount.toString(),
                             paymentDate: new Date(validatedData.paymentDate),
                             method: validatedData.method,
                             reference: validatedData.reference || null,
                             notes: validatedData.notes || null,
+                            idempotencyKey: validatedData.idempotencyKey || null,
                         },
                     })
 
-                    // Optimistic lock: Update only if paidAmount hasn't changed
-                    // This prevents lost updates from concurrent payments
+                    // Optimistic lock: Update only if version hasn't changed
                     const updateResult = await tx.invoice.updateMany({
                         where: {
                             id: validatedData.invoiceId,
-                            paidAmount: currentPaidAmount, // Optimistic lock condition
+                            version: invoice.version, // Standard optimistic lock
                         },
                         data: {
                             paidAmount: newPaidAmount,
                             status: newStatus,
+                            version: { increment: 1 }
                         },
                     })
 
@@ -121,8 +137,12 @@ export async function createPayment(formData: FormData): Promise<PaymentActionRe
                         throw new Error('CONCURRENT_MODIFICATION')
                     }
 
-                    return { payment, newPaidAmount, newStatus }
+                    return { payment, newPaidAmount, newStatus, alreadyExists: false }
                 })
+
+                if ((result as any).alreadyExists) {
+                    return { success: true, data: result.payment }
+                }
 
                 // Success - log and return
                 await logAudit({
@@ -205,16 +225,17 @@ export async function deletePayment(id: string): Promise<PaymentActionResult> {
                     }
 
                     // Read current state for optimistic lock
-                    const currentPaidAmount = Number(payment.invoice.paidAmount)
-                    const paymentAmount = Number(payment.amount)
-                    const invoiceTotal = Number(payment.invoice.total)
-                    const newPaidAmount = Math.max(0, currentPaidAmount - paymentAmount)
+                    const currentPaidAmount = new Decimal(payment.invoice.paidAmount)
+                    const paymentAmount = new Decimal(payment.amount)
+                    const invoiceTotal = new Decimal(payment.invoice.total)
+                    const newPaidAmount = Decimal.max(0, currentPaidAmount.minus(paymentAmount))
+                    const currentInvoiceVersion = payment.invoice.version
 
                     // Determine new status
                     let newStatus: 'PENDING' | 'PARTIAL' | 'PAID' = 'PENDING'
-                    if (newPaidAmount >= invoiceTotal) {
+                    if (newPaidAmount.gte(invoiceTotal)) {
                         newStatus = 'PAID'
-                    } else if (newPaidAmount > 0) {
+                    } else if (newPaidAmount.gt(0)) {
                         newStatus = 'PARTIAL'
                     }
 
@@ -224,15 +245,16 @@ export async function deletePayment(id: string): Promise<PaymentActionResult> {
                         data: { deletedAt: new Date() }
                     })
 
-                    // Optimistic lock: Update only if paidAmount hasn't changed
+                    // Optimistic lock: Update only if version hasn't changed
                     const updateResult = await tx.invoice.updateMany({
                         where: {
                             id: payment.invoiceId,
-                            paidAmount: currentPaidAmount, // Optimistic lock condition
+                            version: currentInvoiceVersion, // Standard optimistic lock
                         },
                         data: {
                             paidAmount: newPaidAmount,
                             status: newStatus,
+                            version: { increment: 1 }
                         },
                     })
 

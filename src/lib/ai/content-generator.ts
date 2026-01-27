@@ -19,7 +19,7 @@ const SYSTEM_PROMPT = `Sen profesyonel bir Türk web içerik yazarısın.
 OSGB (Ortak Sağlık Güvenlik Birimi) ve iş sağlığı güvenliği sektöründe uzmanlaşmış içerikler üretiyorsun.
 
 Kurallar:
-- Her zaman Türkçe yaz
+- Her zaman Türkçe yaz (DESIGN hariç, o JSON olabilir)
 - SEO-uyumlu, anahtar kelime odaklı içerik üret
 - Profesyonel ama samimi bir ton kullan
 - Yasal terminolojiyi doğru kullan (6331 sayılı İSG Kanunu vb.)
@@ -27,7 +27,9 @@ Kurallar:
 - Başlığı # ile başlat
 - Meta bilgileri şu formatta ekle:
   META_TITLE: (max 60 karakter)
-  META_DESCRIPTION: (max 160 karakter)`;
+  META_DESCRIPTION: (max 160 karakter)
+- DESIGN talebi gelirse, sadece JSON formatında renk ve stil bilgilerini dön.
+`;
 
 const CONTENT_PROMPTS: Record<ContentType, (info: CompanyInfo) => string> = {
     HOMEPAGE: (info) => `
@@ -125,6 +127,31 @@ En az 8 soru-cevap oluştur. Sorular şunları kapsamalı:
 8. Denetimler hakkında
 
 Her soru-cevabı <div class="faq-item"> içinde yaz. HTML formatında yaz.`,
+
+    DESIGN: (info) => `
+${info.name} firması için bir web tasarım konsepti oluştur.
+
+Firma Bilgileri:
+- Firma Adı: ${info.name}
+- Sektör: ${info.industry || 'İş Sağlığı ve Güvenliği (OSGB)'}
+- Tehlike Sınıfı: ${info.dangerClass || 'Belirtilmemiş'}
+
+Lütfen aşağıdaki JSON formatında site stilini belirle (Sadece JSON dön):
+{
+  "colors": {
+    "primary": "Hex kodu (Sektöre uygun: Güven veren maviler, kırmızılar, turuncular)",
+    "secondary": "Hex kodu",
+    "accent": "Hex kodu",
+    "background": "Hex kodu"
+  },
+  "typography": {
+    "heading": "Modern sans-serif font ismi",
+    "body": "Okunabilir font ismi"
+  },
+  "vibe": "minimalist | corporate | dynamic | techy",
+  "hero_image_prompt": "Bu firma için yapay zeka görsel üreticiye verilecek hero görseli açıklaması"
+}
+`,
 };
 
 // ================================
@@ -166,7 +193,7 @@ export class ContentGenerator {
         companyInfo: CompanyInfo
     ): Promise<Map<ContentType, GeneratedContentResult>> {
         const results = new Map<ContentType, GeneratedContentResult>();
-        const contentTypes: ContentType[] = ['HOMEPAGE', 'ABOUT', 'SERVICES', 'CONTACT', 'FAQ'];
+        const contentTypes: ContentType[] = ['DESIGN', 'HOMEPAGE', 'ABOUT', 'SERVICES', 'CONTACT', 'FAQ'];
 
         for (const contentType of contentTypes) {
             const result = await this.generateContent({

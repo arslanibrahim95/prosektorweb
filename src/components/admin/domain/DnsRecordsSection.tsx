@@ -1,7 +1,7 @@
 'use client'
 
 import { useActionState, useState } from 'react'
-import { createDnsRecord, deleteDnsRecord, DomainActionResult } from '@/actions/domain'
+import { createDnsRecord, deleteDnsRecord, ActionResult as DomainActionResult } from '@/features/projects/actions/domains'
 import { Plus, Trash2, Loader2, Server, Globe, Mail, FileText, Zap } from 'lucide-react'
 
 interface DnsRecord {

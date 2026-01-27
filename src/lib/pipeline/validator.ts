@@ -40,6 +40,12 @@ const INPUT_SCHEMAS: Record<PipelineStage, ValidationRule[]> = {
     { field: "company", required: true, type: "object" },
     { field: "research", required: false, type: "object" },
   ],
+  images: [
+    { field: "projectId", required: true, type: "string" },
+    { field: "company", required: true, type: "object" },
+    { field: "design", required: true, type: "object" },
+    { field: "pages", required: true, type: "array" },
+  ],
   content: [
     { field: "projectId", required: true, type: "string" },
     { field: "company", required: true, type: "object" },
@@ -57,11 +63,17 @@ const INPUT_SCHEMAS: Record<PipelineStage, ValidationRule[]> = {
     { field: "config", required: true, type: "object" },
     { field: "content", required: true, type: "object" },
   ],
+  ui_ux: [
+    { field: "projectId", required: true, type: "string" },
+    { field: "build", required: true, type: "object" },
+    { field: "design", required: true, type: "object" },
+  ],
   review: [
     { field: "projectId", required: true, type: "string" },
     { field: "company", required: true, type: "object" },
     { field: "content", required: true, type: "object" },
     { field: "build", required: true, type: "object" },
+    { field: "uiUx", required: true, type: "object" },
   ],
   publish: [
     { field: "projectId", required: true, type: "string" },
@@ -90,6 +102,13 @@ const OUTPUT_SCHEMAS: Record<PipelineStage, ValidationRule[]> = {
     { field: "typography", required: true, type: "object" },
     { field: "layout", required: true, type: "object" },
   ],
+  images: [
+    { field: "projectId", required: true, type: "string" },
+    { field: "images", required: true, type: "array" },
+    { field: "totalImages", required: true, type: "number", min: 0 },
+    { field: "heroImages", required: true, type: "array" },
+    { field: "featureIcons", required: true, type: "array" },
+  ],
   content: [
     { field: "projectId", required: true, type: "string" },
     { field: "pages", required: true, type: "array", minLength: 1 },
@@ -103,6 +122,13 @@ const OUTPUT_SCHEMAS: Record<PipelineStage, ValidationRule[]> = {
   build: [
     { field: "projectId", required: true, type: "string" },
     { field: "status", required: true, type: "string" },
+  ],
+  ui_ux: [
+    { field: "projectId", required: true, type: "string" },
+    { field: "overallScore", required: true, type: "number", min: 0, max: 100 },
+    { field: "lighthouse", required: true, type: "object" },
+    { field: "checks", required: true, type: "array" },
+    { field: "readyForReview", required: true, type: "boolean" },
   ],
   review: [
     { field: "projectId", required: true, type: "string" },
@@ -277,9 +303,11 @@ export class PipelineValidator {
       "input",
       "research",
       "design",
+      "images",
       "content",
       "seo",
       "build",
+      "ui_ux",
       "review",
       "publish",
     ];

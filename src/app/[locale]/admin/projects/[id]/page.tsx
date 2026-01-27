@@ -81,6 +81,16 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
                         <Sparkles className="w-4 h-4" />
                         İçerik Üret
                     </Link>
+                    {project.slug && (
+                        <Link
+                            href={`/demo/${project.slug}`}
+                            target="_blank"
+                            className="flex items-center gap-2 px-4 py-2 bg-brand-50 text-brand-700 rounded-xl font-medium hover:bg-brand-100 transition-colors border border-brand-200"
+                        >
+                            <Sparkles className="w-4 h-4" />
+                            AI Önizleme
+                        </Link>
+                    )}
                     {project.previewUrl && (
                         <a
                             href={project.previewUrl}

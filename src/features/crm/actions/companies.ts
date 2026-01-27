@@ -66,6 +66,15 @@ async function logActivity(action: AuditAction, entity: string, entityId: string
  */
 export async function getCompanies(page: number = 1, limit: number = 20, search?: string) {
     try {
+        const session = await auth()
+        if (!session?.user) return { data: [], meta: { total: 0, page: 1, limit: 20, totalPages: 0 } }
+
+        // ADMIN can see all, CLIENT can only see their own company (if applicable in multitenant context)
+        // For now, these are legacy admin list views - restrict to ADMIN
+        if (session.user.role !== 'ADMIN') {
+            return { data: [], meta: { total: 0, page: 1, limit: 20, totalPages: 0 } }
+        }
+
         const skip = (page - 1) * limit
         const where: any = {
             deletedAt: null // Soft delete check
@@ -114,6 +123,14 @@ export async function getCompanies(page: number = 1, limit: number = 20, search?
  */
 export async function getCompany(id: string) {
     try {
+        const session = await auth()
+        if (!session?.user) return null
+
+        // AuthZ: ADMIN or USER who belongs to this company
+        if (session.user.role !== 'ADMIN' && session.user.companyId !== id) {
+            return null
+        }
+
         return await prisma.company.findUnique({
             where: { id },
             include: {

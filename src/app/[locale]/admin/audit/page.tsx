@@ -40,16 +40,18 @@ function isValidAuditAction(value: string | undefined): value is AuditAction {
 export default async function AuditPage({
     searchParams,
 }: {
-    searchParams: Promise<{ page?: string; entity?: string; action?: string }>
+    searchParams: Promise<{ page?: string; entity?: string; action?: string; startDate?: string; endDate?: string }>
 }) {
     const params = await searchParams
     const page = parseInt(params.page || '1')
     const entity = params.entity || undefined
     const action = isValidAuditAction(params.action) ? params.action : undefined
+    const startDate = params.startDate || undefined
+    const endDate = params.endDate || undefined
 
     const { data: logs, meta } = await getAuditLogs(page, 25, {
-        startDate: undefined, // TODO: Add date filters
-        endDate: undefined,
+        startDate,
+        endDate,
         entity,
         action,
     })
@@ -69,7 +71,12 @@ export default async function AuditPage({
 
             {/* Filters - Client Component */}
             <Suspense fallback={<div className="h-10 bg-gray-100 rounded animate-pulse w-64" />}>
-                <AuditFilters currentEntity={entity} currentAction={action} />
+                <AuditFilters
+                    currentEntity={entity}
+                    currentAction={action}
+                    currentStartDate={startDate}
+                    currentEndDate={endDate}
+                />
             </Suspense>
 
             {/* Table */}

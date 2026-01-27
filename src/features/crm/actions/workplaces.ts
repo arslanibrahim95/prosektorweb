@@ -56,11 +56,22 @@ async function logActivity(action: AuditAction, entity: string, entityId: string
 
 export async function getWorkplaces(page: number = 1, limit: number = 20, search?: string) {
     try {
-        const skip = (page - 1) * limit
         const session = await auth()
+        if (!session?.user) return { data: [], meta: { total: 0, page: 1, limit: 20, totalPages: 0 } }
+
+        const skip = (page - 1) * limit
 
         // Build filters
-        const where: any = {}
+        const where: any = {
+            deletedAt: null
+        }
+
+        // AuthZ: Non-admins can only see their own company's workplaces
+        if (session.user.role !== 'ADMIN') {
+            if (!session.user.companyId) return { data: [], meta: { total: 0, page: 1, limit: 20, totalPages: 0 } }
+            where.companyId = session.user.companyId
+        }
+
         if (search) {
             where.OR = [
                 { title: { contains: search } },
@@ -100,14 +111,26 @@ export async function getWorkplaces(page: number = 1, limit: number = 20, search
 
 export async function getWorkplace(id: string) {
     try {
-        return await prisma.workplace.findUnique({
-            where: { id },
+        const session = await auth()
+        if (!session?.user) return null
+
+        const workplace = await prisma.workplace.findFirst({
+            where: { id, deletedAt: null },
             include: {
                 company: true,
                 employees: true,
                 _count: { select: { employees: true } }
             }
         })
+
+        if (!workplace) return null
+
+        // AuthZ: ADMIN or USER who belongs to this company
+        if (session.user.role !== 'ADMIN' && session.user.companyId !== workplace.companyId) {
+            return null
+        }
+
+        return workplace
     } catch (e) {
         return null
     }
@@ -186,7 +209,10 @@ export async function deleteWorkplace(id: string): Promise<ActionResult> {
             return { success: false, error: 'Unauthorized' }
         }
 
-        await prisma.workplace.delete({ where: { id } }) // Hard delete for now, assuming cascade or logic
+        await prisma.workplace.update({
+            where: { id },
+            data: { deletedAt: new Date() }
+        })
         // Or Soft delete if schema supported it (Workplace doesn't have deletedAt in schema I saw earlier, wait let me check schema)
 
         await logActivity('DELETE', 'Workplace', id)

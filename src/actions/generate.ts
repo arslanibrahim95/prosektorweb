@@ -73,24 +73,13 @@ async function getCompanyInfoFromProject(projectId: string): Promise<CompanyInfo
     const project = await prisma.webProject.findUnique({
         where: { id: projectId },
         include: {
-            company: {
-                include: {
-                    workplaces: {
-                        take: 1,
-                        select: {
-                            naceCode: true,
-                            dangerClass: true,
-                        },
-                    },
-                },
-            },
+            company: true
         },
     });
 
     if (!project) return null;
 
     const company = project.company;
-    const workplace = company.workplaces[0];
 
     return {
         name: company.name,
@@ -105,10 +94,8 @@ async function getCompanyInfoFromProject(projectId: string): Promise<CompanyInfo
         address: company.address || undefined,
         phone: company.phone || undefined,
         email: company.email || undefined,
-        // Architecture Cleanup: Prefer Company fields, fallback to Workplace (Legacy)
-        // TODO: Remove workplace dependency after data migration
-        naceCode: company.naceCode || workplace?.naceCode || undefined,
-        dangerClass: (company.dangerClass || workplace?.dangerClass) as CompanyInfo['dangerClass'],
+        naceCode: company.naceCode || undefined,
+        dangerClass: company.dangerClass as CompanyInfo['dangerClass'],
     };
 }
 
@@ -357,7 +344,7 @@ export async function generatePageContent(
 export async function generateAllContent(projectId: string): Promise<GenerateAllResult> {
     try {
         await requireAdmin();
-        const contentTypes: ContentType[] = ['HOMEPAGE', 'ABOUT', 'SERVICES', 'CONTACT', 'FAQ'];
+        const contentTypes: ContentType[] = ['DESIGN', 'HOMEPAGE', 'ABOUT', 'SERVICES', 'CONTACT', 'FAQ'];
         const errors: string[] = [];
         let generated = 0;
         let failed = 0;

@@ -1,7 +1,7 @@
 'use client'
 
 import { useActionState, useRef, useEffect, useState } from 'react'
-import { submitContact, ContactState } from '@/actions/contact'
+import { submitContact, ContactState } from '@/features/support/actions/contact'
 import { Loader2, CheckCircle, AlertCircle, RefreshCw } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 

@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { ChevronLeft, Globe, Loader2, AlertCircle } from 'lucide-react'
-import { createDomain } from '@/actions/domain'
+import { createDomain } from '@/features/projects/actions/domains'
 
 interface Company {
     id: string

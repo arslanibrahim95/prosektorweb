@@ -1,7 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { updateProjectStatus } from '@/actions/project'
+import { updateProjectStatus } from '@/features/projects/actions/projects'
+import { ProjectStatus } from '@prisma/client'
 import { Loader2, CheckCircle2 } from 'lucide-react'
 
 interface Props {
@@ -29,7 +30,7 @@ export function ProjectStatusManager({ projectId, currentStatus }: Props) {
         if (newStatus === status) return
 
         setLoading(newStatus)
-        const result = await updateProjectStatus(projectId, newStatus)
+        const result = await updateProjectStatus(projectId, newStatus as ProjectStatus)
 
         if (result.success) {
             setStatus(newStatus)
@@ -47,8 +48,8 @@ export function ProjectStatusManager({ projectId, currentStatus }: Props) {
                         onClick={() => handleStatusChange(s.value)}
                         disabled={loading !== null}
                         className={`w-full flex items-center justify-between px-4 py-3 rounded-xl border-2 transition-all ${status === s.value
-                                ? `${s.color} border-current`
-                                : 'bg-white border-neutral-200 hover:bg-neutral-50'
+                            ? `${s.color} border-current`
+                            : 'bg-white border-neutral-200 hover:bg-neutral-50'
                             } ${loading !== null ? 'opacity-50' : ''}`}
                     >
                         <span className="font-medium">{s.label}</span>

@@ -1,12 +1,10 @@
-/**
- * Tax Configuration & Logic
- * Merkezi Vergi Oranı Yönetimi
- */
+import { toDecimal, calculateTaxPrecise } from './money'
+import { Decimal } from 'decimal.js'
 
 // Geçmiş vergi oranları (Tarihine göre geçerli oran alınır)
 export const TAX_HISTORY = [
-    { start: new Date('2023-07-10'), rate: 20 },
-    { start: new Date('2000-01-01'), rate: 18 }
+    { start: new Date('2023-07-10'), rate: new Decimal(20) },
+    { start: new Date('2000-01-01'), rate: new Decimal(18) }
 ]
 
 /**
@@ -14,22 +12,23 @@ export const TAX_HISTORY = [
  * @param date İşlem tarihi (opsiyonel, varsayılan: şimdi)
  * @returns KDV Oranı (örn: 20)
  */
-export function getTaxRate(date: Date = new Date()): number {
+export function getTaxRate(date: Date = new Date()): Decimal {
     // Tarihe göre en yeni oranı bul (sorted desc assumed or found)
     const match = TAX_HISTORY.find(h => date >= h.start)
-    return match ? match.rate : 20
+    return match ? match.rate : new Decimal(20)
 }
 
 /**
  * Tutar üzerinden KDV hesaplar
  */
-export function calculateTax(amount: number, date?: Date): { subtotal: number, taxAmount: number, total: number, rate: number } {
+export function calculateTax(amount: number | string | Decimal, date?: Date) {
     const rate = getTaxRate(date)
-    const taxAmount = amount * (rate / 100)
+    const result = calculateTaxPrecise(amount, rate)
+
     return {
-        subtotal: amount,
-        taxAmount,
-        total: amount + taxAmount,
-        rate
+        subtotal: result.subtotal.toString(),
+        taxAmount: result.taxAmount.toString(),
+        total: result.total.toString(),
+        rate: result.rate.toNumber()
     }
 }

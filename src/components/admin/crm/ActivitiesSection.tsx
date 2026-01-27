@@ -1,7 +1,7 @@
 'use client'
 
 import { useActionState, useState } from 'react'
-import { createActivity, toggleActivityComplete, deleteActivity, CrmActionResult } from '@/actions/crm'
+import { createActivity, toggleActivityComplete, deleteActivity, CrmActionResult } from '@/features/crm/actions/crm'
 import { Activity, Plus, CheckCircle2, Circle, Phone, Mail, Calendar, FileText, Bell, Target, Trash2, Loader2, Clock } from 'lucide-react'
 
 interface ActivityItem {

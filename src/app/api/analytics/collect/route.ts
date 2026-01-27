@@ -4,12 +4,13 @@ import { prisma } from '@/lib/prisma'
 import { headers } from 'next/headers'
 import { z } from 'zod'
 import { checkRateLimit, getClientIp } from '@/lib/rate-limit'
+import crypto from 'crypto'
 
-// CORS Headers
+// CORS Headers (Restricted for production)
 const corsHeaders = {
-    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Origin': process.env.NODE_ENV === 'production' ? process.env.NEXT_PUBLIC_APP_URL || '*' : '*',
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type, X-Request-Id',
+    'Access-Control-Allow-Headers': 'Content-Type, X-Request-Id, X-Signature',
 }
 
 // Event Schema
@@ -42,8 +43,45 @@ export async function POST(req: NextRequest) {
             )
         }
 
-        // 2. Parse Body
-        const body = await req.json()
+        // 2. Payload Size Limit (Max 10KB)
+        const contentLength = parseInt(req.headers.get('content-length') || '0')
+        if (contentLength > 10240) {
+            return NextResponse.json({ error: 'Payload Too Large' }, { status: 413, headers: corsHeaders })
+        }
+
+        // 3. HMAC Signature Validation
+        const signature = req.headers.get('x-signature')
+        const secret = process.env.ANALYTICS_SECRET
+
+        if (secret) {
+            const bodyRaw = await req.text()
+            const expectedSignature = crypto
+                .createHmac('sha256', secret)
+                .update(bodyRaw)
+                .digest('hex')
+
+            const signatureBuffer = Buffer.from(signature || '', 'hex')
+            const expectedBuffer = Buffer.from(expectedSignature, 'hex')
+
+            if (signatureBuffer.length !== expectedBuffer.length || !crypto.timingSafeEqual(signatureBuffer, expectedBuffer)) {
+                return NextResponse.json({ error: 'Unauthorized' }, { status: 401, headers: corsHeaders })
+            }
+
+            // Reparse body from text
+            try {
+                var body = JSON.parse(bodyRaw)
+            } catch (e) {
+                return NextResponse.json({ error: 'Invalid JSON' }, { status: 400, headers: corsHeaders })
+            }
+        } else {
+            // If secret not configured in dev, allow but warn
+            if (process.env.NODE_ENV === 'production') {
+                return NextResponse.json({ error: 'Collector misconfigured' }, { status: 500, headers: corsHeaders })
+            }
+            var body = await req.json()
+        }
+
+        // 4. Parse Body
         const validation = EventSchema.safeParse(body)
 
         if (!validation.success) {

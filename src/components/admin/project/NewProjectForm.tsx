@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Loader2, AlertCircle, Globe, Building2, DollarSign } from 'lucide-react'
-import { createProject, ActionResult } from '@/actions/projects'
+import { createProject, ActionResult } from '@/features/projects/actions/projects'
 
 interface Props {
     companies: Array<{ id: string; name: string }>

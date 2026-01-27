@@ -6,7 +6,7 @@ import {
     syncDnsToCloudflare,
     setupStandardDns,
     CloudflareActionResult
-} from '@/actions/cloudflare'
+} from '@/features/projects/actions/cloudflare'
 import { Cloud, Loader2, CheckCircle2, AlertCircle, Server, Zap, RefreshCw } from 'lucide-react'
 
 interface CloudflareActionsProps {

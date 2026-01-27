@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client'
 import { mockDeep, DeepMockProxy } from 'vitest-mock-extended'
+import { vi, beforeEach } from 'vitest'
 import { prisma } from '@/lib/prisma'
 
 // 1. Mock the prisma module

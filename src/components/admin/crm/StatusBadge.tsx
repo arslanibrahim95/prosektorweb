@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { updateCompanyStatus } from '@/actions/crm'
+import { updateCompanyStatus } from '@/features/crm/actions/crm'
 import { ChevronDown } from 'lucide-react'
 
 interface CrmStatusBadgeProps {

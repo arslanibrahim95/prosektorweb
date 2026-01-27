@@ -13,7 +13,8 @@ export type ContentType =
     | 'SERVICES'
     | 'CONTACT'
     | 'BLOG'
-    | 'FAQ';
+    | 'FAQ'
+    | 'DESIGN';
 
 export type ContentStatus =
     | 'DRAFT'
@@ -118,6 +119,11 @@ export const PAGE_TEMPLATES: Record<ContentType, PageTemplate> = {
         contentType: 'FAQ',
         sections: ['questions-answers'],
         requiredFields: ['name', 'services'],
+    },
+    DESIGN: {
+        contentType: 'DESIGN',
+        sections: ['style-guide', 'color-palette', 'typography'],
+        requiredFields: ['name'],
     },
 };
 

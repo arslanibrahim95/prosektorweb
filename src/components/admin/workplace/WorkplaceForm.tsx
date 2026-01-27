@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Loader2, AlertCircle, Building2, MapPin, Hash } from 'lucide-react'
-import { createWorkplace, updateWorkplace } from '@/actions/workplaces'
+import { createWorkplace, updateWorkplace } from '@/features/crm/actions/workplaces'
 
 interface Props {
     companies: Array<{ id: string; name: string }>

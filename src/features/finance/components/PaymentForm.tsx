@@ -1,7 +1,7 @@
 'use client'
 
 import { useActionState, useEffect, useState } from 'react'
-import { createPayment, ActionResult } from '../actions/invoices'
+import { createPayment, PaymentActionResult } from '../actions/payments'
 import { Loader2, AlertCircle, CheckCircle2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 
@@ -10,15 +10,23 @@ interface PaymentFormProps {
     remaining: number
 }
 
-const initialState: ActionResult = {
+const initialState: PaymentActionResult = {
     success: false,
 }
 
 export function PaymentForm({ invoiceId, remaining }: PaymentFormProps) {
     const router = useRouter()
     const [amount, setAmount] = useState<string>('')
+    const [idempotencyKey, setIdempotencyKey] = useState<string>('')
 
-    const formAction = async (prevState: ActionResult, formData: FormData) => {
+    useEffect(() => {
+        setIdempotencyKey(crypto.randomUUID())
+    }, [])
+
+    const formAction = async (prevState: PaymentActionResult, formData: FormData) => {
+        if (idempotencyKey) {
+            formData.set('idempotencyKey', idempotencyKey)
+        }
         return await createPayment(formData)
     }
 

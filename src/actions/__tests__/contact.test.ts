@@ -26,7 +26,7 @@ vi.mock('isomorphic-dompurify', () => ({
 }))
 
 // 2. Import SUT and mocks
-import { submitContact } from '../contact'
+import { submitContact } from '@/features/support/actions/contact'
 import { prisma } from '@/lib/prisma'
 import { headers } from 'next/headers'
 import { getClientIp } from '@/lib/rate-limit'

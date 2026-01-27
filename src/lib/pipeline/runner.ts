@@ -19,12 +19,16 @@ import {
   ResearchStageOutput,
   DesignStageInput,
   DesignStageOutput,
+  ImagesStageInput,
+  ImagesStageOutput,
   ContentStageInput,
   ContentStageOutput,
   SeoStageInput,
   SeoStageOutput,
   BuildStageInput,
   BuildStageOutput,
+  UiUxStageInput,
+  UiUxStageOutput,
   ReviewStageInput,
   ReviewStageOutput,
   PublishStageInput,
@@ -67,9 +71,11 @@ export class PipelineRunner {
     input?: StageHandler<InputStageInput, InputStageOutput>;
     research?: StageHandler<ResearchStageInput, ResearchStageOutput>;
     design?: StageHandler<DesignStageInput, DesignStageOutput>;
+    images?: StageHandler<ImagesStageInput, ImagesStageOutput>;
     content?: StageHandler<ContentStageInput, ContentStageOutput>;
     seo?: StageHandler<SeoStageInput, SeoStageOutput>;
     build?: StageHandler<BuildStageInput, BuildStageOutput>;
+    ui_ux?: StageHandler<UiUxStageInput, UiUxStageOutput>;
     review?: StageHandler<ReviewStageInput, ReviewStageOutput>;
     publish?: StageHandler<PublishStageInput, PublishStageOutput>;
   } = {};
@@ -126,9 +132,11 @@ export class PipelineRunner {
         input: { status: "pending" },
         research: { status: "pending" },
         design: { status: "pending" },
+        images: { status: "pending" },
         content: { status: "pending" },
         seo: { status: "pending" },
         build: { status: "pending" },
+        ui_ux: { status: "pending" },
         review: { status: "pending" },
         publish: { status: "pending" },
       } as unknown as PipelineState["stages"],
@@ -478,12 +486,21 @@ export class PipelineRunner {
           seoFiles: stages.seo.output?.files,
         } as BuildStageInput;
 
+      case "ui_ux":
+        return {
+          projectId,
+          build: stages.build.output,
+          design: stages.design.output,
+          previewUrl: stages.build.output?.previewUrl,
+        } as UiUxStageInput;
+
       case "review":
         return {
           projectId,
           company: stages.input.output?.company,
           content: stages.content.output,
           build: stages.build.output,
+          uiUx: stages.ui_ux.output,
         } as ReviewStageInput;
 
       case "publish":

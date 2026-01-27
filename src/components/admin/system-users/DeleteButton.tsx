@@ -1,6 +1,6 @@
 'use client'
 
-import { deleteSystemUser } from "@/actions/system-users"
+import { deleteSystemUser } from "@/features/system/actions/system-users"
 import { Trash2 } from "lucide-react"
 import { useTransition } from "react"
 

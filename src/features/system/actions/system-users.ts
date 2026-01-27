@@ -206,6 +206,7 @@ export async function updateSystemUser(id: string, formData: FormData): Promise<
 
         if (typeof rawData.password === 'string' && rawData.password.length >= 6) {
             updateData.password = await bcrypt.hash(rawData.password, 10)
+            updateData.sessionVersion = { increment: 1 }
         }
 
         const user = await prisma.systemUser.update({

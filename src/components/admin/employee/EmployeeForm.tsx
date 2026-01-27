@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Loader2, AlertCircle, User, Briefcase, Phone, Mail, Calendar } from 'lucide-react'
-import { createEmployee, updateEmployee } from '@/actions/employee'
+import { createEmployee, updateEmployee } from '@/features/crm/actions/employees'
 
 interface Props {
     workplaces: Array<{ id: string; title: string }>

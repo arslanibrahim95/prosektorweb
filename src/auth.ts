@@ -48,7 +48,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                             email: systemUser.email,
                             role: systemUser.role, // "ADMIN", "DOCTOR", etc.
                             companyId: null, // System users don't have companyId
-                            isSystemUser: true
+                            isSystemUser: true,
+                            sessionVersion: systemUser.sessionVersion.toString()
                         }
                     }
                 }
@@ -68,7 +69,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                             email: user.email,
                             role: user.role, // Should effectively be "CLIENT" mostly
                             companyId: user.companyId,
-                            isSystemUser: false
+                            isSystemUser: false,
+                            sessionVersion: user.sessionVersion.toString()
                         }
                     }
                 }

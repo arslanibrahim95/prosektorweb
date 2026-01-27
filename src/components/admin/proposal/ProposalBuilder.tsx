@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Loader2, AlertCircle, Plus, Trash2, Calculator, FileText } from 'lucide-react'
-import { createProposal } from '@/actions/proposals'
+import { createProposal } from '@/features/crm/actions/proposals'
 
 interface Props {
     companies: Array<{ id: string; name: string }>

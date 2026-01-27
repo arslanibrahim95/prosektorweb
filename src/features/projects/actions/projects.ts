@@ -7,6 +7,7 @@ import { getErrorMessage, getZodErrorMessage, validatePagination } from '@/lib/a
 import { z } from 'zod'
 import { getUserCompanyId, requireCompanyAccess, requireTenantAccess } from '@/lib/guards/tenant-guard'
 import { AuditAction, ProjectStatus, ProjectPriority } from '@prisma/client'
+import { slugify } from '@/lib/utils'
 
 export interface ProjectInput {
     companyId: string
@@ -60,9 +61,18 @@ async function logActivity(action: AuditAction, entity: string, entityId: string
 
 export async function getProjects(page: number = 1, limit: number = 20, search?: string, status?: string) {
     try {
+        const session = await auth()
+        if (!session?.user) return { data: [], meta: { total: 0, page: 1, limit: 20, totalPages: 0 } }
+
         const skip = (page - 1) * limit
         const where: any = {
             deletedAt: null
+        }
+
+        // AuthZ: Non-admins can only see their own company's projects
+        if (session.user.role !== 'ADMIN') {
+            if (!session.user.companyId) return { data: [], meta: { total: 0, page: 1, limit: 20, totalPages: 0 } }
+            where.companyId = session.user.companyId
         }
 
         if (search) {
@@ -109,7 +119,10 @@ export async function getProjects(page: number = 1, limit: number = 20, search?:
 
 export async function getProject(id: string) {
     try {
-        return await prisma.webProject.findUnique({
+        const session = await auth()
+        if (!session?.user) return null
+
+        const project = await prisma.webProject.findUnique({
             where: { id },
             include: {
                 company: true,
@@ -117,6 +130,15 @@ export async function getProject(id: string) {
                 tasks: { orderBy: { createdAt: 'desc' } }
             }
         })
+
+        if (!project) return null
+
+        // AuthZ: ADMIN or USER who belongs to this company
+        if (session.user.role !== 'ADMIN' && session.user.companyId !== project.companyId) {
+            return null
+        }
+
+        return project
     } catch (e) {
         return null
     }
@@ -145,6 +167,7 @@ export async function createProject(input: ProjectInput | FormData): Promise<Act
         const project = await prisma.webProject.create({
             data: {
                 name: validated.name,
+                slug: slugify(validated.name) + '-' + Math.random().toString(36).substring(2, 7),
                 companyId: validated.companyId,
                 domainId: validated.domainId || null,
                 price: validated.price || null,
@@ -258,6 +281,9 @@ export async function deleteProject(id: string): Promise<ActionResult> {
 
 export async function getProjectStats() {
     try {
+        const session = await auth()
+        if (session?.user?.role !== 'ADMIN') return { total: 0, draft: 0, inProgress: 0, review: 0, live: 0, totalRevenue: 0, pendingPayment: 0 }
+
         const [total, draft, inProgress, review, live, revenue, pending] = await Promise.all([
             prisma.webProject.count({ where: { deletedAt: null } }),
             prisma.webProject.count({ where: { status: 'DRAFT', deletedAt: null } }),

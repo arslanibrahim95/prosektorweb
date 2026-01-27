@@ -182,6 +182,7 @@ export async function deleteService(id: string): Promise<ActionResult> {
     }
 }
 import { generateInvoiceNo } from './invoices'
+import { toDecimal, calculateTaxPrecise } from '@/lib/money'
 
 export async function renewService(id: string): Promise<ActionResult> {
     try {
@@ -202,10 +203,9 @@ export async function renewService(id: string): Promise<ActionResult> {
 
         // 1. Generate Invoice
         const invoiceNo = await generateInvoiceNo()
-        const subtotal = Number(service.price)
+        const subtotal = toDecimal(service.price)
         const taxRate = 20
-        const taxAmount = (subtotal * taxRate) / 100
-        const total = subtotal + taxAmount
+        const { taxAmount, total } = calculateTaxPrecise(subtotal, taxRate)
 
         await prisma.invoice.create({
             data: {
@@ -213,10 +213,10 @@ export async function renewService(id: string): Promise<ActionResult> {
                 companyId: service.companyId,
                 issueDate: new Date(),
                 dueDate: currentRenewDate,
-                subtotal,
-                taxRate,
-                taxAmount,
-                total,
+                subtotal: subtotal.toString(),
+                taxRate: taxRate.toString(),
+                taxAmount: taxAmount.toString(),
+                total: total.toString(),
                 status: 'PENDING',
                 description: `${service.name} - Hizmet Yenileme (${currentRenewDate.toLocaleDateString('tr-TR')} - ${newRenewDate.toLocaleDateString('tr-TR')})`,
             }

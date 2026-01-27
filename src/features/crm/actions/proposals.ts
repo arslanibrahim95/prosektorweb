@@ -7,6 +7,9 @@ import { getErrorMessage, getZodErrorMessage, validatePagination } from '@/lib/a
 import { z } from 'zod'
 import { checkRateLimit, getClientIp } from '@/lib/rate-limit'
 import { AuditAction, ProposalStatus, Prisma } from '@prisma/client'
+import { toDecimal, calculateTaxPrecise } from '@/lib/money'
+import { Decimal } from 'decimal.js'
+import crypto from 'crypto'
 
 const ProposalItemSchema = z.object({
     description: z.string().min(1, 'Açıklama gereklidir'),
@@ -69,7 +72,16 @@ export async function getProposals(options: { search?: string, page?: number, li
     const skip = (page - 1) * limit
 
     try {
+        const session = await auth()
+        if (!session?.user) return { proposals: [], meta: { total: 0, page: 1, limit: 20, totalPages: 0 } }
+
         const where: Prisma.ProposalWhereInput = {}
+
+        // AuthZ: Non-admins can only see their own company's proposals
+        if (session.user.role !== 'ADMIN') {
+            if (!session.user.companyId) return { proposals: [], meta: { total: 0, page: 1, limit: 20, totalPages: 0 } }
+            where.companyId = session.user.companyId
+        }
 
         if (search) {
             where.OR = [
@@ -108,13 +120,25 @@ export async function getProposals(options: { search?: string, page?: number, li
 
 export async function getProposal(id: string) {
     try {
-        return await prisma.proposal.findUnique({
+        const session = await auth()
+        if (!session?.user) return null
+
+        const proposal = await prisma.proposal.findUnique({
             where: { id },
             include: {
                 company: true,
                 items: true
             }
         })
+
+        if (!proposal) return null
+
+        // AuthZ: ADMIN or USER who belongs to this company
+        if (session.user.role !== 'ADMIN' && session.user.companyId !== proposal.companyId) {
+            return null
+        }
+
+        return proposal
     } catch (e) {
         return null
     }
@@ -122,17 +146,17 @@ export async function getProposal(id: string) {
 
 export async function createProposal(input: ProposalInput | any): Promise<ActionResult> {
     try {
-        await auth()
+        const session = await auth()
+        if (session?.user?.role !== 'ADMIN') return { success: false, error: 'Unauthorized' }
         const validated = ProposalSchema.parse(input)
 
-        let subtotal = 0
+        let subtotal = new Decimal(0)
         validated.items.forEach(item => {
-            subtotal += item.quantity * item.unitPrice
+            subtotal = subtotal.plus(toDecimal(item.quantity).mul(toDecimal(item.unitPrice)))
         })
 
         const taxRate = validated.taxRate || 20
-        const taxAmount = subtotal * (taxRate / 100)
-        const total = subtotal + taxAmount
+        const { taxAmount, total } = calculateTaxPrecise(subtotal, taxRate)
 
         const proposal = await prisma.proposal.create({
             data: {
@@ -142,22 +166,25 @@ export async function createProposal(input: ProposalInput | any): Promise<Action
                 currency: validated.currency,
                 notes: validated.notes,
                 status: ProposalStatus.DRAFT,
-                subtotal,
-                taxRate,
-                taxAmount,
-                total,
+                subtotal: subtotal.toString(),
+                taxRate: taxRate.toString(),
+                taxAmount: taxAmount.toString(),
+                total: total.toString(),
                 items: {
-                    create: validated.items.map(item => ({
-                        description: item.description,
-                        quantity: item.quantity,
-                        unitPrice: item.unitPrice,
-                        totalPrice: item.quantity * item.unitPrice
-                    }))
+                    create: validated.items.map(item => {
+                        const itemSubtotal = toDecimal(item.quantity).mul(toDecimal(item.unitPrice))
+                        return {
+                            description: item.description,
+                            quantity: item.quantity,
+                            unitPrice: toDecimal(item.unitPrice).toString(),
+                            totalPrice: itemSubtotal.toString()
+                        }
+                    })
                 }
             }
         })
 
-        await logActivity('CREATE', 'Proposal', proposal.id, { subject: validated.subject, total })
+        await logActivity('CREATE', 'Proposal', proposal.id, { subject: validated.subject, total: total.toString() })
         revalidatePath('/admin/proposals')
         return { success: true, data: proposal }
     } catch (e: any) {
@@ -171,17 +198,21 @@ export async function generateApprovalToken(id: string): Promise<ActionResult> {
         const session = await auth()
         if (session?.user?.role !== 'ADMIN') return { success: false, error: 'Unauthorized' }
 
-        const token = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
+        const token = crypto.randomBytes(32).toString('hex')
+        const hashedToken = crypto.createHash('sha256').update(token).digest('hex')
+        const expiresAt = new Date()
+        expiresAt.setDate(expiresAt.getDate() + 7) // 7 days expiry
 
         await prisma.proposal.update({
             where: { id },
             data: {
-                approvalToken: token,
+                approvalToken: hashedToken,
+                tokenExpiresAt: expiresAt,
                 status: 'SENT'
             }
         })
 
-        await logActivity('UPDATE', 'Proposal', id, { action: 'GENERATE_TOKEN', status: 'SENT' })
+        await logActivity('UPDATE', 'Proposal', id, { action: 'GENERATE_TOKEN', status: 'SENT', expiresAt })
         revalidatePath(`/admin/proposals/${id}`)
         return { success: true, data: token }
     } catch (e) {
@@ -301,13 +332,18 @@ export async function getProposalByToken(token: string) {
         const limit = await checkRateLimit(`proposal:view:${ip}`, { limit: 10, windowSeconds: 3600 })
         if (!limit.success) return { success: false as const, error: 'Çok fazla deneme yaptınız.' }
 
+        const hashedToken = crypto.createHash('sha256').update(token).digest('hex')
         const proposal = await prisma.proposal.findUnique({
-            where: { approvalToken: token },
+            where: { approvalToken: hashedToken },
             include: { company: { select: { name: true } }, items: true }
         })
 
         if (!proposal) return { success: false as const, error: 'Geçersiz link.' }
         if (proposal.status === 'ACCEPTED') return { success: false as const, error: 'Zaten onaylanmış.' }
+
+        if (proposal.tokenExpiresAt && proposal.tokenExpiresAt < new Date()) {
+            return { success: false as const, error: 'Bu linkin süresi dolmuş.' }
+        }
 
         return {
             success: true as const,
@@ -343,6 +379,10 @@ export async function approveProposalByToken(token: string) {
 
         const proposal = await prisma.proposal.findUnique({ where: { approvalToken: token } })
         if (!proposal || proposal.status === 'ACCEPTED') return { success: false, error: 'Geçersiz veya zaten onaylı.' }
+
+        if (proposal.tokenExpiresAt && proposal.tokenExpiresAt < new Date()) {
+            return { success: false, error: 'Bu linkin süresi dolmuş.' }
+        }
 
         await prisma.proposal.update({
             where: { id: proposal.id },

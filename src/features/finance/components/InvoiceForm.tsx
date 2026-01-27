@@ -24,11 +24,20 @@ export function InvoiceForm({ companies, initialInvoiceNo }: InvoiceFormProps) {
     const router = useRouter()
     const [subtotal, setSubtotal] = useState<number>(0)
     const [taxRate, setTaxRate] = useState<number>(20)
+    const [idempotencyKey, setIdempotencyKey] = useState<string>('')
+
+    useEffect(() => {
+        // Generate key on client-side mount
+        setIdempotencyKey(crypto.randomUUID())
+    }, [])
 
     const taxAmount = subtotal * (taxRate / 100)
     const total = subtotal + taxAmount
 
     const formAction = async (prevState: ActionResult, formData: FormData) => {
+        if (idempotencyKey) {
+            formData.set('idempotencyKey', idempotencyKey)
+        }
         return await createInvoice(formData)
     }
 
@@ -38,8 +47,18 @@ export function InvoiceForm({ companies, initialInvoiceNo }: InvoiceFormProps) {
         if (state.success) {
             router.push('/admin/invoices')
             router.refresh()
+        } else if (state.error) {
+            // Regenerate key on failure to allow retry if it was a logic error
+            // But if it was network error, maybe keep key? 
+            // Better to keep key strictly for "Duplicate Submission" protection.
+            // If error is business logic (e.g. invalid date), new key needed?
+            // Actually, idempotency is for "Same Request". If I change data, I need new key.
+            // But here we are just preventing double-click.
+            // Let's keep it simple: retry with same key usually implies EXACT same request.
+            // If user changes data, they are editing the form, so maybe we should watch form changes?
+            // For now, let's just leave it. If they submit again with same key and same data, they get cached result (success) or re-run (error).
         }
-    }, [state.success, router])
+    }, [state.success, state.error, router])
 
     const formatCurrency = (amount: number) => {
         return new Intl.NumberFormat('tr-TR', {
@@ -50,6 +69,8 @@ export function InvoiceForm({ companies, initialInvoiceNo }: InvoiceFormProps) {
 
     return (
         <form action={action} className="space-y-6">
+            <input type="hidden" name="idempotencyKey" value={idempotencyKey} />
+
             {/* Error Message */}
             {!state.success && state.error && (
                 <div className="p-4 bg-red-50 border border-red-200 rounded-xl flex items-center gap-3 text-red-700">

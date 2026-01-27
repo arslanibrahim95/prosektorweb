@@ -5,7 +5,7 @@ import { revalidatePath } from 'next/cache'
 import { auth } from '@/auth'
 import { getErrorMessage, getZodErrorMessage, isPrismaUniqueConstraintError } from '@/lib/action-types'
 import { z } from 'zod'
-import { encryptSensitive } from '@/lib/auth/crypto'
+import { encrypt } from '@/lib/auth/crypto'
 import { checkRateLimit, getClientIp } from '@/lib/rate-limit'
 import { AuditAction, DomainStatus } from '@prisma/client'
 
@@ -52,6 +52,9 @@ const DomainSchema = z.object({
 // Stats
 export async function getDomainStats() {
     try {
+        const session = await auth()
+        if (session?.user?.role !== 'ADMIN') return { total: 0, active: 0, pending: 0, suspended: 0, expired: 0, expiringSoon: 0 }
+
         const [total, active, pending, suspended, expired] = await Promise.all([
             prisma.domain.count({ where: { deletedAt: null } }),
             prisma.domain.count({ where: { status: 'ACTIVE', deletedAt: null } }),
@@ -109,9 +112,18 @@ async function logActivity(action: AuditAction, entity: string, entityId: string
 
 export async function getDomains(page: number = 1, limit: number = 20, search?: string) {
     try {
+        const session = await auth()
+        if (!session?.user) return { data: [], meta: { total: 0, page: 1, limit: 20, totalPages: 0 } }
+
         const skip = (page - 1) * limit
         const where: any = {
             deletedAt: null
+        }
+
+        // AuthZ: Non-admins can only see their own company's domains
+        if (session.user.role !== 'ADMIN') {
+            if (!session.user.companyId) return { data: [], meta: { total: 0, page: 1, limit: 20, totalPages: 0 } }
+            where.companyId = session.user.companyId
         }
 
         if (search) {
@@ -152,7 +164,10 @@ export async function getDomains(page: number = 1, limit: number = 20, search?: 
 
 export async function getDomain(id: string) {
     try {
-        return await prisma.domain.findUnique({
+        const session = await auth()
+        if (!session?.user) return null
+
+        const domain = await prisma.domain.findUnique({
             where: { id },
             include: {
                 company: true,
@@ -160,6 +175,15 @@ export async function getDomain(id: string) {
                 webProjects: true
             }
         })
+
+        if (!domain) return null
+
+        // AuthZ: ADMIN or USER who belongs to this company
+        if (session.user.role !== 'ADMIN' && session.user.companyId !== domain.companyId) {
+            return null
+        }
+
+        return domain
     } catch (e) {
         return null
     }
@@ -344,21 +368,24 @@ export async function saveApiConfig(formData: FormData): Promise<ActionResult> {
         const apiSecret = formData.get('apiSecret') as string
         const apiEndpoint = formData.get('apiEndpoint') as string
 
-        // In real app, encrypt here. For now, simple save.
+        // Encrypt sensitive keys
+        const encryptedApiKey = apiKey ? encrypt(apiKey) : undefined
+        const encryptedApiSecret = apiSecret ? encrypt(apiSecret) : undefined
+
         await prisma.apiConfig.upsert({
             where: { provider },
             update: {
                 name,
-                apiKey: apiKey || undefined, // Only update if provided
-                apiSecret: apiSecret || undefined,
+                apiKey: encryptedApiKey, // Only update if provided
+                apiSecret: encryptedApiSecret,
                 apiEndpoint,
                 isActive: true
             },
             create: {
                 provider,
                 name,
-                apiKey,
-                apiSecret,
+                apiKey: encryptedApiKey || '',
+                apiSecret: encryptedApiSecret || '',
                 apiEndpoint,
                 isActive: true
             }

@@ -1,7 +1,7 @@
 'use client'
 
 import { useActionState, useState } from 'react'
-import { updateProject, ActionResult } from '@/actions/projects'
+import { updateProject, ActionResult } from '@/features/projects/actions/projects'
 import { Loader2, Save, CheckCircle2 } from 'lucide-react'
 
 interface Props {

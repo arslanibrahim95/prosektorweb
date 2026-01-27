@@ -6,7 +6,7 @@ import {
     TrendingUp, TrendingDown, AlertTriangle, Clock,
     ArrowRight, Plus, Eye, Database, Server, Globe, Shield,
     DollarSign, Briefcase, Activity as ActivityIcon,
-    Wallet, CreditCard, PieChart
+    Wallet, CreditCard, PieChart, Settings
 } from 'lucide-react'
 import SpotlightCard from '@/components/ui/SpotlightCard'
 import { GradientButton } from '@/components/ui/GradientButton'
@@ -39,161 +39,181 @@ export default async function SuperAdminDashboard() {
 
     return (
         <div className="space-y-8 pb-10">
-            {/* Page Header */}
-            <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                className="flex flex-col md:flex-row md:items-center justify-between gap-4"
-            >
-                <div>
-                    <h1 className="text-4xl font-bold text-neutral-900 font-serif tracking-tight">Yönetim Paneli</h1>
-                    <p className="text-neutral-500 mt-1 flex items-center gap-2">
-                        <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                        Sistem genelinde canlı performans ve aktivite özeti
-                    </p>
-                </div>
-                <div className="flex items-center gap-3">
-                    <span className="text-sm font-bold bg-white px-5 py-2.5 rounded-2xl border border-neutral-200 text-neutral-700 shadow-sm flex items-center gap-2">
-                        <Clock className="w-4 h-4 text-brand-500" />
-                        {new Date().toLocaleDateString('tr-TR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
-                    </span>
-                </div>
-            </motion.div>
-
-            {/* Database Error Alert */}
-            {stats.error && (
+            <div className="space-y-10 pb-16">
+                {/* Page Header - Command Center Style */}
                 <motion.div
-                    initial={{ scale: 0.9, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    className="p-4 bg-red-50 border border-red-200 rounded-2xl flex items-center gap-4"
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="flex flex-col md:flex-row md:items-end justify-between gap-6"
                 >
-                    <div className="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center shrink-0">
-                        <AlertTriangle className="w-6 h-6 text-red-600" />
+                    <div className="space-y-2">
+                        <div className="flex items-center gap-2 text-brand-600 font-black text-xs uppercase tracking-[.3em]">
+                            <Shield className="w-4 h-4" />
+                            Super Admin Command Center
+                        </div>
+                        <h1 className="text-5xl md:text-6xl font-black text-neutral-900 tracking-tighter">
+                            Kontrol <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-600 to-purple-600">Paneli</span>
+                        </h1>
+                        <p className="text-neutral-500 text-lg max-w-2xl font-medium">
+                            Platform genelindeki tüm operasyonları, finansal akışı ve AI üretim hattını buradan yönetin.
+                        </p>
                     </div>
-                    <div className="flex-1">
-                        <h3 className="font-bold text-red-800">Veri Bağlantı Hatası</h3>
-                        <p className="text-sm text-red-600">Veritabanına erişilemiyor. Gösterilen veriler önbellekten gelmiş olabilir.</p>
-                    </div>
-                </motion.div>
-            )}
 
-            {/* FINANCIAL PULSE */}
-            <motion.div
-                variants={container}
-                initial="hidden"
-                animate="show"
-                className="grid grid-cols-1 md:grid-cols-3 gap-6"
-            >
-                <motion.div variants={item}>
-                    <SpotlightCard className="border-neutral-200 bg-white" spotlightColor="rgba(34, 197, 94, 0.1)">
-                        <div className="flex items-start justify-between mb-4">
-                            <div className="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center text-green-600">
-                                <Wallet className="w-6 h-6" />
+                    <div className="flex items-center gap-3">
+                        <div className="hidden lg:flex flex-col items-end mr-4">
+                            <span className="text-[10px] font-black text-neutral-400 uppercase tracking-widest">Sistem Zamanı</span>
+                            <span className="text-sm font-mono font-bold text-neutral-900">
+                                {new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}
+                            </span>
+                        </div>
+                        <div className="bg-white p-1 rounded-2xl border border-neutral-200 shadow-xl shadow-neutral-200/40 flex items-center gap-1">
+                            <span className="px-4 py-2 text-sm font-bold text-neutral-700">Canlı İzleme</span>
+                            <div className="w-8 h-8 bg-green-500 rounded-xl flex items-center justify-center animate-pulse">
+                                <ActivityIcon className="w-4 h-4 text-white" />
                             </div>
-                            <span className="text-[10px] font-black uppercase tracking-wider bg-green-100 text-green-700 px-2 py-1 rounded-lg">Ciro</span>
                         </div>
-                        <div className="text-3xl font-bold text-neutral-900 mb-1 leading-none">{formatCurrency(stats.totalRevenue)}</div>
-                        <div className="text-xs font-bold text-neutral-400 uppercase tracking-widest">Tahsil Edilen Toplam</div>
-                    </SpotlightCard>
-                </motion.div>
-
-                <motion.div variants={item}>
-                    <SpotlightCard className="border-neutral-200 bg-white" spotlightColor="rgba(249, 115, 22, 0.1)">
-                        <div className="flex items-start justify-between mb-4">
-                            <div className="w-12 h-12 bg-orange-50 rounded-xl flex items-center justify-center text-orange-600">
-                                <CreditCard className="w-6 h-6" />
-                            </div>
-                            <span className="text-[10px] font-black uppercase tracking-wider bg-orange-100 text-orange-700 px-2 py-1 rounded-lg">Alacak</span>
-                        </div>
-                        <div className="text-3xl font-bold text-neutral-900 mb-1 leading-none">{formatCurrency(stats.outstandingReceivables)}</div>
-                        <div className="text-xs font-bold text-neutral-400 uppercase tracking-widest">Bekleyen Faturalar</div>
-                    </SpotlightCard>
-                </motion.div>
-
-                {/* REMOVED: Monthly MRR Projection (Advanced) */}
-
-            </motion.div>
-
-            {/* CHART SECTION */}
-            <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4 }}
-                className="bg-white rounded-3xl border border-neutral-200 p-8 shadow-sm overflow-hidden relative"
-            >
-                <div className="flex items-center justify-between mb-8">
-                    <div>
-                        <h3 className="text-xl font-bold text-neutral-900">Finansal Akış</h3>
-                        <p className="text-sm text-neutral-500">Son 6 aylık tahsilat ve alacak dengesi</p>
                     </div>
-                    <div className="flex items-center gap-4">
-                        <div className="flex items-center gap-2">
-                            <div className="w-3 h-3 bg-green-500 rounded-full" />
-                            <span className="text-xs font-bold text-neutral-600 uppercase">Tahsilat</span>
+                </motion.div>
+
+                {/* FINANCIAL PULSE - Premium Cards */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <motion.div variants={item} className="lg:col-span-2">
+                        <div className="bg-white rounded-[2.5rem] border border-neutral-200 p-8 shadow-sm h-full relative overflow-hidden group">
+                            <div className="absolute top-0 right-0 p-8">
+                                <div className="w-16 h-16 bg-emerald-50 rounded-3xl flex items-center justify-center text-emerald-600 group-hover:scale-110 transition-transform">
+                                    <TrendingUp className="w-8 h-8" />
+                                </div>
+                            </div>
+                            <div className="relative z-10">
+                                <span className="text-xs font-black text-neutral-400 uppercase tracking-widest mb-4 block">Toplam Ciro & Tahsilat</span>
+                                <div className="text-6xl font-black text-neutral-900 mb-6 tracking-tighter">
+                                    {formatCurrency(stats.totalRevenue)}
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-8 border-t border-neutral-100 pt-8">
+                                    <div>
+                                        <span className="text-[10px] font-black text-neutral-400 uppercase tracking-widest mb-1 block">Bekleyen Alacak</span>
+                                        <div className="text-2xl font-bold text-orange-600">{formatCurrency(stats.outstandingReceivables)}</div>
+                                    </div>
+                                    <div>
+                                        <span className="text-[10px] font-black text-neutral-400 uppercase tracking-widest mb-1 block">Aylık Hedef (MRR)</span>
+                                        <div className="text-2xl font-bold text-brand-600">{formatCurrency(stats.mrr)}</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-brand-500 via-emerald-500 to-purple-500" />
                         </div>
-                        <div className="flex items-center gap-2">
-                            <div className="w-3 h-3 bg-orange-500 rounded-full" />
-                            <span className="text-xs font-bold text-neutral-600 uppercase">Bekleyen</span>
-                        </div>
+                    </motion.div>
+
+                    <div className="space-y-6">
+                        <StatsCard
+                            href="/admin/companies"
+                            icon={Building2}
+                            label="Aktif Müşteri"
+                            value={stats.companies}
+                            color="brand"
+                        />
+                        <StatsCard
+                            href="/admin/projects"
+                            icon={Briefcase}
+                            label="Aktif AI Üretimi"
+                            value={stats.pendingProjects}
+                            color="purple"
+                            badge="Süreçte"
+                        />
                     </div>
                 </div>
-                <DashboardChart data={stats.chartData} />
-            </motion.div>
 
-            {/* MAIN STATS GRID */}
-            <motion.div
-                variants={container}
-                initial="hidden"
-                animate="show"
-                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
-            >
-                <StatsCard
-                    href="/admin/companies"
-                    icon={Building2}
-                    label="Firma"
-                    value={stats.companies}
-                    color="brand"
-                />
-                <StatsCard
-                    href="/admin/workplaces"
-                    icon={Layers}
-                    label="İşyeri"
-                    value={stats.workplaces}
-                    color="purple"
-                />
-                <StatsCard
-                    href="/admin/projects"
-                    icon={Briefcase}
-                    label="Proje"
-                    value={stats.pendingProjects}
-                    color="amber"
-                    badge="Süreçte"
-                />
-                <StatsCard
-                    href="/admin/tickets"
-                    icon={MessageSquare}
-                    label="Destek"
-                    value={stats.activeTickets}
-                    color="red"
-                    badge="Açık"
-                />
-            </motion.div>
+                {/* AI PRODUCTION LINE & CHART */}
+                <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
+                    {/* CHART */}
+                    <motion.div
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        className="lg:col-span-3 bg-neutral-900 rounded-[2.5rem] p-8 border border-white/5 shadow-2xl relative overflow-hidden"
+                    >
+                        <div className="absolute top-0 right-0 w-64 h-64 bg-brand-600/10 blur-[100px] rounded-full -mr-32 -mt-32" />
 
-            {/* QUICK ACTIONS (Hero for Mid-Level) */}
-            <div className="bg-neutral-50 rounded-3xl border border-neutral-200 p-8 shadow-sm text-center">
-                <h3 className="text-lg font-bold text-neutral-900 mb-6 font-serif">Hızlı İşlemler</h3>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
-                    <QuickAction href="/admin/invoices/new" icon={DollarSign} label="Fatura Kes" color="green" />
-                    <QuickAction href="/admin/companies/new" icon={Plus} label="Firma Ekle" color="brand" />
-                    <QuickAction href="/admin/tickets" icon={MessageSquare} label="Destek Talebi" color="red" />
-                    <QuickAction href="/admin/users/new" icon={Users} label="Kullanıcı Davet Et" color="purple" />
+                        <div className="flex items-center justify-between mb-10 relative z-10">
+                            <div>
+                                <h3 className="text-xl font-bold text-white">Gelir Analizi</h3>
+                                <p className="text-sm text-neutral-400">Son 6 aylık performans verisi</p>
+                            </div>
+                            <div className="flex items-center gap-4 bg-white/5 p-2 rounded-xl border border-white/10">
+                                <div className="flex items-center gap-2 px-2">
+                                    <div className="w-2 h-2 bg-emerald-500 rounded-full" />
+                                    <span className="text-[10px] font-bold text-neutral-300 uppercase">Gelir</span>
+                                </div>
+                                <div className="flex items-center gap-2 px-2">
+                                    <div className="w-2 h-2 bg-orange-500 rounded-full" />
+                                    <span className="text-[10px] font-bold text-neutral-300 uppercase">Alacak</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="relative z-10 invert brightness-150 contrast-125 opacity-90">
+                            <DashboardChart data={stats.chartData} />
+                        </div>
+                    </motion.div>
+
+                    {/* AI PRODUCTION LINE */}
+                    <motion.div
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        className="lg:col-span-2 bg-white rounded-[2.5rem] border border-neutral-200 p-8 shadow-sm"
+                    >
+                        <div className="flex items-center justify-between mb-8">
+                            <div>
+                                <h3 className="text-xl font-bold text-neutral-900">AI Üretim Hattı</h3>
+                                <p className="text-sm text-neutral-500">Son üretim aktiviteleri</p>
+                            </div>
+                            <div className="w-10 h-10 bg-purple-50 text-purple-600 rounded-xl flex items-center justify-center">
+                                <ActivityIcon className="w-5 h-5" />
+                            </div>
+                        </div>
+
+                        <div className="space-y-4">
+                            {recentActivities.filter(a => a.entity === 'WebProject' || a.action === 'CREATE').slice(0, 5).map((activity) => (
+                                <div key={activity.id} className="flex items-center gap-4 p-4 bg-neutral-50 rounded-2xl hover:bg-neutral-100 transition-colors group">
+                                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${activity.action === 'CREATE' ? 'bg-green-100 text-green-600' : 'bg-brand-100 text-brand-600'
+                                        }`}>
+                                        {activity.entity === 'WebProject' ? <Globe className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <div className="font-bold text-neutral-900 truncate text-sm">
+                                            {activity.details?.name || activity.entity}
+                                        </div>
+                                        <div className="text-[10px] font-bold text-neutral-400 uppercase tracking-tighter">
+                                            {activity.action === 'CREATE' ? 'YENİ OLUŞTURULDU' : 'GÜNCELLENDİ'} • {new Date(activity.createdAt).toLocaleDateString('tr-TR')}
+                                        </div>
+                                    </div>
+                                    <ArrowRight className="w-4 h-4 text-neutral-300 group-hover:text-neutral-900 group-hover:translate-x-1 transition-all" />
+                                </div>
+                            ))}
+
+                            <Link href="/admin/audit" className="flex items-center justify-center gap-2 w-full py-4 text-sm font-bold text-neutral-400 hover:text-brand-600 transition-colors group">
+                                Tüm Aktiviteyi Gör
+                                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-all" />
+                            </Link>
+                        </div>
+                    </motion.div>
+                </div>
+
+                {/* QUICK ACTIONS - Command Style */}
+                <div className="bg-gradient-to-br from-neutral-900 to-neutral-800 rounded-[3rem] p-12 shadow-2xl relative overflow-hidden">
+                    <div className="absolute top-0 left-0 w-full h-full bg-[url('/grid.svg')] opacity-10" />
+                    <div className="relative z-10 flex flex-col items-center">
+                        <h3 className="text-2xl font-black text-white mb-10 tracking-tight">Hızlı Komuta İşlemleri</h3>
+                        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 w-full max-w-5xl">
+                            <QuickAction href="/admin/invoices/new" icon={DollarSign} label="Yeni Fatura" color="green" />
+                            <QuickAction href="/admin/companies/new" icon={Plus} label="Firma Kaydı" color="brand" />
+                            <QuickAction href="/admin/projects" icon={Globe} label="AI Site Üret" color="purple" />
+                            <QuickAction href="/admin/settings" icon={Settings} label="Sistem Ayarları" color="neutral" />
+                        </div>
+                    </div>
                 </div>
             </div>
-
         </div>
-    )
-}
-        </div >
     )
 }
 

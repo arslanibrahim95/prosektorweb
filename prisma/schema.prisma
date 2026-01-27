@@ -187,7 +187,8 @@ model Invoice {
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
   deletedAt     DateTime?     // Soft Delete
-  version       Int           @default(0)
+  idempotencyKey String?       @unique // Idempotency check
+  version        BigInt        @default(0)
 
   @@index([companyId])
   @@index([status])
@@ -211,9 +212,9 @@ model Payment {
   
   createdAt     DateTime      @default(now())
 
-  // Soft Delete
-  deletedAt     DateTime?
-  deletedBy     String?
+  idempotencyKey String?       @unique // Idempotency check 
+  deletedAt     DateTime?     // Soft Delete
+  version       BigInt        @default(0)
   
   @@index([invoiceId])
   @@index([paymentDate])
@@ -239,9 +240,11 @@ model Workplace {
 
   createdAt      DateTime    @default(now())
   updatedAt      DateTime    @updatedAt
+  deletedAt      DateTime?   // Soft Delete
 
   @@index([companyId])
   @@index([sgkId])
+  @@index([deletedAt])
 }
 
 // 3. Çalışanlar (Personel Listesi)
@@ -287,6 +290,7 @@ model SystemUser {
   lastName       String?
   role           UserRole @default(OFFICE)
   isActive       Boolean  @default(true)
+  sessionVersion BigInt   @default(0)
 
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
@@ -325,7 +329,7 @@ model BlogPost {
   // Meta
   authorName      String?       @default("ProSektorWeb")
   readingTime     Int?          @default(5)
-  viewCount       Int           @default(0)
+  viewCount       BigInt        @default(0)
   
   // SEO
   metaTitle       String?       @db.VarChar(500)
@@ -486,10 +490,11 @@ model Proposal {
   // Müşteri Onayı
   approvedAt  DateTime?      // Müşteri onay tarihi
   approvalToken String?      @unique // Dijital onay linki için token
+  tokenExpiresAt DateTime?   // Token geçerlilik süresi
   
   createdAt   DateTime       @default(now())
   updatedAt   DateTime       @updatedAt
-  version     Int            @default(0)
+  version     BigInt         @default(0)
 
   @@index([companyId])
   @@index([status])
@@ -627,7 +632,7 @@ model WebProject {
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
   deletedAt   DateTime?     // Soft Delete
-  version     Int           @default(0)
+  version     BigInt        @default(0)
 
   @@index([companyId])
   @@index([domainId])
@@ -643,9 +648,11 @@ enum PipelineStage {
   INPUT
   RESEARCH
   DESIGN
+  IMAGES    // Gemini Imagen gorsel uretimi
   CONTENT
   SEO
   BUILD
+  UI_UX     // UI/UX quality checks
   REVIEW
   PUBLISH
 }
@@ -700,6 +707,7 @@ enum ContentType {
   CONTACT
   BLOG
   FAQ
+  DESIGN
 }
 
 enum ContentStatus {
@@ -858,16 +866,20 @@ enum Role {
 }
 
 model User {
-  id          String    @id @default(uuid())
-  name        String?
-  email       String    @unique
-  password    String    @db.Text // Hashed Password (bcrypt)
-  role        Role      @default(CLIENT)
-  companyId   String?
-  company     Company?  @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  deletedAt   DateTime? // Soft Delete
+  id             String    @id @default(uuid())
+  email          String    @unique
+  password       String
+  name           String?
+  role           String    @default("CLIENT")
+  companyId      String?
+  company        Company?  @relation(fields: [companyId], references: [id])
+  
+  isActive       Boolean   @default(true)
+  sessionVersion BigInt    @default(0) // For session invalidation
+  
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  deletedAt      DateTime? // Soft Delete
 
   @@index([companyId])
   @@index([deletedAt])
@@ -1103,4 +1115,12 @@ model LeadCapture {
 // SECURITY & SYSTEM
 // ===============================
 
-// RateLimit model removed in favor of Redis (Phase 4)
+model PasswordResetToken {
+  id        String   @id @default(uuid())
+  email     String
+  token     String   @unique // Hashed token
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([email])
+}

@@ -1,5 +1,6 @@
 import { getDomains, getDomainStats } from '@/features/projects/actions/domains'
 import Link from 'next/link'
+import { Pagination } from '@/components/ui/Pagination'
 import {
     Globe,
     Plus,
@@ -16,7 +17,7 @@ import {
 } from 'lucide-react'
 
 interface DomainsPageProps {
-    searchParams: Promise<{ q?: string, search?: string }>
+    searchParams: Promise<{ q?: string, search?: string, page?: string }>
 }
 
 const statusConfig: Record<string, { label: string, color: string }> = {
@@ -29,13 +30,14 @@ const statusConfig: Record<string, { label: string, color: string }> = {
 export default async function DomainsPage({ searchParams }: DomainsPageProps) {
     const params = await searchParams
     const searchQuery = params.q || params.search || ''
+    const page = parseInt(params.page || '1')
 
     const [domainsData, stats] = await Promise.all([
-        getDomains(1, 100, searchQuery), // TODO: Implement real pagination in UI
+        getDomains(page, 20, searchQuery),
         getDomainStats(),
     ])
 
-    const { data: domains } = domainsData
+    const { data: domains, meta } = domainsData
 
     return (
         <div className="space-y-6">
@@ -219,6 +221,12 @@ export default async function DomainsPage({ searchParams }: DomainsPageProps) {
                     </table>
                 </div>
             )}
+
+            <Pagination
+                currentPage={meta.page}
+                totalPages={meta.totalPages}
+                baseUrl="/admin/domains"
+            />
         </div>
     )
 }

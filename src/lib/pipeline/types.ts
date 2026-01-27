@@ -13,9 +13,11 @@ export const PIPELINE_STAGES = [
   "input",
   "research",
   "design",
+  "images",    // NEW: Gemini Imagen ile görsel üretimi
   "content",
   "seo",
   "build",
+  "ui_ux",     // NEW: UI/UX quality checks
   "review",
   "publish"
 ] as const;
@@ -165,6 +167,58 @@ export interface DesignStageOutput {
 }
 
 export interface DesignStageExpectation {
+  nextStage: "images";
+  expectedOutputs: {
+    imageCount: number;
+    imageTypes: string[];
+    estimatedGenerationTime: string;
+  };
+}
+
+// ============================================
+// STAGE 4: IMAGES (Gemini Imagen)
+// ============================================
+
+export interface ImagesStageInput {
+  projectId: string;
+  company: InputStageOutput["company"];
+  design: DesignStageOutput;
+  pages: InputStageOutput["pages"];
+}
+
+export interface GeneratedImage {
+  id: string;
+  type: "hero" | "feature" | "background" | "icon" | "illustration" | "photo";
+  prompt: string;
+  url: string;
+  localPath?: string;
+  width: number;
+  height: number;
+  format: "webp" | "png" | "jpg";
+  altText: string;
+  page?: string; // Which page this image belongs to
+  section?: string; // Which section (hero, features, etc.)
+}
+
+export interface ImagesStageOutput {
+  projectId: string;
+  images: GeneratedImage[];
+  totalImages: number;
+  generationStats: {
+    model: string;
+    totalGenerations: number;
+    successCount: number;
+    failedCount: number;
+    duration: number;
+  };
+  // Organized by usage
+  heroImages: GeneratedImage[];
+  featureIcons: GeneratedImage[];
+  backgroundImages: GeneratedImage[];
+  illustrations: GeneratedImage[];
+}
+
+export interface ImagesStageExpectation {
   nextStage: "content";
   expectedOutputs: {
     pageCount: number;
@@ -174,7 +228,7 @@ export interface DesignStageExpectation {
 }
 
 // ============================================
-// STAGE 4: CONTENT
+// STAGE 5: CONTENT
 // ============================================
 
 export interface ContentStageInput {
@@ -183,6 +237,7 @@ export interface ContentStageInput {
   pages: InputStageOutput["pages"];
   research?: ResearchStageOutput;
   design: DesignStageOutput;
+  images?: ImagesStageOutput; // Generated images to reference in content
 }
 
 export interface PageContent {
@@ -330,16 +385,85 @@ export interface BuildStageOutput {
 }
 
 export interface BuildStageExpectation {
-  nextStage: "review";
+  nextStage: "ui_ux";
   expectedOutputs: {
-    reviewChecks: string[];
+    uiuxChecks: string[];
     potentialIssues: string[];
     qualityScore: number;
   };
 }
 
 // ============================================
-// STAGE 7: REVIEW
+// STAGE 7: UI/UX (Quality Control)
+// ============================================
+
+export interface UiUxStageInput {
+  projectId: string;
+  build: BuildStageOutput;
+  design: DesignStageOutput;
+  previewUrl?: string;
+}
+
+export interface UiUxCheck {
+  category: "performance" | "accessibility" | "responsive" | "contrast" | "typography" | "forms" | "loading";
+  name: string;
+  status: "pass" | "warning" | "fail";
+  score: number;
+  details: string;
+  recommendation?: string;
+}
+
+export interface UiUxStageOutput {
+  projectId: string;
+  overallScore: number;
+
+  // Lighthouse scores
+  lighthouse: {
+    performance: number;
+    accessibility: number;
+    bestPractices: number;
+    seo: number;
+  };
+
+  // Detailed checks
+  checks: UiUxCheck[];
+
+  // Responsive test results
+  responsiveTests: {
+    mobile: { passed: boolean; issues: string[] };
+    tablet: { passed: boolean; issues: string[] };
+    desktop: { passed: boolean; issues: string[] };
+  };
+
+  // Accessibility issues
+  a11yIssues: {
+    critical: string[];
+    serious: string[];
+    moderate: string[];
+  };
+
+  // Color contrast issues
+  contrastIssues: {
+    element: string;
+    foreground: string;
+    background: string;
+    ratio: number;
+    required: number;
+  }[];
+
+  readyForReview: boolean;
+}
+
+export interface UiUxStageExpectation {
+  nextStage: "review";
+  expectedOutputs: {
+    estimatedScore: number;
+    criticalChecks: string[];
+  };
+}
+
+// ============================================
+// STAGE 8: REVIEW
 // ============================================
 
 export interface ReviewStageInput {
@@ -347,6 +471,7 @@ export interface ReviewStageInput {
   company: InputStageOutput["company"];
   content: ContentStageOutput;
   build: BuildStageOutput;
+  uiUx: UiUxStageOutput;
 }
 
 export interface ReviewCheck {
@@ -381,7 +506,7 @@ export interface ReviewStageExpectation {
 }
 
 // ============================================
-// STAGE 8: PUBLISH
+// STAGE 9: PUBLISH
 // ============================================
 
 export interface PublishStageInput {
@@ -449,9 +574,11 @@ export interface PipelineState {
     input: StageResult<InputStageOutput, InputStageExpectation>;
     research: StageResult<ResearchStageOutput, ResearchStageExpectation>;
     design: StageResult<DesignStageOutput, DesignStageExpectation>;
+    images: StageResult<ImagesStageOutput, ImagesStageExpectation>;
     content: StageResult<ContentStageOutput, ContentStageExpectation>;
     seo: StageResult<SeoStageOutput, SeoStageExpectation>;
     build: StageResult<BuildStageOutput, BuildStageExpectation>;
+    ui_ux: StageResult<UiUxStageOutput, UiUxStageExpectation>;
     review: StageResult<ReviewStageOutput, ReviewStageExpectation>;
     publish: StageResult<PublishStageOutput, PublishStageExpectation>;
   };
@@ -471,7 +598,7 @@ export interface PipelineState {
 // STAGE METADATA
 // ============================================
 
-export type AIProviderType = "claude" | "chatgpt" | "gemini" | "codex" | "manual";
+export type AIProviderType = "claude" | "chatgpt" | "gemini" | "gemini-imagen" | "glm" | "codex" | "manual";
 
 export interface StageMetadata {
   id: PipelineStage;
@@ -535,9 +662,24 @@ export const STAGE_METADATA: Record<PipelineStage, StageMetadata> = {
     canSkip: false,
     canRetry: true,
     isInteractive: true, // Vibe mode: manual design
-    aiProvider: "claude",
-    aiProviderFallback: "chatgpt",
-    aiProviderDescription: "Claude CLI ile mimari ve tasarim kararlari",
+    aiProvider: "glm",
+    aiProviderFallback: "claude",
+    aiProviderDescription: "GLM-4 ile yapisal tasarim (JSON cikti)",
+  },
+  images: {
+    id: "images",
+    name: "Gorseller",
+    description: "Hero, ikon ve arkaplan gorselleri uretimi",
+    icon: "Image",
+    color: "#F472B6", // Pink-400
+    estimatedDuration: "2-4 dakika",
+    requiredInputs: ["company", "design", "pages"],
+    producedOutputs: ["heroImages", "featureIcons", "backgroundImages", "illustrations"],
+    canSkip: true,
+    canRetry: true,
+    isInteractive: false,
+    aiProvider: "gemini",
+    aiProviderDescription: "Gemini Imagen 3 ile gorsel uretimi",
   },
   content: {
     id: "content",
@@ -551,9 +693,9 @@ export const STAGE_METADATA: Record<PipelineStage, StageMetadata> = {
     canSkip: false,
     canRetry: true,
     isInteractive: false,
-    aiProvider: "chatgpt",
-    aiProviderFallback: "claude",
-    aiProviderDescription: "ChatGPT ile icerik uretimi",
+    aiProvider: "glm",
+    aiProviderFallback: "chatgpt",
+    aiProviderDescription: "GLM-4 Flash ile ekonomik icerik uretimi",
   },
   seo: {
     id: "seo",
@@ -586,6 +728,22 @@ export const STAGE_METADATA: Record<PipelineStage, StageMetadata> = {
     aiProvider: "gemini",
     aiProviderFallback: "claude",
     aiProviderDescription: "Gemini ile site/kod uretimi",
+  },
+  ui_ux: {
+    id: "ui_ux",
+    name: "UI/UX Kontrol",
+    description: "Gorsel tutarlilik, erisilebilirlik ve kullanici deneyimi kontrolu",
+    icon: "Eye",
+    color: "#10B981", // Emerald
+    estimatedDuration: "2-3 dakika",
+    requiredInputs: ["build", "design"],
+    producedOutputs: ["lighthouse", "checks", "responsiveTests", "a11yIssues"],
+    canSkip: false,
+    canRetry: true,
+    isInteractive: false,
+    aiProvider: "codex",
+    aiProviderFallback: "claude",
+    aiProviderDescription: "Codex ile UI/UX analizi ve oneriler",
   },
   review: {
     id: "review",

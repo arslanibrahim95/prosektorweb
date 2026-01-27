@@ -1,7 +1,7 @@
 'use client'
 
 import { useActionState, useState } from 'react'
-import { saveApiConfig, DomainActionResult } from '@/actions/domain'
+import { saveApiConfig, ActionResult as DomainActionResult } from '@/features/projects/actions/domains'
 import { Loader2, CheckCircle2 } from 'lucide-react'
 
 interface ApiConfig {
