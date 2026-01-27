@@ -20,3 +20,15 @@
 - [ ] I have commented hard-to-understand areas
 - [ ] My changes generate no new warnings/lint errors
 - [ ] I have added tests that prove my fix is effective or that my feature works
+
+# Vibe Coding Edge Case Checklist 🛡️
+<!-- Mark checked items as done. If N/A, explain why in comments. -->
+
+- [ ] **String:** Emojis, Unicode, ZWJ, RTL text handled?
+- [ ] **Numbers:** Tested with 0, negative, NaN, Infinity?
+- [ ] **Collections:** Empty array, null, undefined handled?
+- [ ] **Concurrent:** Race conditions, double-submit protection?
+- [ ] **Navigation:** Back button, Multi-tab, Refresh safety?
+- [ ] **Limits:** Pagination bounds, Integer overflow, Payload size?
+- [ ] **Null Handling:** `null` vs `undefined` vs `""` checked?
+- [ ] **Security:** Input sanitized? DevTools bypass checked?
