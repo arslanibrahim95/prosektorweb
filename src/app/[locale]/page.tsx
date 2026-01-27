@@ -30,7 +30,7 @@ export default async function HomePage() {
   const t = await getTranslations('Home')
   return (
     <LandingProvider>
-      <div className="min-h-screen bg-transparent text-neutral-900 font-sans selection:bg-brand-100 selection:text-brand-900 relative overflow-hidden">
+      <div className="min-h-screen bg-transparent text-neutral-900 dark:text-neutral-50 font-sans selection:bg-brand-100 selection:text-brand-900 relative overflow-hidden">
         <JsonLd data={{
           "@context": "https://schema.org",
           "@type": "WebSite",
@@ -46,8 +46,8 @@ export default async function HomePage() {
         {/* Fluent "Aurora" Background Effect - Enhanced */}
         {/* Optimized Static Gradient (Performance Fix) */}
         <div className="fixed inset-0 pointer-events-none -z-20 overflow-hidden">
-          <div className="absolute -top-[10%] -left-[10%] w-[50%] h-[50%] rounded-full bg-brand-100/40 blur-3xl opacity-50 mix-blend-multiply" />
-          <div className="absolute top-[20%] -right-[10%] w-[40%] h-[60%] rounded-full bg-blue-100/40 blur-3xl opacity-50 mix-blend-multiply" />
+          <div className="absolute -top-[10%] -left-[10%] w-[50%] h-[50%] rounded-full bg-brand-100/40 dark:bg-brand-900/20 blur-3xl opacity-50 mix-blend-multiply dark:mix-blend-soft-light" />
+          <div className="absolute top-[20%] -right-[10%] w-[40%] h-[60%] rounded-full bg-blue-100/40 dark:bg-indigo-900/20 blur-3xl opacity-50 mix-blend-multiply dark:mix-blend-soft-light" />
         </div>
 
         {/* Technical Grid Pattern */}
@@ -84,8 +84,8 @@ export default async function HomePage() {
         <section id="iletisim" className="py-24 relative z-0">
           <Container>
             <div className="max-w-xl mx-auto text-center mb-10">
-              <h2 className="text-3xl font-bold mb-4 text-neutral-900">{t('contact_section_title')}</h2>
-              <p className="text-neutral-500">{t('contact_section_desc')}</p>
+              <h2 className="text-3xl font-bold mb-4 text-neutral-900 dark:text-neutral-50">{t('contact_section_title')}</h2>
+              <p className="text-neutral-500 dark:text-neutral-400">{t('contact_section_desc')}</p>
             </div>
             <ContactForm />
           </Container>

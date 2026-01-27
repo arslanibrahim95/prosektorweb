@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { LucideIcon, Plus } from 'lucide-react'
+import { Button } from '@/components/ui/Button'
 
 interface EmptyStateProps {
     title: string
@@ -22,13 +23,12 @@ export function EmptyState({ title, description, icon: Icon, action }: EmptyStat
                 {description}
             </p>
             {action && (
-                <Link
-                    href={action.href}
-                    className="inline-flex items-center gap-2 px-6 py-3 bg-brand-600 text-white rounded-xl font-medium hover:bg-brand-700 transition-colors shadow-lg shadow-brand-600/30"
-                >
-                    <Plus className="w-5 h-5" />
-                    {action.label}
-                </Link>
+                <Button asChild>
+                    <Link href={action.href}>
+                        <Plus className="w-4 h-4 mr-2" />
+                        {action.label}
+                    </Link>
+                </Button>
             )}
         </div>
     )

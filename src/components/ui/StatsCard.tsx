@@ -1,4 +1,7 @@
 import { LucideIcon } from 'lucide-react'
+import { cn } from '@/lib/utils'
+
+export type StatsColor = 'brand' | 'blue' | 'green' | 'red' | 'orange' | 'yellow' | 'purple' | 'neutral'
 
 interface StatsCardProps {
     label: string
@@ -8,10 +11,11 @@ interface StatsCardProps {
         value: string
         isPositive: boolean
     }
-    color?: 'brand' | 'blue' | 'green' | 'red' | 'orange' | 'yellow' | 'purple' | 'neutral'
+    color?: StatsColor
+    className?: string
 }
 
-const colorMap = {
+const colorMap: Record<StatsColor, string> = {
     brand: 'text-brand-600 bg-brand-50',
     blue: 'text-blue-600 bg-blue-50',
     green: 'text-green-600 bg-green-50',
@@ -22,18 +26,19 @@ const colorMap = {
     neutral: 'text-neutral-600 bg-neutral-50',
 }
 
-export function StatsCard({ label, value, icon: Icon, color = 'neutral' }: StatsCardProps) {
+export function StatsCard({ label, value, icon: Icon, color = 'neutral', className }: StatsCardProps) {
     return (
-        <div className="bg-white rounded-2xl border border-neutral-200 p-5 shadow-sm">
+        <div className={cn("bg-white rounded-2xl border border-neutral-200 p-5 shadow-sm", className)}>
             <div className="flex items-center justify-between mb-2">
                 <span className="text-sm font-medium text-neutral-500">{label}</span>
                 {Icon && (
-                    <div className={`p-2 rounded-lg ${colorMap[color]}`}>
+                    <div className={cn("p-2 rounded-lg", colorMap[color])}>
                         <Icon className="w-4 h-4" />
                     </div>
                 )}
             </div>
             <div className="text-2xl font-bold text-neutral-900">{value}</div>
+            {/* Future: Add trend if needed */}
         </div>
     )
 }

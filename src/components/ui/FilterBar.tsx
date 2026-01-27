@@ -3,6 +3,7 @@
 import { Search } from 'lucide-react'
 import { useSearchParams, useRouter, usePathname } from 'next/navigation'
 import { useTransition } from 'react'
+import { Input } from '@/components/ui/Input'
 
 interface FilterOption {
     label: string
@@ -19,6 +20,7 @@ export function FilterBar({ placeholder = "Ara...", statusOptions }: FilterBarPr
     const searchParams = useSearchParams()
     const { replace } = useRouter()
     const pathname = usePathname()
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [isPending, startTransition] = useTransition()
 
     const handleSearch = (term: string) => {
@@ -49,13 +51,13 @@ export function FilterBar({ placeholder = "Ara...", statusOptions }: FilterBarPr
         <div className="bg-white rounded-2xl border border-neutral-200 p-4 shadow-sm">
             <div className="flex flex-col sm:flex-row gap-4">
                 <div className="relative flex-1">
-                    <Search className="w-5 h-5 text-neutral-400 absolute left-4 top-1/2 -translate-y-1/2" />
-                    <input
+                    <Input
                         type="text"
                         placeholder={placeholder}
                         defaultValue={searchParams.get('q')?.toString()}
                         onChange={(e) => handleSearch(e.target.value)}
-                        className="w-full pl-12 pr-4 py-3 bg-neutral-50 border-0 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 transition-shadow"
+                        leadingIcon={<Search className="w-5 h-5" />}
+                        className="bg-neutral-50 border-0 focus:ring-brand-500"
                     />
                 </div>
                 {statusOptions && (

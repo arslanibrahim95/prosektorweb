@@ -20,24 +20,24 @@ export function Footer({ }: FooterProps) {
                 >
                     {/* Wave 1 - Slowest, background */}
                     <path
-                        className="animate-wave-slow fill-brand-900/20"
+                        className="animate-wave-slow fill-brand-900/20 dark:fill-brand-900/10"
                         d="M0,60 C150,120 350,0 600,60 C850,120 1050,0 1200,60 C1350,120 1440,60 1440,60 L1440,120 L0,120 Z"
                     />
                     {/* Wave 2 - Medium speed */}
                     <path
-                        className="animate-wave-medium fill-brand-800/40"
+                        className="animate-wave-medium fill-brand-800/40 dark:fill-brand-800/20"
                         d="M0,80 C200,40 400,100 600,80 C800,60 1000,100 1200,80 C1400,60 1440,80 1440,80 L1440,120 L0,120 Z"
                     />
                     {/* Wave 3 - Fastest, foreground */}
                     <path
-                        className="animate-wave-fast fill-[#1a0a0a]"
+                        className="animate-wave-fast fill-[#1a0a0a] dark:fill-[#020617]"
                         d="M0,95 C180,70 360,110 540,95 C720,80 900,110 1080,95 C1260,80 1440,95 1440,95 L1440,120 L0,120 Z"
                     />
                 </svg>
             </div>
 
             {/* Main Footer Content */}
-            <div className="bg-gradient-to-b from-[#1a0a0a] via-[#1f0d0d] to-[#0f0505] pt-16 pb-8 px-6 relative overflow-hidden">
+            <div className="bg-[#1a0a0a] dark:bg-[#020617] pt-16 pb-8 px-6 relative overflow-hidden">
                 {/* Floating particles effect */}
                 <div className="absolute inset-0 overflow-hidden pointer-events-none">
                     <div className="absolute w-2 h-2 bg-brand-500/30 rounded-full top-20 left-[10%] animate-float-slow" />

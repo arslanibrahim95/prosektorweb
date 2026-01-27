@@ -1,7 +1,7 @@
 import { getSystemUsers } from '@/features/system/actions/system-users'
 import Link from 'next/link'
 import { Plus, Users, Shield, Clock, Search, MoreVertical, Trash2 } from 'lucide-react'
-import { PageHeader } from '@/components/admin/ui/PageHeader'
+import { PageHeader } from '@/components/ui/PageHeader'
 import { DeleteSystemUserButton } from '@/features/system/components/DeleteButton'
 
 export default async function SystemUsersPage() {

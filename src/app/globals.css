@@ -107,31 +107,27 @@
   --colorBrandBackgroundHover: #f87171;
   --colorBrandBackgroundPressed: #dc2626;
 
-  /* --- Colors: Neutral (Dark Mode) --- */
-  --colorNeutralForeground1: #ffffff;
-  --colorNeutralForeground2: #e0e0e0;
-  --colorNeutralForeground3: #d1d1d1;
-  --colorNeutralForeground4: #a1a1a1;
+  /* --- Colors: Neutral (Dark Mode - Slate Palette) --- */
+  --colorNeutralForeground1: #f8fafc; /* Slate 50 */
+  --colorNeutralForeground2: #e2e8f0; /* Slate 200 */
+  --colorNeutralForeground3: #cbd5e1; /* Slate 300 */
+  --colorNeutralForeground4: #94a3b8; /* Slate 400 */
 
-  --colorNeutralBackground1: #1a1a1a;
-  /* Grey 10 */
-  --colorNeutralBackground2: #242424;
-  /* Grey 14 */
-  --colorNeutralBackground3: #2d2d2d;
-  /* Grey 18 */
-  --colorNeutralBackground4: #333333;
-  /* Grey 22 */
+  --colorNeutralBackground1: #020617; /* Slate 950 (Main BG) */
+  --colorNeutralBackground2: #0f172a; /* Slate 900 (Cards) */
+  --colorNeutralBackground3: #1e293b; /* Slate 800 (Hover/Muted) */
+  --colorNeutralBackground4: #334155; /* Slate 700 */
 
-  --colorNeutralStroke1: #444444;
-  --colorNeutralStroke2: #555555;
+  --colorNeutralStroke1: #1e293b; /* Slate 800 */
+  --colorNeutralStroke2: #334155; /* Slate 700 */
 
   /* --- Legacy/Compat Variables (Dark Mode) --- */
   --background: var(--colorNeutralBackground1);
   --foreground: var(--colorNeutralForeground1);
   --primary: var(--colorBrandBackground);
-  --primary-foreground: #1a1a1a;
+  --primary-foreground: #020617; /* Dark text on primary */
   --muted: var(--colorNeutralBackground3);
-  --muted-foreground: var(--colorNeutralForeground3);
+  --muted-foreground: var(--colorNeutralForeground4); /* Muted text should be dimmer */
   --card: var(--colorNeutralBackground2);
   --card-foreground: var(--colorNeutralForeground1);
   --popover: var(--colorNeutralBackground1);
@@ -142,7 +138,7 @@
 
   --secondary: var(--colorNeutralBackground3);
   --secondary-foreground: var(--colorNeutralForeground1);
-  --accent: var(--colorNeutralBackground4);
+  --accent: var(--colorNeutralBackground3);
   --accent-foreground: var(--colorNeutralForeground1);
 }
 

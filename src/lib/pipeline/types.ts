@@ -471,6 +471,8 @@ export interface PipelineState {
 // STAGE METADATA
 // ============================================
 
+export type AIProviderType = "claude" | "chatgpt" | "gemini" | "codex" | "manual";
+
 export interface StageMetadata {
   id: PipelineStage;
   name: string;
@@ -483,6 +485,10 @@ export interface StageMetadata {
   canSkip: boolean;
   canRetry: boolean;
   isInteractive: boolean; // For vibe coding - manual interaction required
+  // AI Provider configuration
+  aiProvider: AIProviderType;
+  aiProviderFallback?: AIProviderType;
+  aiProviderDescription: string;
 }
 
 export const STAGE_METADATA: Record<PipelineStage, StageMetadata> = {
@@ -498,6 +504,8 @@ export const STAGE_METADATA: Record<PipelineStage, StageMetadata> = {
     canSkip: false,
     canRetry: true,
     isInteractive: true,
+    aiProvider: "manual",
+    aiProviderDescription: "Kullanici tarafindan manuel giris",
   },
   research: {
     id: "research",
@@ -511,6 +519,9 @@ export const STAGE_METADATA: Record<PipelineStage, StageMetadata> = {
     canSkip: true,
     canRetry: true,
     isInteractive: false,
+    aiProvider: "gemini",
+    aiProviderFallback: "chatgpt",
+    aiProviderDescription: "Gemini ile sektor ve rakip analizi",
   },
   design: {
     id: "design",
@@ -524,6 +535,9 @@ export const STAGE_METADATA: Record<PipelineStage, StageMetadata> = {
     canSkip: false,
     canRetry: true,
     isInteractive: true, // Vibe mode: manual design
+    aiProvider: "claude",
+    aiProviderFallback: "chatgpt",
+    aiProviderDescription: "Claude CLI ile mimari ve tasarim kararlari",
   },
   content: {
     id: "content",
@@ -537,6 +551,9 @@ export const STAGE_METADATA: Record<PipelineStage, StageMetadata> = {
     canSkip: false,
     canRetry: true,
     isInteractive: false,
+    aiProvider: "chatgpt",
+    aiProviderFallback: "claude",
+    aiProviderDescription: "ChatGPT ile icerik uretimi",
   },
   seo: {
     id: "seo",
@@ -550,6 +567,9 @@ export const STAGE_METADATA: Record<PipelineStage, StageMetadata> = {
     canSkip: false,
     canRetry: true,
     isInteractive: false,
+    aiProvider: "gemini",
+    aiProviderFallback: "chatgpt",
+    aiProviderDescription: "Gemini ile SEO optimizasyonu",
   },
   build: {
     id: "build",
@@ -563,6 +583,9 @@ export const STAGE_METADATA: Record<PipelineStage, StageMetadata> = {
     canSkip: false,
     canRetry: true,
     isInteractive: true, // Vibe mode: manual code/iteration
+    aiProvider: "gemini",
+    aiProviderFallback: "claude",
+    aiProviderDescription: "Gemini ile site/kod uretimi",
   },
   review: {
     id: "review",
@@ -576,6 +599,9 @@ export const STAGE_METADATA: Record<PipelineStage, StageMetadata> = {
     canSkip: false,
     canRetry: true,
     isInteractive: true,
+    aiProvider: "codex",
+    aiProviderFallback: "claude",
+    aiProviderDescription: "Codex ile kod inceleme ve kalite kontrol",
   },
   publish: {
     id: "publish",
@@ -589,6 +615,8 @@ export const STAGE_METADATA: Record<PipelineStage, StageMetadata> = {
     canSkip: false,
     canRetry: true,
     isInteractive: false,
+    aiProvider: "manual",
+    aiProviderDescription: "Deploy islemi (Vercel/Cloudflare)",
   },
 };
 

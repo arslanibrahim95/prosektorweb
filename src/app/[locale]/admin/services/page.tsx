@@ -1,10 +1,10 @@
 import { getServices, deleteService, renewService } from '@/features/finance/actions/services'
 import { Plus, RefreshCw, AlertTriangle, Calendar, Trash2 } from 'lucide-react'
 import { ServiceType } from '@prisma/client'
-import { PageHeader } from '@/components/admin/ui/PageHeader'
-import { FilterBar } from '@/components/admin/ui/FilterBar'
-import { EmptyState } from '@/components/admin/ui/EmptyState'
-import { statusStyles } from '@/components/admin/ui/styles'
+import { PageHeader } from '@/components/ui/PageHeader'
+import { FilterBar } from '@/components/ui/FilterBar'
+import { EmptyState } from '@/components/ui/EmptyState'
+import { statusStyles } from '@/components/ui/admin-styles'
 
 const typeLabels: Record<string, string> = {
     HOSTING: 'Hosting',

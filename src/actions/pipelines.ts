@@ -16,7 +16,16 @@ import {
     PipelineState,
     PipelineStage,
     PIPELINE_STAGES,
-    STAGE_METADATA
+    STAGE_METADATA,
+    generateQuote,
+    QuoteRequest,
+    GeneratedQuote,
+    formatQuoteAsText,
+    quoteToProposalData,
+    PRICING_TIERS,
+    ADD_ON_FEATURES,
+    AI_PROVIDERS,
+    STAGE_AI_CONFIG
 } from '@/lib/pipeline'
 
 // ==========================================
@@ -591,6 +600,139 @@ export async function getPipelineStageMetadata(): Promise<PipelineActionResult> 
         data: {
             stages: PIPELINE_STAGES,
             metadata: STAGE_METADATA,
+        }
+    }
+}
+
+// ==========================================
+// QUOTE GENERATION
+// ==========================================
+
+const QuoteRequestSchema = z.object({
+    companyName: z.string().min(2, 'Firma adi en az 2 karakter olmali'),
+    industry: z.string().optional(),
+    pageCount: z.number().min(1).max(100),
+    features: z.array(z.string()),
+    preferredTier: z.string().optional(),
+    hasExistingSite: z.boolean(),
+    needsDomain: z.boolean(),
+    needsHosting: z.boolean(),
+    urgency: z.enum(['normal', 'fast', 'urgent']),
+    notes: z.string().optional(),
+})
+
+/**
+ * Generate a price quote for a web project
+ */
+export async function generateProjectQuote(
+    request: QuoteRequest
+): Promise<PipelineActionResult> {
+    try {
+        // Validate request
+        const validated = QuoteRequestSchema.parse(request)
+
+        // Generate quote
+        const quote = generateQuote(validated)
+
+        return { success: true, data: quote }
+    } catch (error: unknown) {
+        console.error('generateProjectQuote error:', error)
+        if (error instanceof z.ZodError) {
+            return { success: false, error: getZodErrorMessage(error) }
+        }
+        return { success: false, error: 'Teklif olusturulurken hata olustu' }
+    }
+}
+
+/**
+ * Generate quote and create proposal in database
+ */
+export async function generateAndSaveQuote(
+    request: QuoteRequest,
+    companyId: string
+): Promise<PipelineActionResult> {
+    try {
+        await requireAuth()
+
+        // Tenant isolation
+        await requireCompanyAccess(companyId)
+
+        // Validate request
+        const validated = QuoteRequestSchema.parse(request)
+
+        // Generate quote
+        const quote = generateQuote(validated)
+
+        // Convert to proposal data
+        const proposalData = quoteToProposalData(quote)
+
+        // Create proposal in database
+        const proposal = await prisma.proposal.create({
+            data: {
+                companyId,
+                title: proposalData.title,
+                description: proposalData.description,
+                items: proposalData.items,
+                subtotal: proposalData.subtotal,
+                discount: proposalData.discount,
+                tax: proposalData.tax,
+                total: proposalData.total,
+                validUntil: proposalData.validUntil,
+                notes: proposalData.notes,
+                status: 'DRAFT',
+            }
+        })
+
+        await logAudit({
+            action: 'CREATE',
+            entity: 'Proposal',
+            entityId: proposal.id,
+            details: { quoteId: quote.id, companyId }
+        })
+
+        revalidatePath('/admin/proposals')
+        return {
+            success: true,
+            data: {
+                quote,
+                proposal,
+                formattedQuote: formatQuoteAsText(quote)
+            }
+        }
+    } catch (error: unknown) {
+        console.error('generateAndSaveQuote error:', error)
+        if (error instanceof TenantAccessError || error instanceof UnauthorizedError) {
+            return { success: false, error: error.message }
+        }
+        if (error instanceof z.ZodError) {
+            return { success: false, error: getZodErrorMessage(error) }
+        }
+        return { success: false, error: 'Teklif olusturulurken hata olustu' }
+    }
+}
+
+/**
+ * Get pricing tiers and add-on features
+ */
+export async function getPricingOptions(): Promise<PipelineActionResult> {
+    return {
+        success: true,
+        data: {
+            tiers: PRICING_TIERS,
+            addOns: ADD_ON_FEATURES,
+        }
+    }
+}
+
+/**
+ * Get AI provider configuration
+ */
+export async function getAIProviderConfig(): Promise<PipelineActionResult> {
+    return {
+        success: true,
+        data: {
+            providers: AI_PROVIDERS,
+            stageConfig: STAGE_AI_CONFIG,
         }
     }
 }

@@ -1,7 +1,7 @@
 import { getRevenueData, getProjectStats, getInvoiceStats, getTicketStats } from '@/features/system/actions/reports'
 import { RevenueChart } from '@/components/admin/reports/RevenueChart'
 import { ProjectPipeline } from '@/components/admin/reports/ProjectPipeline'
-import { PageHeader } from '@/components/admin/ui/PageHeader'
+import { PageHeader } from '@/components/ui/PageHeader'
 import { TrendingUp, Receipt, Ticket, Layers, DollarSign, AlertCircle, CheckCircle, Clock } from 'lucide-react'
 
 export default async function ReportsPage() {

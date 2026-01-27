@@ -1,5 +1,5 @@
 import { getTasks } from '@/features/system/actions/tasks'
-import { PageHeader } from '@/components/admin/ui/PageHeader'
+import { PageHeader } from '@/components/ui/PageHeader'
 import { TaskBoard, type Task } from '@/features/system/components/TaskBoard'
 import { Plus } from 'lucide-react'
 

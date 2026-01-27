@@ -10,7 +10,7 @@ import {
     MoreHorizontal,
     UserCog
 } from 'lucide-react'
-import { PageHeader } from '@/components/admin/ui/PageHeader'
+import { PageHeader } from '@/components/ui/PageHeader'
 
 interface UsersPageProps {
     searchParams: Promise<{ q?: string, page?: string }>

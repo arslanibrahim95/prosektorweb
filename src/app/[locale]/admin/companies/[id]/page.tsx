@@ -4,7 +4,7 @@ import Link from 'next/link'
 import {
     ChevronLeft, Edit, Building2, MapPin, Phone, Mail, Globe, Calendar, Users, Briefcase, FileText, Receipt, Layers, MessageSquare
 } from 'lucide-react'
-import { PageHeader } from '@/components/admin/ui/PageHeader'
+import { PageHeader } from '@/components/ui/PageHeader'
 import { CrmNotesSection } from '@/features/crm/components/NotesSection'
 import { CrmContactsSection } from '@/features/crm/components/ContactsSection'
 import { CrmActivitiesSection } from '@/features/crm/components/ActivitiesSection'

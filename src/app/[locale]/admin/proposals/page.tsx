@@ -1,10 +1,10 @@
 import { getProposals } from '@/features/crm/actions/proposals'
 import Link from 'next/link'
 import { Plus, ArrowUpRight, FileText } from 'lucide-react'
-import { PageHeader } from '@/components/admin/ui/PageHeader'
-import { FilterBar } from '@/components/admin/ui/FilterBar'
-import { EmptyState } from '@/components/admin/ui/EmptyState'
-import { statusStyles } from '@/components/admin/ui/styles'
+import { PageHeader } from '@/components/ui/PageHeader'
+import { FilterBar } from '@/components/ui/FilterBar'
+import { EmptyState } from '@/components/ui/EmptyState'
+import { statusStyles } from '@/components/ui/admin-styles'
 
 // Status Badge Helper
 const statusMap: Record<string, { label: string, color: string }> = {
