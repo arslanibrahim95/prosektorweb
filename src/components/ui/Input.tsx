@@ -10,7 +10,7 @@ export interface InputProps
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
     ({ className, type, error, leadingIcon, ...props }, ref) => {
         return (
-            <div className="relative w-full">
+            <div className="relative w-full group">
                 {leadingIcon && (
                     <div className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400 group-focus-within:text-brand-500 transition-colors">
                         {leadingIcon}
