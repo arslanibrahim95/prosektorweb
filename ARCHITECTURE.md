@@ -54,3 +54,25 @@ All expensive queries are wrapped in `getOrSet`, which implements **Singleflight
 -   **Authorization:** RBAC via Middleware + `tenant-guard` (Company Isolation).
 -   **Rate Limiting:** Sliding Window (Redis) implemented in `src/lib/rate-limit.ts`.
 -   **Input Validation:** Strict Zod schemas for all Server Actions.
+
+## 6. Data Integrity & Data Types Policy
+
+We enforce strict rules to prevent overflow and future-compatibility issues.
+
+### 6.1 Counters & Numbers
+-   **Monotonic Counters:** MUST use `BigInt` (SQL: `BIGINT`). **Never `Int` (32-bit).**
+    -   *Why:* 2 Billion limit is easily reached by logs/views over years. "Int(11)" is a display myth; capacity is determined by type.
+-   **Increments:** MUST be atomic via database updates (`UPDATE table SET count = count + 1`).
+    -   *Never:* Read -> Application Increment -> Write (Race Condition Risk).
+-   **Negative Guards:** Counters MUST have database-level checks (`CHECK (count >= 0)`) or application-level clamping.
+
+### 6.2 Timestamps
+-   **Type:** MUST be `DateTime` (SQL: `TIMESTAMP(3)` or `TIMESTAMPTZ`).
+-   **Epochs:** NEVER store timestamps as `Int32` (Unix Epoch). This crashes in 2038.
+-   **Timezone:** ALWAYS store as UTC. Conversion happens at the UI layer.
+
+### 6.3 Keys & Identifiers
+-   **Primary Keys:** Prefer `UUID` (String) or `BigInt` with Auto-Increment.
+    -   *Why:* Int32 keys run out. UUIDs allow easy merging/sharding later.
+-   **References:** Foreign keys must match the type of the referenced column exactly.
+
