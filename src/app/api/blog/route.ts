@@ -62,5 +62,6 @@ export const GET = safeApi(async (request) => {
         }
     }
 }, {
-    rateLimit: { limit: 100, windowSeconds: 3600 } // 100 per hour for blog listing
+    rateLimit: { limit: 100, windowSeconds: 3600 }, // 100 per hour for blog listing
+    cacheControl: 'public, max-age=3600, stale-while-revalidate=86400' // Cache for 1 hour, stale for 1 day
 })

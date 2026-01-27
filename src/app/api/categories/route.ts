@@ -10,5 +10,6 @@ export const GET = safeApi(async () => {
 
     return categories
 }, {
-    rateLimit: { limit: 100, windowSeconds: 3600 }
+    rateLimit: { limit: 100, windowSeconds: 3600 },
+    cacheControl: 'public, max-age=86400, stale-while-revalidate=604800' // 1 day cache, 1 week stale
 })

@@ -31,6 +31,11 @@ interface SafeApiOptions {
         limit: number
         windowSeconds: number
     }
+    /**
+     * HTTP Cache-Control header value.
+     * Example: 'public, max-age=3600, stale-while-revalidate=60'
+     */
+    cacheControl?: string
 }
 
 /**
@@ -144,7 +149,13 @@ export function safeApi<TResult, TParams = any>(
             const duration = Date.now() - start
             logger.info({ requestId, path: req.nextUrl.pathname, duration }, 'API Request Success')
 
+
             const response = NextResponse.json(finalResponse)
+
+            // Add Cache-Control Header
+            if (options.cacheControl) {
+                response.headers.set('Cache-Control', options.cacheControl)
+            }
 
             // Add Rate Limit Headers
             if (limitInfo.limit) response.headers.set('X-RateLimit-Limit', limitInfo.limit.toString())

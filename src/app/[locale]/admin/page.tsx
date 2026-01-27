@@ -12,6 +12,8 @@ import SpotlightCard from '@/components/ui/SpotlightCard'
 import { GradientButton } from '@/components/ui/GradientButton'
 import { DashboardChart } from '@/features/system/components/DashboardChart'
 
+export const revalidate = 60; // Cache this page for 1 minute
+
 export default async function SuperAdminDashboard() {
     const stats = await getAdminDashboardStats()
     const recentActivities = await getRecentActivities(8)

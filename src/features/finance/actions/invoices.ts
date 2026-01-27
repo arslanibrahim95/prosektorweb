@@ -6,6 +6,7 @@ import { auth } from '@/auth'
 import { getErrorMessage, getZodErrorMessage, isPrismaUniqueConstraintError, validatePagination } from '@/lib/action-types'
 import { z } from 'zod'
 import { getUserCompanyId, requireTenantAccess } from '@/lib/guards/tenant-guard'
+import { invalidateCache } from '@/lib/cache'
 import { AuditAction, InvoiceStatus, PaymentMethod } from '@prisma/client'
 
 export interface InvoiceInput {
@@ -181,6 +182,12 @@ export async function createInvoice(input: InvoiceInput | FormData): Promise<Act
                 })
 
                 await logActivity('CREATE', 'Invoice', invoice.id, { invoiceNo: invoice.invoiceNo, total })
+
+                // Invalidate Cache
+                await invalidateCache('dashboard:admin:stats')
+                await invalidateCache('reports:revenue:data')
+                await invalidateCache('reports:invoices:stats')
+
                 revalidatePath('/admin/invoices')
                 return { success: true, data: invoice }
             } catch (err) {
@@ -208,6 +215,12 @@ export async function updateInvoiceStatus(id: string, status: InvoiceStatus): Pr
         })
 
         await logActivity('UPDATE', 'Invoice', id, { status })
+
+        // Invalidate Cache
+        await invalidateCache('dashboard:admin:stats')
+        await invalidateCache('reports:revenue:data')
+        await invalidateCache('reports:invoices:stats')
+
         revalidatePath('/admin/invoices')
         return { success: true }
     } catch (e) {
@@ -228,6 +241,12 @@ export async function deleteInvoice(id: string): Promise<ActionResult> {
         })
 
         await logActivity('DELETE', 'Invoice', id)
+
+        // Invalidate Cache
+        await invalidateCache('dashboard:admin:stats')
+        await invalidateCache('reports:revenue:data')
+        await invalidateCache('reports:invoices:stats')
+
         revalidatePath('/admin/invoices')
         return { success: true }
     } catch (e) {
@@ -306,6 +325,12 @@ export async function createPayment(formData: FormData): Promise<ActionResult> {
         }
 
         await logActivity('CREATE', 'Payment', payment.id, { invoiceId, amount })
+
+        // Invalidate Cache
+        await invalidateCache('dashboard:admin:stats')
+        await invalidateCache('reports:revenue:data')
+        await invalidateCache('reports:invoices:stats')
+
         revalidatePath(`/admin/invoices/${invoiceId}`)
         return { success: true }
     } catch (e) {
