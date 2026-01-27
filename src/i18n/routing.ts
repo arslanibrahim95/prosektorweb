@@ -16,7 +16,12 @@ export const routing = defineRouting({
     // User didn't specify. I'll use standard behavior: default locale NOT prefixed?
     // P0 correction: If user wants "tr-TR" vs "en-US", I'll stick to 'tr' and 'en' keys for now simplicty.
     // "prefix: 'as-needed'" is common.
-    localePrefix: 'as-needed'
+    // "prefix: 'as-needed'" is common.
+    localePrefix: 'as-needed',
+
+    // Disable automatic locale detection to prevent unwanted redirects
+    // based on Accept-Language header. This ensures / always stays /.
+    localeDetection: false
 });
 
 export const { Link, redirect, usePathname, useRouter } =
