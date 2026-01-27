@@ -61,6 +61,34 @@ export const prisma = prismaBase.$extends({
                     })
                 }
                 return query(args)
+            },
+            async count({ model, args, query }) {
+                if (isSoftDeleteModel(model)) {
+                    args.where = { deletedAt: null, ...args.where }
+                }
+                return query(args)
+            },
+            async aggregate({ model, args, query }) {
+                if (isSoftDeleteModel(model)) {
+                    args.where = { deletedAt: null, ...args.where }
+                }
+                return query(args)
+            },
+            async groupBy({ model, args, query }) {
+                if (isSoftDeleteModel(model)) {
+                    args.where = { deletedAt: null, ...args.where }
+                }
+                return query(args)
+            },
+            async findUnique({ model, args, query }) {
+                if (isSoftDeleteModel(model)) {
+                    // findUnique does not strictly support arbitrary where clauses for non-unique fields in type definition,
+                    // but extensions allow modifying args.
+                    // However, safe practice is to route via findFirst if we want to filter specific fields not in the unique key.
+                    args.where = { deletedAt: null, ...args.where }
+                    return query(args)
+                }
+                return query(args)
             }
         }
     }
