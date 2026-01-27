@@ -11,6 +11,7 @@
 
 import { prisma } from '@/lib/prisma';
 import { getContentGenerator } from '@/lib/ai';
+import { executeWithRetry } from '@/lib/resiliency';
 import { revalidatePath } from 'next/cache';
 import type { ContentType, CompanyInfo } from '@/lib/ai/types';
 import { ContentType as PrismaContentType, ContentStatus } from '@prisma/client';
@@ -243,7 +244,16 @@ export async function generatePageContent(
 
         if (USE_PYTHON_PIPELINE) {
             // Python Pipeline (claude-code-maestro) kullan
-            const pyResult = await generateWithPythonPipeline(contentType, companyInfo);
+            // WRAPPED: Resilient execution with retry
+            const pyRes = await executeWithRetry(
+                () => generateWithPythonPipeline(contentType, companyInfo),
+                { name: 'python_pipeline', timeoutMs: 120000, maxAttempts: 1 } // Retrying heavy spawn is risky, keep 1 attempt but protect with timeout
+            );
+
+            if (!pyRes.ok) {
+                return { success: false, error: pyRes.error.message };
+            }
+            const pyResult = pyRes.data;
 
             if (!pyResult.success) {
                 return { success: false, error: pyResult.error || 'Python pipeline hatası' };
@@ -253,12 +263,21 @@ export async function generatePageContent(
             modelUsed = pyResult.model_used || 'claude';
         } else {
             // TypeScript Connector kullan
-            const generator = getContentGenerator();
-            const result = await generator.generateContent({
-                projectId,
-                contentType,
-                companyInfo,
-            });
+            // WRAPPED: Resilient execution with retry
+            const genRes = await executeWithRetry(
+                () => getContentGenerator().generateContent({
+                    projectId,
+                    contentType,
+                    companyInfo,
+                }),
+                { name: 'ts_connector', maxAttempts: 3, timeoutMs: 60000 }
+            );
+
+            if (!genRes.ok) {
+                return { success: false, error: genRes.error.message };
+            }
+            const result = genRes.data;
+
 
             if (!result.success) {
                 return { success: false, error: result.error || 'İçerik üretilemedi' };
