@@ -74,6 +74,7 @@ export function AdminShell({ children, userEmail }: AdminShellProps) {
                     <button
                         onClick={() => setIsSidebarOpen(false)}
                         className="lg:hidden text-white/50 hover:text-white"
+                        aria-label="Menüyü kapat"
                     >
                         <X className="w-6 h-6" />
                     </button>
@@ -201,6 +202,7 @@ export function AdminShell({ children, userEmail }: AdminShellProps) {
                         <button
                             className="lg:hidden p-2 -ml-2 text-neutral-500 hover:bg-neutral-100 rounded-lg"
                             onClick={() => setIsSidebarOpen(true)}
+                            aria-label="Menüyü aç"
                         >
                             <Menu className="w-6 h-6" />
                         </button>
@@ -211,12 +213,16 @@ export function AdminShell({ children, userEmail }: AdminShellProps) {
                                 type="text"
                                 placeholder="Ara... (Firma, Çalışan, İşyeri)"
                                 className="pl-10 pr-4 py-2 bg-muted border-0 rounded-lg text-sm w-80 focus:outline-none focus:ring-2 focus:ring-brand-500"
+                                aria-label="Arama yap"
                             />
                         </div>
                     </div>
                     <div className="flex items-center gap-2 lg:gap-4">
                         <ThemeToggle />
-                        <button className="relative p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors">
+                        <button
+                            className="relative p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors"
+                            aria-label="Bildirimler"
+                        >
                             <Bell className="w-5 h-5" />
                             <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
                         </button>
