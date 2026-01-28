@@ -67,8 +67,21 @@ export default auth(async (req) => {
 
     // 0.4 Rate Limit: Specific API Limits
     if (req.nextUrl.pathname.startsWith('/api')) {
-        const { limit, window } = RATE_LIMIT_TIERS.API
-        const { success } = await checkRateLimit(`api:${ip}`, { limit, windowSeconds: window })
+        let limitKey = `api:${ip}`
+        let limitConfig: { limit: number; window: number } = RATE_LIMIT_TIERS.API
+
+        // Use User ID for authenticated users to avoid IP collisions
+        if (isLoggedIn && req.auth?.user?.id) {
+            limitKey = `user:${req.auth.user.id}`
+            if (userRole === 'ADMIN') {
+                limitConfig = RATE_LIMIT_TIERS.ADMIN
+            } else {
+                limitConfig = RATE_LIMIT_TIERS.AUTHENTICATED
+            }
+        }
+
+        const { limit, window } = limitConfig
+        const { success } = await checkRateLimit(limitKey, { limit, windowSeconds: window })
         if (!success) {
             logExit()
             return Response.json({ error: 'Too Many Requests' }, { status: 429 })

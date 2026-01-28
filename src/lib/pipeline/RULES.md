@@ -392,6 +392,128 @@ Performans:
 
 ---
 
+## 4.6 OSGB YEREL SEO KURALLARI
+
+### Hizmet Alani Mantigi
+
+```yaml
+OSGB Hizmet Alani:
+  - Kendi ili (tum ilceler dahil)
+  - Sinir komsusu iller (tum ilceler dahil)
+
+Ornek - Istanbul OSGB:
+  - Istanbul: 39 ilce
+  - Kocaeli: 12 ilce (komsu)
+  - Tekirdag: 11 ilce (komsu)
+  = Toplam: 3 il, 62 ilce
+```
+
+### URL Yapisi
+
+```yaml
+Tercih Edilen Pattern:
+  Il Sayfasi: /{il}-{hizmet}/
+  Ilce Sayfasi: /{il}-{hizmet}/{ilce}/
+
+Ornekler:
+  - /istanbul-isyeri-hekimi/
+  - /istanbul-isyeri-hekimi/kadikoy/
+  - /kocaeli-risk-analizi/
+  - /kocaeli-risk-analizi/gebze/
+```
+
+### Sayfa Yapisi Kurallari
+
+```yaml
+Her Lokasyon Sayfasinda:
+  Zorunlu:
+    - H1: "{Lokasyon} {Hizmet Adi}"
+    - Hero section (CTA ile)
+    - Hizmet tanimi (lokasyon odakli)
+    - Yasal zorunluluk bilgisi
+    - Hizmet bolgesi (komsu iller)
+    - SSS (lokasyon bazli)
+    - Iletisim CTA
+
+  SEO Meta:
+    - Title: "{Ilce}, {Il} {Hizmet} | {Firma}"
+    - Description: "{Lokasyon} bolgesinde {hizmet}..."
+    - Keywords: lokasyon + hizmet kombinasyonlari
+
+  Schema.org:
+    - LocalBusiness veya ProfessionalService
+    - areaServed: Il + Komsu Iller
+    - serviceType: Hizmet listesi
+```
+
+### Keyword Stratejisi
+
+```yaml
+Primary Keywords (Her sayfa icin):
+  - "{sehir} {hizmet}"
+  - "{ilce} {hizmet}"
+  - "{sehir} osgb"
+
+Secondary Keywords:
+  - "{hizmet} fiyatlari {sehir}"
+  - "{sehir} {hizmet} firmalari"
+  - "{ilce} is guvenligi"
+
+Long-tail Keywords:
+  - "{sehir}'da isyeri hekimi nasil bulunur"
+  - "{ilce} bolgesinde osgb hizmeti"
+  - "{sehir} {hizmet} ucretleri {yil}"
+```
+
+### Ic Baglanti Kurallari
+
+```yaml
+Her Sayfadan Baglantilar:
+  - Ayni hizmet, farkli lokasyonlar (3-5 adet)
+  - Ayni lokasyon, farkli hizmetler (3-5 adet)
+  - Komsu il sayfalari (2-3 adet)
+
+Breadcrumb:
+  Ana Sayfa > Hizmet > Il > Ilce
+```
+
+### Icerik Minimum Standartlari
+
+```yaml
+Il Sayfasi:
+  - Minimum 800 kelime
+  - En az 5 H2 basligi
+  - En az 1 tablo veya liste
+  - En az 5 SSS
+
+Ilce Sayfasi:
+  - Minimum 500 kelime
+  - En az 3 H2 basligi
+  - En az 3 SSS
+  - Il sayfasina referans
+```
+
+### Sayfa Sayisi Hesaplama
+
+```yaml
+Formul:
+  Toplam Sayfa = (Il Sayisi + Ilce Sayisi) x Hizmet Sayisi
+
+Ornek - Istanbul OSGB (4 zorunlu hizmet):
+  - Iller: 3 (Istanbul, Kocaeli, Tekirdag)
+  - Ilceler: ~62
+  - Hizmetler: 4
+  - Toplam: (3 + 62) x 4 = 260 sayfa
+
+Tum Turkiye (81 il):
+  - Her il kendi + komsulari
+  - Ortalama 4-6 komsu il
+  - ~922 ilce toplam
+  - Mukerrer sayfalari cikart
+```
+
+---
+
 ## 5. İÇERİK KALİTESİ Kuralları
 
 ### 5.1 Metin Kalite Standartları

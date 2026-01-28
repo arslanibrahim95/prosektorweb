@@ -48,7 +48,9 @@ export const RATE_LIMIT_TIERS = {
     PAGE: { limit: 50, window: 10 },        // Burst protection for HTML pages
     API: { limit: 100, window: 60 },         // Standard API usage
     AUTH: { limit: 10, window: 60 },         // Strict login/auth protection
-    BOT: { limit: 5, window: 60 }            // Very strict for suspicious IPs
+    BOT: { limit: 5, window: 60 },           // Very strict for suspicious IPs
+    AUTHENTICATED: { limit: 1000, window: 60 }, // High limit for logged-in users
+    ADMIN: { limit: 5000, window: 60 }       // Very high limit for admins
 } as const
 
 // Memory cache for extreme performance (optional, good for high-traffic)
