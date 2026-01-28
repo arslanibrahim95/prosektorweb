@@ -162,6 +162,9 @@ export function safeApi<TResult, TParams = any>(
             if (limitInfo.remaining !== undefined) response.headers.set('X-RateLimit-Remaining', limitInfo.remaining.toString())
             if (limitInfo.reset) response.headers.set('X-RateLimit-Reset', Math.floor(limitInfo.reset.getTime() / 1000).toString())
 
+            // Add Request ID Header (Observability)
+            response.headers.set('X-Request-Id', requestId)
+
             return response
 
         } catch (error) {
@@ -205,6 +208,8 @@ export function safeApi<TResult, TParams = any>(
                 code: errorCode,
                 meta: { requestId }
             }, { status })
+
+            errorResponse.headers.set('X-Request-Id', requestId)
 
             return errorResponse
         }

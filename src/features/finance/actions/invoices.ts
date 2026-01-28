@@ -18,8 +18,8 @@ export interface InvoiceInput {
     invoiceNo?: string
     issueDate: Date | string
     dueDate: Date | string
-    subtotal: number
-    taxRate: number
+    subtotal: string // String for Decimal
+    taxRate: string // String for Decimal
     description?: string
     notes?: string
     idempotencyKey?: string
@@ -30,8 +30,8 @@ const InvoiceSchema = z.object({
     invoiceNo: z.string().optional(),
     issueDate: z.coerce.date(),
     dueDate: z.coerce.date(),
-    subtotal: z.coerce.number().min(0),
-    taxRate: z.coerce.number().min(0).max(100).default(20),
+    subtotal: z.string().min(1, 'Tutar girilmeli'), // Expect string
+    taxRate: z.string().default('20'), // Expect string
     description: z.string().optional(),
     notes: z.string().optional(),
     idempotencyKey: z.string().optional()
@@ -89,9 +89,8 @@ export async function generateInvoiceNo(): Promise<string> {
     return `${year}-${String(lastSeq + 1).padStart(4, '0')}`
 }
 
-export async function getInvoices(page: number = 1, limit: number = 20, search?: string) {
+export async function getInvoices(cursor?: string, limit: number = 20, search?: string) {
     try {
-        const skip = (page - 1) * limit
         const session = await auth()
 
         const where: any = {
@@ -108,9 +107,13 @@ export async function getInvoices(page: number = 1, limit: number = 20, search?:
         const [data, total] = await Promise.all([
             prisma.invoice.findMany({
                 where,
-                skip,
-                take: limit,
-                orderBy: { issueDate: 'desc' },
+                take: limit + 1, // Fetch one extra to check for next page
+                skip: cursor ? 1 : 0,
+                cursor: cursor ? { id: cursor } : undefined,
+                orderBy: [
+                    { issueDate: 'desc' },
+                    { id: 'desc' } // Ensure stable sort for cursor pagination
+                ],
                 include: {
                     company: { select: { id: true, name: true } }
                 }
@@ -118,18 +121,23 @@ export async function getInvoices(page: number = 1, limit: number = 20, search?:
             prisma.invoice.count({ where })
         ])
 
+        let nextCursor: string | null = null
+        if (data.length > limit) {
+            const nextItem = data.pop() // Remove the extra item
+            nextCursor = nextItem?.id || null
+        }
+
         return {
             data,
             meta: {
                 total,
-                page,
-                limit,
-                totalPages: Math.ceil(total / limit)
+                nextCursor,
+                hasMore: !!nextCursor
             }
         }
     } catch (e) {
-        logger.error({ error: e, page, limit, search }, 'getInvoices Error')
-        return { data: [], meta: { total: 0, page: 1, limit: 20, totalPages: 0 } }
+        logger.error({ error: e, cursor, limit, search }, 'getInvoices Error')
+        return { data: [], meta: { total: 0, nextCursor: null, hasMore: false } }
     }
 }
 

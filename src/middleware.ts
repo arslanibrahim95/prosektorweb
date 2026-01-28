@@ -16,6 +16,14 @@ export default auth(async (req) => {
     const requestId = crypto.randomUUID()
     const requestStart = Date.now()
 
+    // Helper for structured responses with headers
+    const createErrorResponse = (message: string | object, status: number) => {
+        const body = typeof message === 'string' ? message : JSON.stringify(message)
+        const res = new NextResponse(body, { status })
+        res.headers.set('X-Request-Id', requestId)
+        return res
+    }
+
     // Structured log context
     const logContext = {
         requestId,
@@ -37,14 +45,18 @@ export default auth(async (req) => {
     }
 
     // 0. Rate Limiting (Security)
-    const ip = req.headers.get('x-forwarded-for') || '127.0.0.1'
+    const forwardedFor = req.headers.get('x-forwarded-for')
+    const ip = forwardedFor ? forwardedFor.split(',')[0].trim() : '127.0.0.1'
 
-    // Strict limit for Auth/Login
-    if (req.nextUrl.pathname.startsWith('/api/auth') || req.nextUrl.pathname === '/login') {
+    // Strict limit for Auth (Brute Force Protection)
+    // Only limit POST requests to /api/auth (Login, Register, etc.)
+    // Allow GET requests (CSRF, Session, Page Loads) to pass to standard limits
+    if (req.nextUrl.pathname.startsWith('/api/auth') && req.method === 'POST') {
         const { success } = await checkRateLimit(`auth:${ip}`, { limit: 10, windowSeconds: 60 })
         if (!success) {
             logExit()
-            return new NextResponse('Too Many Requests', { status: 429 })
+            logExit()
+            return createErrorResponse('Too Many Requests', 429)
         }
     }
 
@@ -54,14 +66,15 @@ export default auth(async (req) => {
     // 0.1 Block Empty User-Agent (Common in simple scripts)
     if (!userAgent) {
         logExit()
-        return new NextResponse('Bad Request: User-Agent required', { status: 400 })
+        logExit()
+        return createErrorResponse('Bad Request: User-Agent required', 400)
     }
 
     // 0.2 Block Known Bad Bots
     const BAD_BOTS = ['GPTBot', 'AhrefsBot', 'SemrushBot', 'DotBot', 'MJ12bot', 'Bytespider', 'ClaudeBot', 'anthropic-ai']
     if (BAD_BOTS.some(bot => userAgent.includes(bot))) {
         logExit()
-        return new NextResponse('Forbidden: Bot access denied', { status: 403 })
+        return createErrorResponse('Forbidden: Bot access denied', 403)
     }
 
 
@@ -84,7 +97,10 @@ export default auth(async (req) => {
         const { success } = await checkRateLimit(limitKey, { limit, windowSeconds: window })
         if (!success) {
             logExit()
-            return Response.json({ error: 'Too Many Requests' }, { status: 429 })
+            if (!success) {
+                logExit()
+                return createErrorResponse({ error: 'Too Many Requests' }, 429)
+            }
         }
     }
 
@@ -103,13 +119,19 @@ export default auth(async (req) => {
         // Require auth for all other API routes
         if (!isLoggedIn) {
             logExit()
-            return Response.json({ success: false, error: 'Unauthorized', code: 'UNAUTHORIZED' }, { status: 401 })
+            if (!isLoggedIn) {
+                logExit()
+                return createErrorResponse({ success: false, error: 'Unauthorized', code: 'UNAUTHORIZED' }, 401)
+            }
         }
 
         // Admin-only API routes
         if (req.nextUrl.pathname.startsWith('/api/admin') && userRole !== 'ADMIN') {
             logExit()
-            return Response.json({ success: false, error: 'Forbidden', code: 'FORBIDDEN' }, { status: 403 })
+            if (req.nextUrl.pathname.startsWith('/api/admin') && userRole !== 'ADMIN') {
+                logExit()
+                return createErrorResponse({ success: false, error: 'Forbidden', code: 'FORBIDDEN' }, 403)
+            }
         }
 
         logExit()

@@ -47,10 +47,21 @@ export const GET = safeApi(async (request) => {
     ])
 
     // Parse tags from JSON string and fix type safety
-    const formattedPosts = posts.map((post) => ({
-        ...post,
-        tags: typeof post.tags === 'string' ? JSON.parse(post.tags) : (post.tags || [])
-    }))
+    const formattedPosts = posts.map((post) => {
+        let parsedTags = post.tags
+        if (typeof post.tags === 'string') {
+            try {
+                parsedTags = JSON.parse(post.tags)
+            } catch (error) {
+                // Fallback for malformed tags
+                parsedTags = post.tags.includes(',') ? post.tags.split(',') : [post.tags]
+            }
+        }
+        return {
+            ...post,
+            tags: parsedTags || []
+        }
+    })
 
     return {
         data: formattedPosts,

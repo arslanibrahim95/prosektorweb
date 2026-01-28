@@ -20,14 +20,23 @@ const initialState: ActionResult = {
     error: '',
 }
 
+import { Decimal } from 'decimal.js'
+
+// ... imports ...
+
 export function InvoiceForm({ companies, initialInvoiceNo }: InvoiceFormProps) {
     const router = useRouter()
-    const [subtotal, setSubtotal] = useState<number>(0)
-    const [taxRate, setTaxRate] = useState<number>(20)
+
+    // RED LINE FIX: Use strings for money input to avoid float precision issues during typing
+    const [subtotal, setSubtotal] = useState<string>('')
+    const [taxRate, setTaxRate] = useState<string>('20')
     const [idempotencyKey] = useState(() => window.crypto.randomUUID())
 
-    const taxAmount = subtotal * (taxRate / 100)
-    const total = subtotal + taxAmount
+    // Safe Decimal Math (Client-side projection)
+    const subVal = new Decimal(subtotal || '0')
+    const taxVal = new Decimal(taxRate || '0')
+    const taxAmount = subVal.mul(taxVal).div(100)
+    const total = subVal.plus(taxAmount)
 
     const formAction = async (prevState: ActionResult, formData: FormData) => {
         return await createInvoice(formData)
@@ -42,11 +51,12 @@ export function InvoiceForm({ companies, initialInvoiceNo }: InvoiceFormProps) {
         }
     }, [state.success, router])
 
-    const formatCurrency = (amount: number) => {
+    const formatCurrency = (amount: Decimal | number) => {
+        const val = typeof amount === 'number' ? amount : amount.toNumber()
         return new Intl.NumberFormat('tr-TR', {
             style: 'currency',
             currency: 'TRY',
-        }).format(amount)
+        }).format(val)
     }
 
     return (
@@ -170,7 +180,7 @@ export function InvoiceForm({ companies, initialInvoiceNo }: InvoiceFormProps) {
                                     min="0"
                                     step="0.01"
                                     value={subtotal}
-                                    onChange={(e) => setSubtotal(parseFloat(e.target.value) || 0)}
+                                    onChange={(e) => setSubtotal(e.target.value)}
                                     className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all"
                                 />
                             </div>
@@ -183,7 +193,7 @@ export function InvoiceForm({ companies, initialInvoiceNo }: InvoiceFormProps) {
                                 <select
                                     name="taxRate"
                                     value={taxRate}
-                                    onChange={(e) => setTaxRate(parseFloat(e.target.value))}
+                                    onChange={(e) => setTaxRate(e.target.value)}
                                     className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all"
                                 >
                                     <option value="0">%0</option>
@@ -204,7 +214,7 @@ export function InvoiceForm({ companies, initialInvoiceNo }: InvoiceFormProps) {
                         <div className="space-y-4">
                             <div className="flex justify-between items-center">
                                 <span className="text-brand-100">Ara Toplam</span>
-                                <span className="font-bold">{formatCurrency(subtotal)}</span>
+                                <span className="font-bold">{formatCurrency(subVal)}</span>
                             </div>
                             <div className="flex justify-between items-center">
                                 <span className="text-brand-100">KDV (%{taxRate})</span>

@@ -66,7 +66,7 @@ export const TURKEY_PROVINCES: Province[] = [
     name: "Ankara",
     slug: "ankara",
     region: "ic_anadolu",
-    neighbors: [3, 5, 18, 26, 40, 42, 43, 71], // Afyon, Amasya, Cankiri, Eskisehir, Kırıkkale, Konya, Kutahya, Kırıkkale
+    neighbors: [14, 18, 26, 40, 42, 68, 71], // Bolu, Cankiri, Eskisehir, Kirsehir, Konya, Aksaray, Kirikkale
     districts: [
       { name: "Cankaya", slug: "cankaya", isCenter: true },
       { name: "Kecioren", slug: "kecioren", isCenter: true },

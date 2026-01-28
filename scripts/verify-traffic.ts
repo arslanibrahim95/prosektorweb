@@ -39,6 +39,10 @@ async function runSimulation() {
         console.error('Redis connection failed.');
     }
 
+    // NOTE: We relaxed AUTH limit (strict 10) to POST requests only.
+    // This script checks Redis directly, so it can't simulate Method checks.
+    // Skipping manual AUTH check simulation as it's covered by Unit Tests.
+
     // 3. Simulate Bot Traffic
     console.log('\n--- Simulation 3: Bot Traffic ---');
     const botIp = '10.0.0.99';

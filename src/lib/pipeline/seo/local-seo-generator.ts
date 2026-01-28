@@ -622,6 +622,90 @@ export function generateSiteStructure(
 }
 
 // ============================================
+// SITEMAP XML GENERATOR
+// ============================================
+
+const SITEMAP_MAX_URLS = 50000;
+const SITEMAP_SPLIT_THRESHOLD = 1000;
+
+/**
+ * Sitemap XML olustur
+ */
+export function generateSitemapXml(entries: SitemapEntry[]): string {
+  const header = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`;
+  const footer = `</urlset>`;
+
+  const urls = entries
+    .map(
+      (e) => `  <url>
+    <loc>${escapeXml(e.loc)}</loc>
+    <lastmod>${e.lastmod}</lastmod>
+    <changefreq>${e.changefreq}</changefreq>
+    <priority>${e.priority.toFixed(1)}</priority>
+  </url>`
+    )
+    .join("\n");
+
+  return `${header}\n${urls}\n${footer}`;
+}
+
+/**
+ * Buyuk siteler icin sitemap index olustur
+ * 1000+ URL varsa birden fazla sitemap dosyasina boler
+ */
+export function generateSitemapIndex(
+  entries: SitemapEntry[],
+  baseUrl: string,
+  entriesPerSitemap: number = SITEMAP_SPLIT_THRESHOLD
+): { index: string; sitemaps: { filename: string; xml: string }[] } {
+  if (entries.length <= entriesPerSitemap) {
+    return {
+      index: "",
+      sitemaps: [{ filename: "sitemap.xml", xml: generateSitemapXml(entries) }],
+    };
+  }
+
+  const chunks: SitemapEntry[][] = [];
+  for (let i = 0; i < entries.length; i += entriesPerSitemap) {
+    chunks.push(entries.slice(i, i + entriesPerSitemap));
+  }
+
+  const now = new Date().toISOString().split("T")[0];
+  const sitemaps = chunks.map((chunk, i) => ({
+    filename: `sitemap-${i + 1}.xml`,
+    xml: generateSitemapXml(chunk),
+  }));
+
+  const indexHeader = `<?xml version="1.0" encoding="UTF-8"?>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`;
+  const indexFooter = `</sitemapindex>`;
+
+  const indexEntries = sitemaps
+    .map(
+      (s) => `  <sitemap>
+    <loc>${escapeXml(`${baseUrl}/${s.filename}`)}</loc>
+    <lastmod>${now}</lastmod>
+  </sitemap>`
+    )
+    .join("\n");
+
+  return {
+    index: `${indexHeader}\n${indexEntries}\n${indexFooter}`,
+    sitemaps,
+  };
+}
+
+function escapeXml(str: string): string {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&apos;");
+}
+
+// ============================================
 // STATISTICS
 // ============================================
 

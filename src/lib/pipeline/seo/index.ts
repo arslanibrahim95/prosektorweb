@@ -77,6 +77,10 @@ export {
   generateAllLocalPages,
   generateSiteStructure,
 
+  // Sitemap
+  generateSitemapXml,
+  generateSitemapIndex,
+
   // Statistics
   calculateTotalPagesForAllProvinces,
   getExampleStats,
@@ -95,6 +99,14 @@ export {
   ISYERI_HEKIMI_TEMPLATE,
   IS_GUVENLIGI_UZMANI_TEMPLATE,
   RISK_ANALIZI_TEMPLATE,
+  ISG_EGITIMI_TEMPLATE,
+  ILKYARDIM_EGITIMI_TEMPLATE,
+  YANGIN_EGITIMI_TEMPLATE,
+  SAGLIK_TARAMASI_TEMPLATE,
+  ACIL_DURUM_PLANI_TEMPLATE,
+  ISG_KURULU_TEMPLATE,
+  ONAYLI_DEFTER_TEMPLATE,
+  ISG_KATIP_TEMPLATE,
 
   // Functions
   prepareVariables,

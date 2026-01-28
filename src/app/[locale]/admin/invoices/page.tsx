@@ -17,7 +17,7 @@ interface InvoicesPageProps {
     searchParams: Promise<{
         search?: string
         status?: string
-        page?: string
+        cursor?: string
     }>
 }
 
@@ -40,16 +40,27 @@ const statusColors: Record<string, string> = {
 export default async function InvoicesPage({ searchParams }: InvoicesPageProps) {
     const params = await searchParams
     const search = params.search || ''
-    const status = params.status || undefined // 'all' filter removed from backend, pass undefined
-    const page = parseInt(params.page || '1', 10)
+    const status = params.status || undefined
+    const cursor = params.cursor || undefined // Correct property access
+    // Actually best to rename usage to 'cursor' in URL.
+
+    // Changing params interface logic below
+    return <InvoicesPageContent searchParams={searchParams} />
+}
+
+async function InvoicesPageContent({ searchParams }: InvoicesPageProps) {
+    const params = await searchParams
+    const search = params.search || ''
+    const status = params.status || undefined
+    const cursor = params.cursor || undefined // Use 'cursor' param
 
     const [invoicesData, stats] = await Promise.all([
-        getInvoices(page, 10, search),
+        getInvoices(cursor, 10, search),
         getInvoiceStats(),
     ])
 
     const { data: invoices, meta } = invoicesData
-    const { total, totalPages: pages, page: currentPage } = meta
+    const { total, nextCursor, hasMore } = meta
 
     const formatCurrency = (amount: number | any) => {
         return new Intl.NumberFormat('tr-TR', {
@@ -217,32 +228,34 @@ export default async function InvoicesPage({ searchParams }: InvoicesPageProps) 
                         </tbody>
                     </table>
 
-                    {/* Pagination */}
-                    {pages > 1 && (
-                        <div className="px-6 py-4 border-t border-neutral-100 flex items-center justify-between">
-                            <div className="text-sm text-neutral-500">
-                                Sayfa {currentPage} / {pages}
-                            </div>
-                            <div className="flex items-center gap-2">
-                                {currentPage > 1 && (
-                                    <Link
-                                        href={`/admin/invoices?page=${currentPage - 1}${search ? `&search=${search}` : ''}${status !== 'all' ? `&status=${status}` : ''}`}
-                                        className="p-2 text-neutral-400 hover:text-neutral-900 hover:bg-neutral-100 rounded-lg transition-colors"
-                                    >
-                                        <ChevronLeft className="w-5 h-5" />
-                                    </Link>
-                                )}
-                                {currentPage < pages && (
-                                    <Link
-                                        href={`/admin/invoices?page=${currentPage + 1}${search ? `&search=${search}` : ''}${status !== 'all' ? `&status=${status}` : ''}`}
-                                        className="p-2 text-neutral-400 hover:text-neutral-900 hover:bg-neutral-100 rounded-lg transition-colors"
-                                    >
-                                        <ChevronRight className="w-5 h-5" />
-                                    </Link>
-                                )}
-                            </div>
+                    {/* Pagination - Cursor Based */}
+                    <div className="px-6 py-4 border-t border-neutral-100 flex items-center justify-between">
+                        <div className="text-sm text-neutral-500">
+                            Toplam {total} kayıt
                         </div>
-                    )}
+                        <div className="flex items-center gap-2">
+
+                            {/* Back button logic is complex without history stack. Simply implementing Next/Reset for now */}
+                            {cursor && (
+                                <Link
+                                    href={`/admin/invoices`} // Reset to first page
+                                    className="px-4 py-2 text-sm text-neutral-600 hover:text-neutral-900 bg-neutral-50 hover:bg-neutral-100 rounded-lg transition-colors"
+                                >
+                                    Başa Dön
+                                </Link>
+                            )}
+
+                            {hasMore && nextCursor && (
+                                <Link
+                                    href={`/admin/invoices?cursor=${nextCursor}${search ? `&search=${search}` : ''}${status !== 'all' && status ? `&status=${status}` : ''}`}
+                                    className="px-4 py-2 flex items-center gap-2 text-sm text-white bg-neutral-900 hover:bg-neutral-800 rounded-lg transition-colors"
+                                >
+                                    Sonraki Sayfa
+                                    <ChevronRight className="w-4 h-4" />
+                                </Link>
+                            )}
+                        </div>
+                    </div>
                 </div>
             )}
         </div>

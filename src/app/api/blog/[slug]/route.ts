@@ -33,10 +33,21 @@ export async function GET(
             data: { viewCount: { increment: 1 } }
         })
 
-        // Parse tags if needed (consistency with list endpoint)
+        // Parse tags safely
+        let parsedTags = post.tags
+        if (typeof post.tags === 'string') {
+            try {
+                parsedTags = JSON.parse(post.tags)
+            } catch (e) {
+                // Fallback: keep as string or empty array?
+                // For stability, let's keep original string or try to split if comma separated
+                parsedTags = post.tags.includes(',') ? post.tags.split(',') : [post.tags]
+            }
+        }
+
         const formattedPost = {
             ...post,
-            tags: typeof post.tags === 'string' ? JSON.parse(post.tags) : post.tags
+            tags: parsedTags
         }
 
         return NextResponse.json(formattedPost)

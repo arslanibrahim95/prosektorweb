@@ -1,9 +1,10 @@
 'use client'
 
 import { useActionState, useEffect, useState } from 'react'
-import { createInvoice, updateInvoiceStatus, ActionResult } from '../actions/invoices'
+import { createInvoice, ActionResult } from '@/features/finance/actions/invoices'
 import { useRouter } from 'next/navigation'
-import { Loader2, AlertCircle, Receipt, Building2, Calendar, Calculator } from 'lucide-react'
+import { Loader2, AlertCircle, Receipt, Calculator } from 'lucide-react'
+import { Decimal } from 'decimal.js'
 
 interface Company {
     id: string
@@ -22,17 +23,24 @@ const initialState: ActionResult = {
 
 export function InvoiceForm({ companies, initialInvoiceNo }: InvoiceFormProps) {
     const router = useRouter()
-    const [subtotal, setSubtotal] = useState<number>(0)
-    const [taxRate, setTaxRate] = useState<number>(20)
+
+    // RED LINE FIX: Use strings for money input to avoid float precision issues during typing
+    const [subtotal, setSubtotal] = useState<string>('')
+    const [taxRate, setTaxRate] = useState<string>('20')
     const [idempotencyKey, setIdempotencyKey] = useState<string>('')
 
     useEffect(() => {
         // Generate key on client-side mount
-        setIdempotencyKey(crypto.randomUUID())
+        if (typeof window !== 'undefined') {
+            setIdempotencyKey(crypto.randomUUID())
+        }
     }, [])
 
-    const taxAmount = subtotal * (taxRate / 100)
-    const total = subtotal + taxAmount
+    // Safe Decimal Math (Client-side projection)
+    const subVal = new Decimal(subtotal || '0')
+    const taxVal = new Decimal(taxRate || '0')
+    const taxAmount = subVal.mul(taxVal).div(100)
+    const total = subVal.plus(taxAmount)
 
     const formAction = async (prevState: ActionResult, formData: FormData) => {
         if (idempotencyKey) {
@@ -47,24 +55,15 @@ export function InvoiceForm({ companies, initialInvoiceNo }: InvoiceFormProps) {
         if (state.success) {
             router.push('/admin/invoices')
             router.refresh()
-        } else if (state.error) {
-            // Regenerate key on failure to allow retry if it was a logic error
-            // But if it was network error, maybe keep key? 
-            // Better to keep key strictly for "Duplicate Submission" protection.
-            // If error is business logic (e.g. invalid date), new key needed?
-            // Actually, idempotency is for "Same Request". If I change data, I need new key.
-            // But here we are just preventing double-click.
-            // Let's keep it simple: retry with same key usually implies EXACT same request.
-            // If user changes data, they are editing the form, so maybe we should watch form changes?
-            // For now, let's just leave it. If they submit again with same key and same data, they get cached result (success) or re-run (error).
         }
-    }, [state.success, state.error, router])
+    }, [state.success, router])
 
-    const formatCurrency = (amount: number) => {
+    const formatCurrency = (amount: Decimal | number) => {
+        const val = typeof amount === 'number' ? amount : amount.toNumber()
         return new Intl.NumberFormat('tr-TR', {
             style: 'currency',
             currency: 'TRY',
-        }).format(amount)
+        }).format(val)
     }
 
     return (
@@ -189,7 +188,7 @@ export function InvoiceForm({ companies, initialInvoiceNo }: InvoiceFormProps) {
                                     min="0"
                                     step="0.01"
                                     value={subtotal}
-                                    onChange={(e) => setSubtotal(parseFloat(e.target.value) || 0)}
+                                    onChange={(e) => setSubtotal(e.target.value)}
                                     className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all"
                                 />
                             </div>
@@ -202,7 +201,7 @@ export function InvoiceForm({ companies, initialInvoiceNo }: InvoiceFormProps) {
                                 <select
                                     name="taxRate"
                                     value={taxRate}
-                                    onChange={(e) => setTaxRate(parseFloat(e.target.value))}
+                                    onChange={(e) => setTaxRate(e.target.value)}
                                     className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all"
                                 >
                                     <option value="0">%0</option>
@@ -223,7 +222,7 @@ export function InvoiceForm({ companies, initialInvoiceNo }: InvoiceFormProps) {
                         <div className="space-y-4">
                             <div className="flex justify-between items-center">
                                 <span className="text-brand-100">Ara Toplam</span>
-                                <span className="font-bold">{formatCurrency(subtotal)}</span>
+                                <span className="font-bold">{formatCurrency(subVal)}</span>
                             </div>
                             <div className="flex justify-between items-center">
                                 <span className="text-brand-100">KDV (%{taxRate})</span>

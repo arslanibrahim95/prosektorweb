@@ -89,11 +89,56 @@ describe('Middleware Traffic Segmentation', () => {
         // Then Bot check.
     })
 
+    it('should parse correct IP from x-forwarded-for list', async () => {
+        const req = createReq('/api/test', {
+            'user-agent': 'User',
+            'x-forwarded-for': '1.2.3.4, 5.6.7.8' // Validation of fix
+        })
+        const res = await (middleware as any)(req)
+
+        // This implicitly checks if it didn't crash and passed to next step
+        // To verify the actual IP used, we'd need to spy on checkRateLimit
+        expect(mockCheckRateLimit).toHaveBeenCalledWith(
+            expect.stringContaining('api:1.2.3.4'), // Should use first IP
+            expect.anything()
+        )
+    })
+
     it('should allow good bots/users', async () => {
         const req = createReq('/', { 'user-agent': 'Mozilla/5.0' })
         const res = await (middleware as any)(req)
         // Should return the Intl response (mocked)
         expect(res?.status).toBe(200)
+    })
+
+    describe('Auth Rate Limiting', () => {
+        it('should NOT strictly rate limit GET /api/auth requests (CSRF/Session)', async () => {
+            // GET request to /api/auth/csrf
+            const req = createReq('/api/auth/csrf', { 'user-agent': 'User', 'x-forwarded-for': '1.2.3.4' })
+            // Set method explicitly if needed by createReq, but NextRequest defaults to GET
+            Object.defineProperty(req, 'method', { value: 'GET' });
+
+            await (middleware as any)(req)
+
+            // Should NOT call checkRateLimit with auth: prefix
+            // It might fall through to API limit (api:1.2.3.4)
+            expect(mockCheckRateLimit).not.toHaveBeenCalledWith(
+                'auth:1.2.3.4',
+                expect.anything()
+            )
+        })
+
+        it('should strictly rate limit POST /api/auth requests (Login)', async () => {
+            const req = createReq('/api/auth/callback/credentials', { 'user-agent': 'User', 'x-forwarded-for': '1.2.3.4' })
+            Object.defineProperty(req, 'method', { value: 'POST' });
+
+            await (middleware as any)(req)
+
+            expect(mockCheckRateLimit).toHaveBeenCalledWith(
+                'auth:1.2.3.4',
+                expect.objectContaining({ limit: RATE_LIMIT_TIERS.AUTH.limit })
+            )
+        })
     })
 
     describe('API Rate Limiting', () => {

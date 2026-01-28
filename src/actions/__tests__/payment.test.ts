@@ -1,5 +1,6 @@
 import { vi, describe, it, expect, beforeEach } from 'vitest'
 import { mockDeep } from 'vitest-mock-extended'
+import { Decimal } from 'decimal.js'
 
 // 1. Must mock before imports
 vi.mock('@/lib/prisma', () => ({
@@ -45,9 +46,10 @@ describe('createPayment', () => {
         // Setup initial invoice state
         const mockInvoice = {
             id: 'inv-123',
-            total: 1000,
-            paidAmount: 0,
+            total: new Decimal(1000),
+            paidAmount: new Decimal(0),
             companyId: 'comp-1',
+            version: 1,
         }
 
         // Mock transaction execution
@@ -59,7 +61,7 @@ describe('createPayment', () => {
         prismaMock.invoice.findFirst.mockResolvedValue(mockInvoice as any)
 
         // Mock payment create
-        prismaMock.payment.create.mockResolvedValue({ id: 'pay-1', amount: 100 } as any)
+        prismaMock.payment.create.mockResolvedValue({ id: 'pay-1', amount: new Decimal(100) } as any)
 
         // Mock successful optimistic update (count: 1)
         prismaMock.invoice.updateMany.mockResolvedValue({ count: 1 })
@@ -69,8 +71,12 @@ describe('createPayment', () => {
         expect(result.success).toBe(true)
         expect(prismaMock.payment.create).toHaveBeenCalled()
         expect(prismaMock.invoice.updateMany).toHaveBeenCalledWith({
-            where: { id: 'inv-123', paidAmount: 0 }, // Should use read value for locking
-            data: { paidAmount: 100, status: 'PARTIAL' }
+            where: { id: 'inv-123', version: 1 }, // Should use version for locking
+            data: {
+                paidAmount: expect.objectContaining({ d: [100] }), // Decimal(100)
+                status: 'PARTIAL',
+                version: { increment: 1 }
+            }
         })
     })
 
@@ -78,9 +84,10 @@ describe('createPayment', () => {
         // Setup initial invoice state
         const mockInvoice = {
             id: 'inv-123',
-            total: 1000,
-            paidAmount: 0,
+            total: new Decimal(1000),
+            paidAmount: new Decimal(0),
             companyId: 'comp-1',
+            version: 1,
         }
 
         prismaMock.$transaction.mockImplementation(async (callback: any) => {
@@ -94,7 +101,7 @@ describe('createPayment', () => {
             .mockResolvedValueOnce({ count: 0 }) // Fail first
             .mockResolvedValueOnce({ count: 1 }) // Succeed retry
 
-        prismaMock.payment.create.mockResolvedValue({ id: 'pay-1', amount: 100 } as any)
+        prismaMock.payment.create.mockResolvedValue({ id: 'pay-1', amount: new Decimal(100) } as any)
 
         const result = await createPayment(mockFormData)
 
@@ -110,9 +117,10 @@ describe('createPayment', () => {
 
         prismaMock.invoice.findFirst.mockResolvedValue({
             id: 'inv-123',
-            total: 1000,
-            paidAmount: 0,
+            total: new Decimal(1000),
+            paidAmount: new Decimal(0),
             companyId: 'comp-1',
+            version: 1,
         } as any)
 
         // Always fail optimistic lock

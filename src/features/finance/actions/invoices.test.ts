@@ -11,6 +11,7 @@ vi.mock('@/lib/prisma', () => ({
         invoice: {
             create: vi.fn(),
             findUnique: vi.fn(),
+            findFirst: vi.fn(),
         },
         auditLog: {
             create: vi.fn(),
@@ -34,6 +35,11 @@ vi.mock('@/lib/cache', () => ({
     invalidateCache: vi.fn(),
 }))
 
+vi.mock('@/lib/rate-limit', () => ({
+    checkRateLimit: vi.fn().mockResolvedValue({ success: true }),
+    getClientIp: vi.fn().mockResolvedValue('127.0.0.1')
+}))
+
 vi.mock('next/cache', () => ({
     revalidatePath: vi.fn(),
 }))
@@ -50,8 +56,8 @@ describe('Invoice Actions', () => {
 
             const input = {
                 companyId: 'company-1',
-                subtotal: 100,
-                taxRate: 20,
+                subtotal: '100',
+                taxRate: '20',
                 issueDate: new Date(),
                 dueDate: new Date(),
                 invoiceNo: '2026-0001'
@@ -77,8 +83,8 @@ describe('Invoice Actions', () => {
 
             const input = {
                 companyId: 'company-1',
-                subtotal: 0.1,
-                taxRate: 200, // 200% tax for easy test
+                subtotal: '0.1',
+                taxRate: '200', // 200% tax for easy test
                 issueDate: new Date(),
                 dueDate: new Date(),
                 invoiceNo: '2026-0002'
@@ -106,22 +112,23 @@ describe('Invoice Actions', () => {
             const idempotencyKey = 'unique-key-123'
             const input = {
                 companyId: 'company-1',
-                subtotal: 100,
-                taxRate: 20,
+                subtotal: '100',
+                taxRate: '20',
                 issueDate: new Date(),
                 dueDate: new Date(),
                 idempotencyKey
             }
 
                 ; (redis.get as any).mockResolvedValue('existing-inv-id')
-                ; (prisma.invoice.findUnique as any).mockResolvedValue({ id: 'existing-inv-id', invoiceNo: '2026-9999' })
+                ; (prisma.invoice.findFirst as any).mockResolvedValue({ id: 'existing-inv-id', invoiceNo: '2026-9999' })
 
             const result = await createInvoice(input)
 
             expect(result.success).toBe(true)
             expect(result.data.id).toBe('existing-inv-id')
             expect(prisma.invoice.create).not.toHaveBeenCalled()
-            expect(redis.get).toHaveBeenCalledWith(`invoice:idempotency:${idempotencyKey}`)
+            // Redis check removed from implementation
+            // expect(redis.get).toHaveBeenCalledWith(`invoice:idempotency:${idempotencyKey}`)
         })
     })
 })
