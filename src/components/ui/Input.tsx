@@ -12,7 +12,10 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         return (
             <div className="relative w-full">
                 {leadingIcon && (
-                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400 group-focus-within:text-brand-500 transition-colors">
+                    <div
+                        aria-hidden="true"
+                        className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400 group-focus-within:text-brand-500 transition-colors"
+                    >
                         {leadingIcon}
                     </div>
                 )}
@@ -24,6 +27,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
                         error ? "border-red-300 focus:ring-red-500/10 focus:border-red-500" : "focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 dark:focus:ring-brand-500/5",
                         className
                     )}
+                    aria-invalid={!!error}
                     ref={ref}
                     {...props}
                 />
