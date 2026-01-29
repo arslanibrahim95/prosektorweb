@@ -1,5 +1,5 @@
 import { getEmployeeById } from '@/features/crm/actions/employees'
-import { prisma } from '@/lib/prisma'
+import { prisma } from '@/server/db'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { ChevronLeft, User, Building2, Calendar, Phone, Mail } from 'lucide-react'

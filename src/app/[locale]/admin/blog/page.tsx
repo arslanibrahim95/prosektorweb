@@ -1,4 +1,4 @@
-import { prisma } from '@/lib/prisma'
+import { prisma } from '@/server/db'
 import Link from 'next/link'
 import { FileText, Plus, Eye, Edit, Calendar, Tag } from 'lucide-react'
 

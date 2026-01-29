@@ -1,5 +1,5 @@
 import { createTask } from '@/features/system/actions/tasks'
-import { prisma } from '@/lib/prisma'
+import { prisma } from '@/server/db'
 import Link from 'next/link'
 import { ChevronLeft, Save } from 'lucide-react'
 import { SubmitButton } from '@/components/ui/SubmitButton'

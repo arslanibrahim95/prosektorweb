@@ -1,13 +1,12 @@
 'use server'
 
-import { prisma } from '@/lib/prisma'
+import { prisma } from '@/server/db'
 import { revalidatePath } from 'next/cache'
 import { auth } from '@/auth'
-import { getErrorMessage, getZodErrorMessage, validatePagination } from '@/lib/action-types'
+import { getErrorMessage, getZodErrorMessage, validatePagination, logger, slugify } from '@/shared/lib'
 import { z } from 'zod'
-import { getUserCompanyId, requireCompanyAccess, requireTenantAccess } from '@/lib/guards/tenant-guard'
+import { getUserCompanyId, requireCompanyAccess, requireTenantAccess } from '@/features/system/lib/guards/tenant-guard'
 import { AuditAction, ProjectStatus, ProjectPriority } from '@prisma/client'
-import { slugify } from '@/lib/utils'
 
 export interface ProjectInput {
     companyId: string

@@ -1,9 +1,9 @@
 'use server'
 
-import { prisma } from '@/lib/prisma'
-import { getCloudflareService } from '@/lib/cloudflare'
+import { prisma } from '@/server/db'
+import { getCloudflareService } from '@/server/integrations/cloudflare'
 import { revalidatePath } from 'next/cache'
-import { requireAuth } from '@/lib/auth-guard'
+import { requireAuth } from '@/shared/lib'
 
 // ==========================================
 // TYPES

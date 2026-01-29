@@ -1,7 +1,7 @@
-import { prisma } from '@/lib/prisma'
+import { prisma } from '@/server/db'
 import DOMPurify from 'isomorphic-dompurify'
-import { getClientIp } from '@/lib/rate-limit'
-import { safeApi } from '@/lib/safe-api'
+import { safeApi } from '@/shared/lib/safe-api'
+import { getClientIp } from '@/shared/lib/rate-limit'
 
 export const POST = safeApi(async (request) => {
     const ip = await getClientIp()

@@ -3,12 +3,14 @@
 import React from 'react'
 import Link from 'next/link'
 import { Mail, Phone, ArrowUpRight } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 interface FooterProps {
     variant?: 'landing' | 'inner'
 }
 
 export function Footer({ }: FooterProps) {
+    const t = useTranslations('Footer')
     return (
         <footer className="relative mt-20">
             {/* Animated Wave SVG */}
@@ -36,8 +38,8 @@ export function Footer({ }: FooterProps) {
                 </svg>
             </div>
 
-            {/* Main Footer Content */}
-            <div className="bg-[#1a0a0a] dark:bg-[#020617] pt-16 pb-8 px-6 relative overflow-hidden">
+            {/* Main Footer Content - Always Dark Mode Style */}
+            <div className="bg-neutral-950 dark:bg-[#020617] pt-16 pb-8 px-6 relative overflow-hidden text-white">
                 {/* Floating particles effect */}
                 <div className="absolute inset-0 overflow-hidden pointer-events-none">
                     <div className="absolute w-2 h-2 bg-brand-500/30 rounded-full top-20 left-[10%] animate-float-slow" />
@@ -94,7 +96,7 @@ export function Footer({ }: FooterProps) {
                                     <Link
                                         key={link.label}
                                         href={link.href}
-                                        className="text-neutral-400 hover:text-white transition-colors text-sm flex items-center gap-2 group"
+                                        className="text-neutral-400 hover:text-neutral-100 transition-colors text-sm flex items-center gap-2 group"
                                     >
                                         <span className="w-1.5 h-1.5 bg-brand-500 rounded-full opacity-0 group-hover:opacity-100 transition-all transform scale-0 group-hover:scale-100" />
                                         {link.label}
@@ -105,19 +107,18 @@ export function Footer({ }: FooterProps) {
 
                         {/* Hizmetler */}
                         <div className="space-y-4">
-                            <h4 className="text-xs font-bold text-brand-400 uppercase tracking-widest">Hizmetler</h4>
+                            <h4 className="text-xs font-bold text-brand-400 uppercase tracking-widest">{t('services_title')}</h4>
                             <div className="flex flex-col gap-3">
-                                {['Web Sitesi Tasarımı', 'SEO Optimizasyonu', 'Domain & Hosting', 'Kurumsal Kimlik'].map((service) => (
-                                    <span key={service} className="text-neutral-400 text-sm hover:text-neutral-300 transition-colors cursor-default">
-                                        {service}
-                                    </span>
-                                ))}
+                                <span className="text-neutral-400 text-sm hover:text-neutral-300 transition-colors cursor-default">{t('service_web')}</span>
+                                <span className="text-neutral-400 text-sm hover:text-neutral-300 transition-colors cursor-default">{t('service_seo')}</span>
+                                <span className="text-neutral-400 text-sm hover:text-neutral-300 transition-colors cursor-default">{t('service_domain')}</span>
+                                <span className="text-neutral-400 text-sm hover:text-neutral-300 transition-colors cursor-default">{t('service_identity')}</span>
                             </div>
                         </div>
 
                         {/* İletişim */}
                         <div className="space-y-4">
-                            <h4 className="text-xs font-bold text-brand-400 uppercase tracking-widest">İletişim</h4>
+                            <h4 className="text-xs font-bold text-brand-400 uppercase tracking-widest">{t('contact_title')}</h4>
                             <div className="space-y-3">
                                 <a href="mailto:hello@prosektorweb.com" className="flex items-center gap-3 text-neutral-400 hover:text-white transition-colors text-sm group">
                                     <div className="w-8 h-8 bg-white/5 rounded-lg flex items-center justify-center group-hover:bg-brand-600/30 transition-colors">
@@ -136,7 +137,7 @@ export function Footer({ }: FooterProps) {
 
                         {/* Güvenli Ödeme */}
                         <div className="space-y-4">
-                            <h4 className="text-xs font-bold text-brand-400 uppercase tracking-widest">Güvenli Ödeme</h4>
+                            <h4 className="text-xs font-bold text-brand-400 uppercase tracking-widest">{t('secure_payment')}</h4>
                             <div className="flex items-center gap-2">
                                 {['VISA', 'MC', 'TROY'].map((card) => (
                                     <div
@@ -147,7 +148,7 @@ export function Footer({ }: FooterProps) {
                                     </div>
                                 ))}
                             </div>
-                            <p className="text-xs text-neutral-500">256-bit SSL ile korunan güvenli ödeme altyapısı</p>
+                            <p className="text-xs text-neutral-500">{t('secure_payment_desc')}</p>
                         </div>
                     </div>
 

@@ -1,6 +1,6 @@
 import { auth } from '@/auth'
 import { getClientTickets } from '@/features/auth/actions/portal'
-import { prisma } from '@/lib/prisma'
+import { prisma } from '@/server/db'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { Ticket, Plus, Clock, CheckCircle, AlertCircle, MessageSquare } from 'lucide-react'

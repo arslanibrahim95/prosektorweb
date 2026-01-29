@@ -1,10 +1,10 @@
 'use server'
 
-import { prisma } from '@/lib/prisma'
+import { prisma } from '@/server/db'
 import { z } from 'zod'
 import bcrypt from 'bcryptjs'
-import { generateResetToken, hashToken } from '@/lib/auth/password-reset'
-import { sendPasswordResetEmail } from '@/lib/email'
+import { generateResetToken, hashToken } from '@/features/auth/lib/password-reset'
+import { sendPasswordResetEmail } from '@/shared/lib'
 import { revalidatePath } from 'next/cache'
 
 const ResetSchema = z.object({

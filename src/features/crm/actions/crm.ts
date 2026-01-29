@@ -1,14 +1,13 @@
 'use server'
 
-import { prisma } from '@/lib/prisma'
-import { getErrorMessage, getZodErrorMessage } from '@/lib/action-types'
-import { requireAuth } from '@/lib/auth-guard'
+import { prisma } from '@/server/db'
+import { getErrorMessage, getZodErrorMessage, requireAuth } from '@/shared/lib'
 import {
     requireTenantAccess,
     requireCompanyAccess,
     TenantAccessError,
     UnauthorizedError
-} from '@/lib/guards/tenant-guard'
+} from '@/features/system/lib/guards/tenant-guard'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 import { ActivityType, CompanyStatus } from '@prisma/client'

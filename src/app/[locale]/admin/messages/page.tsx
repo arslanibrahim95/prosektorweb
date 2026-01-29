@@ -1,4 +1,4 @@
-import { prisma } from '@/lib/prisma'
+import { prisma } from '@/server/db'
 import Link from 'next/link'
 import { MessageSquare, Eye, CheckCircle2, Clock, Mail, Phone, User } from 'lucide-react'
 

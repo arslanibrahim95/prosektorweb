@@ -35,7 +35,7 @@ export const metadata: Metadata = {
   },
 };
 
-import { validateEnv } from "@/lib/config/env-validator";
+import { validateEnv } from "@/shared/lib";
 
 export default function RootLayout({
   children,

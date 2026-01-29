@@ -1,5 +1,5 @@
 import { auth } from '@/auth'
-import { prisma } from '@/lib/prisma'
+import { prisma } from '@/server/db'
 import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
 import { ChevronLeft, Send, User, ShieldCheck } from 'lucide-react'

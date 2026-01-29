@@ -16,6 +16,8 @@ import {
 import { ProjectStatusManager } from '@/features/projects/components/ProjectStatusManager'
 import { ProjectEditForm } from '@/features/projects/components/ProjectEditForm'
 import { ProjectOperations } from '@/features/projects/components/ProjectOperations'
+import { RevisionManager } from '@/components/admin/project/RevisionManager'
+import { getSitePackage } from '@/actions/site-package'
 
 interface ProjectDetailPageProps {
     params: Promise<{ id: string }>
@@ -41,6 +43,7 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
         notFound()
     }
 
+    const sitePackage = await getSitePackage(id)
     const status = statusConfig[project.status] || statusConfig.DRAFT
 
     return (
@@ -164,6 +167,20 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
 
                     {/* Operations */}
                     <ProjectOperations project={project} />
+
+                    {/* Revision Manager */}
+                    {sitePackage && (
+                        <RevisionManager
+                            projectId={id}
+                            revisions={sitePackage.revisions.map(r => ({
+                                ...r,
+                                completedAt: r.completedAt?.toISOString() || null,
+                                createdAt: r.createdAt.toISOString(),
+                            }))}
+                            usedRevisions={sitePackage.usedRevisions}
+                            maxRevisions={sitePackage.maxRevisions}
+                        />
+                    )}
                 </div>
 
                 {/* Right - Status & Domain */}

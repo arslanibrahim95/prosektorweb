@@ -1,7 +1,7 @@
 'use client'
 
 import { ReactNode } from 'react'
-import Particles from '@/components/ui/Particles'
+import { ResponsiveParticles } from './ResponsiveParticles'
 import { Link } from '@/i18n/routing'
 import { Mail, Lock } from 'lucide-react'
 import { useTranslations } from 'next-intl'
@@ -21,16 +21,7 @@ export function AuthLayout({ children }: AuthLayoutProps) {
 
             {/* Particles */}
             <div className="absolute inset-0">
-                <Particles
-                    particleColors={['#dc2626', '#ef4444', '#ffffff']}
-                    particleCount={150}
-                    particleSpread={10}
-                    speed={0.08}
-                    particleBaseSize={80}
-                    moveParticlesOnHover={true}
-                    alphaParticles={false}
-                    disableRotation={false}
-                />
+                <ResponsiveParticles />
             </div>
 
             {/* Grid Pattern */}

@@ -1,6 +1,7 @@
 
 import 'dotenv/config'
-import { prisma } from '../src/lib/prisma'
+import { prisma } from '@/server/db'
+import { slugify } from '@/shared/lib/utils'
 
 const GEO_CONTENT = {
     'is-guvenligi-uzmani-sorumluluk': `

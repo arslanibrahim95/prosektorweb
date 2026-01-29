@@ -1,6 +1,6 @@
 import React from 'react'
 import { Page, Text, View, Document, StyleSheet } from '@react-pdf/renderer'
-import { registerFonts } from '@/lib/pdf/fonts'
+import { registerFonts } from '@/features/projects/lib/pdf/fonts'
 
 // Register fonts immediately
 registerFonts()
@@ -21,6 +21,11 @@ const styles = StyleSheet.create({
         paddingBottom: 20,
     },
     logo: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: '#111827',
+    },
+    companyName: {
         fontSize: 24,
         fontWeight: 'bold',
         color: '#111827',
@@ -191,7 +196,7 @@ export const ProposalDocument: React.FC<ProposalDocumentProps> = ({ data }) => {
                 {/* Header */}
                 <View style={styles.header}>
                     <View>
-                        <Text style={styles.logo}>PROSEKTOR</Text>
+                        <Text style={styles.companyName}>ProSektorWeb</Text>
                         <Text style={styles.text}>Yazılım ve Danışmanlık Hizmetleri</Text>
                     </View>
                     <View style={styles.headerInfo}>
@@ -262,10 +267,8 @@ export const ProposalDocument: React.FC<ProposalDocumentProps> = ({ data }) => {
 
                 {/* Footer */}
                 <View style={styles.footer}>
-                    <Text style={styles.footerText}>
-                        Bu belge elektronik ortamda oluşturulmuştur. Islak imza gerektirmez.
-                        ProSektor Yazılım ve Danışmanlık Hizmetleri
-                    </Text>
+                    <Text style={styles.footerText}>Bu teklif bilişim sistemleri vasıtasıyla oluşturulmuştur. İslak imza gerektirmez.</Text>
+                    <Text style={styles.footerText}>ProSektor Yazılım ve Danışmanlık Hizmetleri</Text>
                 </View>
             </Page>
         </Document>

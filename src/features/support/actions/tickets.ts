@@ -1,14 +1,14 @@
 'use server'
 
-import { prisma } from '@/lib/prisma'
-import { requireAuth } from '@/lib/auth-guard'
+import { prisma } from '@/server/db'
+import { requireAuth } from '@/features/auth/lib/auth-guard'
 import { auth } from '@/auth'
-import { logAudit } from '@/lib/audit'
-import { getErrorMessage, getZodErrorMessage, validatePagination } from '@/lib/action-types'
+import { getErrorMessage, getZodErrorMessage, validatePagination, logger } from '@/shared/lib'
+import { checkRateLimit, getClientIp } from '@/shared/lib/rate-limit'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 import { TicketStatus, TicketPriority, TicketCategory } from '@prisma/client'
-import { getUserCompanyId } from '@/lib/guards/tenant-guard'
+import { getUserCompanyId } from '@/features/system/lib/guards/tenant-guard'
 
 // ==========================================
 // TYPES & SCHEMAS
@@ -80,7 +80,8 @@ export async function createTicket(formData: FormData): Promise<TicketFormState>
             }
         })
 
-        await logAudit({
+        // TODO: Replace with new audit implementation
+        logger.info({
             action: 'CREATE',
             entity: 'Ticket',
             entityId: ticket.id,
@@ -154,7 +155,8 @@ export async function updateTicketStatus(id: string, status: TicketStatus) {
             data: { status }
         })
 
-        await logAudit({
+        // TODO: Replace with new audit implementation
+        logger.info({
             action: 'UPDATE',
             entity: 'Ticket',
             entityId: id,

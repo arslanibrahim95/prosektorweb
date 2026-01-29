@@ -6,8 +6,9 @@ vi.mock('@/lib/prisma', () => ({
     prisma: mockDeep(),
 }))
 
-vi.mock('next/headers', () => ({
-    headers: vi.fn(),
+vi.mock('@/shared/lib/headers', () => ({
+    getClientIp: vi.fn(),
+    getUserAgent: vi.fn(),
 }))
 
 vi.mock('@/lib/rate-limit', () => ({
@@ -27,14 +28,14 @@ vi.mock('isomorphic-dompurify', () => ({
 
 // 2. Import SUT and mocks
 import { submitContact } from '@/features/support/actions/contact'
-import { prisma } from '@/lib/prisma'
-import { headers } from 'next/headers'
-import { getClientIp } from '@/lib/rate-limit'
-import { verifyIdempotency } from '@/lib/security/idempotency'
+import { prisma } from '@/server/db'
+import { getClientIp } from '@/shared/lib/rate-limit'
+import { getUserAgent } from '@/shared/lib/headers'
+import { verifyIdempotency } from '@/features/system/lib/security/idempotency'
 
 const prismaMock = prisma as any
-const headersMock = headers as any
 const getClientIpMock = getClientIp as any
+const getUserAgentMock = getUserAgent as any
 const verifyIdempotencyMock = verifyIdempotency as any
 
 describe('submitContact', () => {
@@ -51,8 +52,8 @@ describe('submitContact', () => {
     beforeEach(() => {
         vi.clearAllMocks()
         // Setup default mock behaviors
-        headersMock.mockResolvedValue(new Map([['user-agent', 'Test Agent']]))
         getClientIpMock.mockResolvedValue('127.0.0.1')
+        getUserAgentMock.mockResolvedValue('Test Agent')
         verifyIdempotencyMock.mockResolvedValue(true) // Always new request by default
     })
 

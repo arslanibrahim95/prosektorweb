@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/alt-text */
 import React from 'react'
 import { Page, Text, View, Document, StyleSheet } from '@react-pdf/renderer'
-import { registerFonts } from '@/lib/pdf/fonts'
+import { registerFonts } from '@/features/projects/lib/pdf/fonts'
 
 registerFonts()
 
@@ -21,6 +21,11 @@ const styles = StyleSheet.create({
         paddingBottom: 20,
     },
     logo: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: '#111827',
+    },
+    companyName: {
         fontSize: 24,
         fontWeight: 'bold',
         color: '#111827',
@@ -155,7 +160,7 @@ export const InvoiceDocument: React.FC<InvoiceDocumentProps> = ({ data }) => {
                 {/* Header */}
                 <View style={styles.header}>
                     <View>
-                        <Text style={styles.logo}>PROSEKTOR</Text>
+                        <Text style={styles.companyName}>ProSektorWeb</Text>
                         <Text style={styles.text}>Yazılım ve Danışmanlık Hizmetleri</Text>
                     </View>
                     <View style={styles.headerInfo}>
@@ -224,8 +229,7 @@ export const InvoiceDocument: React.FC<InvoiceDocumentProps> = ({ data }) => {
 
                 {/* Footer */}
                 <View style={styles.footer}>
-                    <Text style={styles.footerText}>
-                        Bu belge elektronik ortamda oluşturulmuştur. Islak imza gerektirmez.
+                    <Text style={styles.footerText}>Bu belge bilişim sistemleri vasıtasıyla oluşturulmuştur. İslak imza gerektirmez.
                         ProSektor Yazılım ve Danışmanlık Hizmetleri
                     </Text>
                 </View>

@@ -4,6 +4,8 @@ import "../globals.css";
 import { AuthProvider } from "@/features/auth/components/AuthProvider";
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
+import { AnalyticsProvider } from "@/features/analytics/components/AnalyticsProvider";
+import { ResourceHints, CriticalCSS } from "@/features/performance/components/WebVitalsTracker";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -75,7 +77,14 @@ export default async function RootLayout({
 
   return (
     <html lang={locale} className={`${inter.variable} ${playfair.variable}`} suppressHydrationWarning>
+      <head>
+        <ResourceHints />
+        <CriticalCSS />
+      </head>
       <body className="font-sans antialiased">
+        <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:z-[100] focus:top-4 focus:left-4 bg-brand-600 text-white px-4 py-2 rounded-lg font-bold shadow-lg">
+          Skip to content
+        </a>
         <JsonLd data={{
           "@context": "https://schema.org",
           "@type": "Organization",
@@ -90,14 +99,16 @@ export default async function RootLayout({
         }} />
         <NextIntlClientProvider messages={messages}>
           <AuthProvider>
-            <ThemeProvider
-              attribute="class"
-              defaultTheme="system"
-              enableSystem
-              disableTransitionOnChange
-            >
-              {children}
-            </ThemeProvider>
+            <AnalyticsProvider>
+              <ThemeProvider
+                attribute="class"
+                defaultTheme="system"
+                enableSystem
+                disableTransitionOnChange
+              >
+                {children}
+              </ThemeProvider>
+            </AnalyticsProvider>
           </AuthProvider>
         </NextIntlClientProvider>
       </body>

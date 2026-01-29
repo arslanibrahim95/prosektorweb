@@ -1,6 +1,6 @@
 import { auth } from '@/auth'
-import { prisma } from '@/lib/prisma'
-import { safeApi } from '@/lib/safe-api'
+import { prisma } from '@/server/db'
+import { safeApi } from '@/shared/lib/safe-api'
 
 export const PUT = safeApi<{ success: true }, { id: string }>(async (request, { params }) => {
     const session = await auth()

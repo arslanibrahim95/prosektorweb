@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { ChevronLeft } from 'lucide-react'
 import { InvoiceForm } from '@/features/finance/components/InvoiceForm'
 import { generateInvoiceNo } from '@/features/finance/actions/invoices'
-import { prisma } from '@/lib/prisma'
+import { prisma } from '@/server/db'
 
 export default async function NewInvoicePage() {
     // Fetch companies for dropdown

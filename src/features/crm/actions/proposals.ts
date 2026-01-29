@@ -1,15 +1,14 @@
 'use server'
 
-import { prisma } from '@/lib/prisma'
+import { prisma } from '@/server/db'
 import { revalidatePath } from 'next/cache'
 import { auth } from '@/auth'
-import { getErrorMessage, getZodErrorMessage, validatePagination } from '@/lib/action-types'
+import { getErrorMessage, getZodErrorMessage, validatePagination, toDecimal, calculateTaxPrecise, AuditAction } from '@/shared/lib'
+import { checkRateLimit, getClientIp } from '@/shared/lib/rate-limit'
 import { z } from 'zod'
-import { checkRateLimit, getClientIp } from '@/lib/rate-limit'
-import { AuditAction, ProposalStatus, Prisma } from '@prisma/client'
-import { toDecimal, calculateTaxPrecise } from '@/lib/money'
 import { Decimal } from 'decimal.js'
 import crypto from 'crypto'
+import { Prisma, ProposalStatus } from '@prisma/client'
 
 const ProposalItemSchema = z.object({
     description: z.string().min(1, 'Açıklama gereklidir'),

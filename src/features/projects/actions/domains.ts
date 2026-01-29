@@ -1,12 +1,12 @@
 'use server'
 
-import { prisma } from '@/lib/prisma'
+import { prisma } from '@/server/db'
 import { revalidatePath } from 'next/cache'
 import { auth } from '@/auth'
-import { getErrorMessage, getZodErrorMessage, isPrismaUniqueConstraintError } from '@/lib/action-types'
+import { getErrorMessage, getZodErrorMessage, isPrismaUniqueConstraintError, logger } from '@/shared/lib'
+import { checkRateLimit, getClientIp } from '@/shared/lib/rate-limit'
+import { encrypt } from '@/features/auth/lib/crypto'
 import { z } from 'zod'
-import { encrypt } from '@/lib/auth/crypto'
-import { checkRateLimit, getClientIp } from '@/lib/rate-limit'
 import { AuditAction, DomainStatus } from '@prisma/client'
 
 export interface DomainInput {

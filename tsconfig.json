@@ -26,6 +26,15 @@
       "@/*": [
         "./src/*"
       ],
+      "@/shared/*": [
+        "./src/shared/*"
+      ],
+      "@/server/*": [
+        "./src/server/*"
+      ],
+      "@/features/*": [
+        "./src/features/*"
+      ],
       "@prisma/client": [
         "./node_modules/@prisma/client"
       ]

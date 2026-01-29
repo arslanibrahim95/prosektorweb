@@ -1,6 +1,6 @@
 import { auth } from '@/auth'
 import { getClientProjects } from '@/features/auth/actions/portal'
-import { prisma } from '@/lib/prisma'
+import { prisma } from '@/server/db'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { ExternalLink, Globe, Calendar, Clock } from 'lucide-react'

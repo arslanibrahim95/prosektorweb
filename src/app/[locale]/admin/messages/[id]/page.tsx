@@ -1,4 +1,4 @@
-import { prisma } from '@/lib/prisma'
+import { prisma } from '@/server/db'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { ChevronLeft, Mail, Calendar, User, Phone } from 'lucide-react'

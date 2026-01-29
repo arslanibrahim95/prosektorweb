@@ -2,7 +2,7 @@
 
 import React from 'react'
 import { LucideIcon, TrendingUp, TrendingDown } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { cn } from '@/shared/lib'
 
 export type StatsColor = 'brand' | 'blue' | 'green' | 'red' | 'orange' | 'yellow' | 'purple' | 'neutral'
 

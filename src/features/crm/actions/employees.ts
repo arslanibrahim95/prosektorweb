@@ -1,8 +1,8 @@
 'use server'
 
-import { prisma } from '@/lib/prisma'
-import { getErrorMessage, getZodErrorMessage, isPrismaUniqueConstraintError } from '@/lib/action-types'
-import { requireAuth } from '@/lib/auth-guard'
+import { prisma } from '@/server/db'
+import { getErrorMessage, getZodErrorMessage, isPrismaUniqueConstraintError } from '@/shared/lib'
+import { requireAuth } from '@/shared/lib/auth-guard'
 import { auth } from '@/auth'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'

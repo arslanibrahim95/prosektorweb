@@ -1,6 +1,6 @@
 'use server'
 
-import { prisma } from '@/lib/prisma'
+import { prisma } from '@/server/db'
 import { auth } from '@/auth'
 import { AuditAction } from '@prisma/client'
 

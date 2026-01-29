@@ -8,7 +8,7 @@ vi.mock('@/lib/prisma', () => ({
 }))
 
 import { createPayment } from '@/features/finance/actions/payments'
-import { prisma } from '@/lib/prisma'
+import { prisma } from '@/server/db'
 
 const prismaMock = prisma as any
 

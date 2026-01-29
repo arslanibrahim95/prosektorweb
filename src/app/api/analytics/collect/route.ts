@@ -1,9 +1,8 @@
 
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
-import { headers } from 'next/headers'
+import { prisma } from '@/server/db'
 import { z } from 'zod'
-import { checkRateLimit, getClientIp } from '@/lib/rate-limit'
+import { checkRateLimit, getClientIp } from '@/shared/lib/rate-limit'
 import crypto from 'crypto'
 
 // CORS Headers (Restricted for production)

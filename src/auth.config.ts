@@ -1,5 +1,5 @@
 import type { NextAuthConfig } from 'next-auth';
-import { prisma } from '@/lib/prisma';
+import { prisma } from '@/server/db';
 
 export const authConfig = {
     pages: {

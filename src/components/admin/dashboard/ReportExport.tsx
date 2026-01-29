@@ -10,14 +10,14 @@ import {
     RefreshCw,
     Printer
 } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { cn } from '@/shared/lib'
 
 // Report types
 export type ReportType = 'companies' | 'employees' | 'invoices' | 'projects' | 'proposals' | 'audit' | 'financial'
 export type ExportFormat = 'pdf' | 'excel' | 'csv'
 
 // Date range options
-interface DateRange {
+export interface DateRange {
     label: string
     value: string
     days: number

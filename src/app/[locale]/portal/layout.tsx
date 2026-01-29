@@ -6,8 +6,9 @@ import {
     Globe, FileText, Settings, Clock, CreditCard, BarChart3
 } from 'lucide-react'
 import { logoutAction } from '@/features/auth/actions/auth'
-import { prisma } from '@/lib/prisma'
+import { prisma } from '@/server/db'
 import Particles from '@/components/ui/Particles'
+import { getTranslations } from 'next-intl/server'
 
 async function getCompanyName(companyId: string | null) {
     if (!companyId) return null
@@ -26,6 +27,7 @@ export default async function PortalLayout({
     const session = await auth()
     const companyId = session?.user?.companyId
     const companyName = await getCompanyName(companyId || null)
+    const t = await getTranslations('Portal')
 
     return (
         <div className="min-h-screen bg-neutral-50 flex flex-col relative overflow-hidden">
@@ -48,7 +50,12 @@ export default async function PortalLayout({
                 <div className="bg-purple-600 text-white px-4 py-2 text-sm font-bold flex items-center justify-between z-50 sticky top-0">
                     <div className="flex items-center gap-2">
                         <Layers className="w-4 h-4" />
-                        <span>SİMÜLASYON MODU: Şu an <u>{companyName}</u> olarak sistemdesiniz.</span>
+                        <span>
+                            {t.rich('simulation_banner', {
+                                company: companyName || 'Simülasyon',
+                                u: (chunks) => <u>{chunks}</u>
+                            })}
+                        </span>
                     </div>
                     <form action={async () => {
                         'use server'
@@ -56,7 +63,7 @@ export default async function PortalLayout({
                         await exitImpersonation()
                     }}>
                         <button className="bg-white text-purple-600 px-3 py-1 rounded text-xs font-extrabold hover:bg-purple-50 transition-colors">
-                            YÖNETİME DÖN
+                            {t('simulation_exit')}
                         </button>
                     </form>
                 </div>
@@ -74,54 +81,54 @@ export default async function PortalLayout({
                                 <h2 className="text-lg font-bold text-white truncate">
                                     {companyName || 'Portal'}
                                 </h2>
-                                <p className="text-xs text-neutral-400">Müşteri Paneli</p>
+                                <p className="text-xs text-neutral-400">{t('customer_panel')}</p>
                             </div>
                         </div>
                     </div>
 
                     <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
                         {/* Ana Bölümler */}
-                        <p className="px-4 py-2 text-xs font-semibold text-neutral-500 uppercase tracking-wider">Ana Menü</p>
+                        <p className="px-4 py-2 text-xs font-semibold text-neutral-500 uppercase tracking-wider">{t('menu_main')}</p>
 
                         <Link href="/portal" className="flex items-center gap-3 px-4 py-3 rounded-xl text-neutral-300 hover:bg-white/5 hover:text-white font-medium transition-all">
                             <LayoutDashboard className="w-5 h-5" />
-                            Özet
+                            {t('dashboard')}
                         </Link>
                         <Link href="/portal/projects" className="flex items-center gap-3 px-4 py-3 rounded-xl text-neutral-300 hover:bg-white/5 hover:text-white font-medium transition-all">
                             <Layers className="w-5 h-5" />
-                            Projelerim
+                            {t('projects')}
                         </Link>
                         <Link href="/portal/tickets" className="flex items-center gap-3 px-4 py-3 rounded-xl text-neutral-300 hover:bg-white/5 hover:text-white font-medium transition-all">
                             <Ticket className="w-5 h-5" />
-                            Destek
+                            {t('tickets')}
                         </Link>
 
                         {/* Hizmetler */}
-                        <p className="px-4 py-2 mt-4 text-xs font-semibold text-neutral-500 uppercase tracking-wider">Hizmetler</p>
+                        <p className="px-4 py-2 mt-4 text-xs font-semibold text-neutral-500 uppercase tracking-wider">{t('menu_services')}</p>
 
                         <Link href="/portal/analytics" className="flex items-center gap-3 px-4 py-3 rounded-xl text-neutral-300 hover:bg-white/5 hover:text-white font-medium transition-all">
                             <BarChart3 className="w-5 h-5" />
-                            Site Analitiği
+                            {t('analytics')}
                         </Link>
                         <Link href="/portal/services" className="flex items-center gap-3 px-4 py-3 rounded-xl text-neutral-300 hover:bg-white/5 hover:text-white font-medium transition-all">
                             <Clock className="w-5 h-5" />
-                            Aboneliklerim
+                            {t('subscription')}
                         </Link>
                         <Link href="/portal/domains" className="flex items-center gap-3 px-4 py-3 rounded-xl text-neutral-300 hover:bg-white/5 hover:text-white font-medium transition-all">
                             <Globe className="w-5 h-5" />
-                            Domainlerim
+                            {t('domains')}
                         </Link>
 
                         {/* Finansal */}
-                        <p className="px-4 py-2 mt-4 text-xs font-semibold text-neutral-500 uppercase tracking-wider">Finansal</p>
+                        <p className="px-4 py-2 mt-4 text-xs font-semibold text-neutral-500 uppercase tracking-wider">{t('menu_financial')}</p>
 
                         <Link href="/portal/invoices" className="flex items-center gap-3 px-4 py-3 rounded-xl text-neutral-300 hover:bg-white/5 hover:text-white font-medium transition-all">
                             <Receipt className="w-5 h-5" />
-                            Faturalar
+                            {t('invoices')}
                         </Link>
                         <Link href="/portal/proposals" className="flex items-center gap-3 px-4 py-3 rounded-xl text-neutral-300 hover:bg-white/5 hover:text-white font-medium transition-all">
                             <FileText className="w-5 h-5" />
-                            Teklifler
+                            {t('proposals')}
                         </Link>
                     </nav>
 
@@ -138,7 +145,7 @@ export default async function PortalLayout({
                         <form action={logoutAction}>
                             <button className="flex w-full items-center gap-3 px-4 py-2 text-sm text-red-400 hover:text-red-300 transition-colors">
                                 <LogOut className="w-4 h-4" />
-                                Çıkış Yap
+                                {t('logout')}
                             </button>
                         </form>
                     </div>

@@ -5,10 +5,10 @@
  * Statik site oluşturma ve deploy işlemleri
  */
 
-import { prisma } from '@/lib/prisma';
-import { generateStaticSite } from '@/lib/deploy/static-generator';
-import { SiteExporter } from '@/lib/deploy/exporter';
-import { getCloudflareService, getDefaultServerIp } from '@/lib/cloudflare';
+import { prisma } from '@/server/db';
+import { generateStaticSite } from '@/features/projects/lib/deploy/static-generator';
+import { SiteExporter } from '@/features/projects/lib/deploy/exporter';
+import { getCloudflareService, getDefaultServerIp } from '@/server/integrations/cloudflare';
 import { revalidatePath } from 'next/cache';
 import fs from 'fs/promises';
 import path from 'path';

@@ -60,6 +60,10 @@ model Company {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
+  // AI Generation
+  aiGenerationJobs AIGenerationJob[]
+  generatedWebsites GeneratedWebsite[]
+
   @@index([name])
   @@index([status])
   @@index([deletedAt])
@@ -564,6 +568,19 @@ model ApiConfig {
 // WEB PROJELERİ (Web Ajansı)
 // ===============================
 
+enum PackageTier {
+  STARTER
+  PROFESSIONAL
+  ENTERPRISE
+}
+
+enum RevisionStatus {
+  REQUESTED
+  IN_PROGRESS
+  COMPLETED
+  REJECTED
+}
+
 enum ProjectStatus {
   DRAFT       // Taslak
   DESIGNING   // Tasarım
@@ -603,6 +620,7 @@ model WebProject {
   analytics   SiteAnalytics?
   generatedContents GeneratedContent[]
   pipelineRuns PipelineRun[]
+  sitePackage SitePackage?
 
   progress    Int           @default(0)
   
@@ -731,6 +749,10 @@ model GeneratedContent {
   metaTitle     String?       @db.VarChar(100)
   metaDescription String?     @db.VarChar(200)
   
+  // Versioning
+  version       Int           @default(1)
+  revisionId    String?
+
   // Generation metadata
   modelUsed     String        // gpt-4, gpt-4-turbo, etc.
   tokensUsed    Int?
@@ -880,6 +902,14 @@ model User {
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
   deletedAt      DateTime? // Soft Delete
+
+  // AI Generation
+  aiGenerationJobs AIGenerationJob[]
+  generatedWebsites GeneratedWebsite[]
+  generationPresets GenerationPreset[]
+  generationActivities GenerationActivity[]
+  generationRateLimits GenerationRateLimit[]
+  createdTemplates GenerationTemplate[]
 
   @@index([companyId])
   @@index([deletedAt])
@@ -1123,4 +1153,300 @@ model PasswordResetToken {
   createdAt DateTime @default(now())
 
   @@index([email])
+}
+
+// ===============================
+// AI WEBSITE GENERATION
+// ===============================
+
+enum GenerationStatus {
+  PENDING
+  ANALYZING
+  DESIGNING
+  GENERATING_CONTENT
+  GENERATING_CODE
+  BUILDING
+  COMPLETED
+  FAILED
+  CANCELLED
+}
+
+enum GenerationComplexity {
+  SIMPLE
+  MODERATE
+  COMPLEX
+}
+
+enum GenerationActivityType {
+  JOB_CREATED
+  JOB_STARTED
+  STEP_COMPLETED
+  JOB_COMPLETED
+  JOB_FAILED
+  JOB_CANCELLED
+  VERSION_CREATED
+  DEPLOYED
+  ROLLED_BACK
+  CLONED
+  EDITED
+  DELETED
+}
+
+model AIGenerationJob {
+  id                String           @id @default(uuid())
+  userId            String
+  user              User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  companyId         String?
+  company           Company?         @relation(fields: [companyId], references: [id])
+  
+  prompt            String           @db.Text
+  promptHash        String           @db.VarChar(64)
+  status            GenerationStatus @default(PENDING)
+  currentStep       String?          @db.VarChar(50)
+  progress          Int              @default(0)
+  stepsCompleted    Int              @default(0)
+  totalSteps        Int              @default(5)
+  
+  // Analysis Results
+  analysisResult    Json?
+  designResult      Json?
+  contentResult     Json?
+  codeResult        Json?
+  
+  // Error Handling
+  errorMessage      String?          @db.Text
+  errorCode         String?          @db.VarChar(50)
+  retryCount        Int              @default(0)
+  maxRetries        Int              @default(3)
+  
+  // Metadata
+  estimatedDuration Int?
+  startedAt         DateTime?
+  completedAt       DateTime?
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+  
+  // Version Control
+  version           BigInt           @default(0)
+  isLatest          Boolean          @default(true)
+  parentJobId       String?
+  parentJob         AIGenerationJob? @relation("JobVersions", fields: [parentJobId], references: [id])
+  childJobs         AIGenerationJob[] @relation("JobVersions")
+
+  generatedWebsites GeneratedWebsite[]
+  activities        GenerationActivity[]
+
+  @@index([userId])
+  @@index([companyId])
+  @@index([status])
+  @@index([createdAt])
+  @@index([isLatest])
+  @@index([promptHash])
+}
+
+model GeneratedWebsite {
+  id                String           @id @default(uuid())
+  jobId             String
+  job               AIGenerationJob  @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  userId            String
+  user              User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  companyId         String?
+  company           Company?         @relation(fields: [companyId], references: [id])
+  
+  // Website Metadata
+  name              String           @db.VarChar(255)
+  slug              String           @db.VarChar(255)
+  description       String?          @db.Text
+  template          String           @default("default") @db.VarChar(100)
+  
+  // Generated Assets
+  siteStructure     Json
+  pages             Json
+  components        Json?
+  styles            Json?
+  assets            Json?
+  
+  // Source Code
+  sourceCode        String?          @db.LongText
+  buildOutput       String?          @db.LongText
+  
+  // Preview
+  previewUrl        String?          @db.VarChar(500)
+  thumbnailUrl      String?          @db.VarChar(500)
+  
+  // Version Control
+  version           Int              @default(1)
+  versionLabel      String?          @db.VarChar(100)
+  versionNotes      String?          @db.Text
+  isActive          Boolean          @default(false)
+  isDeployed        Boolean          @default(false)
+  deployedAt        DateTime?
+  deployedUrl       String?          @db.VarChar(500)
+  
+  // Rollback Support
+  canRollback       Boolean          @default(true)
+  rollbackToVersion Int?
+  
+  // Metadata
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+
+  activities        GenerationActivity[]
+
+  @@unique([slug, version])
+  @@index([jobId])
+  @@index([userId])
+  @@index([companyId])
+  @@index([isActive])
+  @@index([isDeployed])
+  @@index([createdAt])
+}
+
+model GenerationTemplate {
+  id                String               @id @default(uuid())
+  name              String               @db.VarChar(255)
+  slug              String               @unique @db.VarChar(255)
+  description       String?              @db.Text
+  category          String               @db.VarChar(100)
+  
+  // Template Configuration
+  promptTemplate    String               @db.Text
+  systemPrompt      String?              @db.Text
+  structureTemplate Json
+  defaultStyles     Json?
+  
+  // Template Settings
+  isActive          Boolean              @default(true)
+  isPublic          Boolean              @default(true)
+  isPremium         Boolean              @default(false)
+  complexity        GenerationComplexity @default(MODERATE)
+  estimatedDuration Int?
+  
+  // Usage Stats
+  usageCount        Int                  @default(0)
+  rating            Decimal?             @db.Decimal(3, 2)
+  ratingCount       Int                  @default(0)
+  
+  // Metadata
+  createdBy         String?
+  creator           User?                @relation(fields: [createdBy], references: [id])
+  createdAt         DateTime             @default(now())
+  updatedAt         DateTime             @updatedAt
+
+  presets           GenerationPreset[]
+
+  @@index([category])
+  @@index([isActive])
+  @@index([isPublic])
+}
+
+model GenerationPreset {
+  id                String              @id @default(uuid())
+  userId            String
+  user              User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name              String              @db.VarChar(255)
+  description       String?             @db.Text
+  
+  // Preset Configuration
+  basePrompt        String              @db.Text
+  templateId        String?
+  template          GenerationTemplate? @relation(fields: [templateId], references: [id])
+  customSettings    Json?
+  
+  // Metadata
+  isFavorite        Boolean             @default(false)
+  usageCount        Int                 @default(0)
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  
+  @@index([userId])
+  @@index([templateId])
+  @@index([isFavorite])
+}
+
+model GenerationActivity {
+  id           String                 @id @default(uuid())
+  jobId        String
+  job          AIGenerationJob        @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  websiteId    String?
+  website      GeneratedWebsite?      @relation(fields: [websiteId], references: [id], onDelete: Cascade)
+  userId       String
+  user         User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Activity Details
+  activityType GenerationActivityType
+  stepName     String?                @db.VarChar(50)
+  details      Json?
+  metadata     Json?
+  
+  // Timestamps
+  createdAt    DateTime               @default(now())
+  
+  @@index([jobId])
+  @@index([websiteId])
+  @@index([userId])
+  @@index([activityType])
+  @@index([createdAt])
+}
+
+model GenerationRateLimit {
+  id            String   @id @default(uuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Rate Limit Tracking
+  periodStart   DateTime
+  periodEnd     DateTime
+  requestsCount Int      @default(0)
+  requestsLimit Int      @default(10)
+  
+  // Usage Stats
+  tokensUsed    Int      @default(0)
+  estimatedCost Decimal  @default(0.0000) @db.Decimal(10, 4)
+  
+  // Metadata
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  @@unique([userId, periodStart])
+  @@index([periodEnd])
+}
+
+// ===============================
+// SITE PACKAGE & REVISIONS
+// ===============================
+
+model SitePackage {
+  id               String      @id @default(uuid())
+  webProjectId     String      @unique
+  webProject       WebProject  @relation(fields: [webProjectId], references: [id], onDelete: Cascade)
+  tier             PackageTier @default(STARTER)
+  maxRevisions     Int         @default(2)
+  usedRevisions    Int         @default(0)
+  maxPages         Int         @default(5)
+  hostingStartDate DateTime?
+  hostingEndDate   DateTime?
+  isHostingActive  Boolean     @default(false)
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+  revisions        SiteRevision[]
+
+  @@index([tier])
+}
+
+model SiteRevision {
+  id              String         @id @default(uuid())
+  packageId       String
+  package         SitePackage    @relation(fields: [packageId], references: [id], onDelete: Cascade)
+  revisionNumber  Int
+  description     String         @db.Text
+  affectedPages   Json?
+  status          RevisionStatus @default(REQUESTED)
+  adminNotes      String?        @db.Text
+  completedAt     DateTime?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  @@index([packageId])
+  @@index([status])
 }

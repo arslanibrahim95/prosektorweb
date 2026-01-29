@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { ChevronLeft } from 'lucide-react'
 import { WorkplaceForm } from '@/features/crm/components/WorkplaceForm'
-import { prisma } from '@/lib/prisma'
+import { prisma } from '@/server/db'
 
 export default async function NewWorkplacePage() {
     const companies = await prisma.company.findMany({

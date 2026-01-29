@@ -1,7 +1,7 @@
 'use server'
 
-import { getCloudflareService, getDefaultServerIp } from '@/lib/cloudflare'
-import { prisma } from '@/lib/prisma'
+import { getCloudflareService, getDefaultServerIp } from '@/server/integrations/cloudflare'
+import { prisma } from '@/server/db'
 import { revalidatePath } from 'next/cache'
 import { auth } from '@/auth'
 
@@ -40,7 +40,8 @@ async function requireAdmin() {
 // DOMAIN AVAILABILITY CHECK WITH PRICING
 // ==========================================
 
-import { checkRateLimit, getClientIp } from '@/lib/rate-limit'
+import { createSafeAction } from '@/shared/lib'
+import { checkRateLimit, getClientIp } from '@/shared/lib/rate-limit'
 
 export async function searchDomainsWithPricing(query: string): Promise<{
     success: boolean
@@ -122,8 +123,6 @@ export async function searchDomainsWithPricing(query: string): Promise<{
 // REGISTER DOMAIN
 // ==========================================
 
-import { createSafeAction } from '@/lib/safe-action'
-
 const purchaseDomainHandler = async ({ domain, contactInfo, companyId }: {
     domain: string,
     contactInfo: {
@@ -198,7 +197,7 @@ const purchaseDomainHandler = async ({ domain, contactInfo, companyId }: {
     }
 
     // Log Domain Purchase
-    const auditLib = await import('@/lib/audit')
+    const auditLib = await import('@/shared/lib')
     const authLib = await import('@/auth')
     const session = await authLib.auth()
 

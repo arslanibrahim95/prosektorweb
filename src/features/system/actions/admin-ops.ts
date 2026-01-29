@@ -1,9 +1,9 @@
 'use server'
 
 import { auth } from '@/auth'
-import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
-import { logAudit } from '@/lib/audit'
+import { getErrorMessage, getZodErrorMessage, logger } from '@/shared/lib'
+import { setCookie, deleteCookie } from '@/shared/lib/headers'
 
 export async function impersonateCompany(companyId: string) {
     const session = await auth()
@@ -13,7 +13,9 @@ export async function impersonateCompany(companyId: string) {
     }
 
     // Audit Log: Start Impersonation
-    await logAudit({
+    // Audit Log: Start Impersonation
+    // TODO: Replace with new audit implementation
+    logger.info({
         action: 'UPDATE', // Using UPDATE as we are changing session context
         entity: 'AdminOps',
         entityId: companyId,
@@ -22,8 +24,7 @@ export async function impersonateCompany(companyId: string) {
     })
 
     // Set a cookie to indicate which company the admin acts as
-    const cookieStore = await cookies()
-    cookieStore.set('admin_view_company_id', companyId, {
+    await setCookie('admin_view_company_id', companyId, {
         path: '/',
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
@@ -39,13 +40,14 @@ export async function exitImpersonation() {
 
     if (session?.user?.role !== 'ADMIN') {
         // Even if not admin, clear the cookie just in case
-        const cookieStore = await cookies()
-        cookieStore.delete('admin_view_company_id')
+        await deleteCookie('admin_view_company_id')
         redirect('/login')
     }
 
     // Audit Log: End Impersonation
-    await logAudit({
+    // Audit Log: End Impersonation
+    // TODO: Replace with new audit implementation
+    logger.info({
         action: 'UPDATE',
         entity: 'AdminOps',
         entityId: session.user.companyId || 'system',
@@ -53,8 +55,7 @@ export async function exitImpersonation() {
         details: { operation: 'IMPERSONATE_END' }
     })
 
-    const cookieStore = await cookies()
-    cookieStore.delete('admin_view_company_id')
+    await deleteCookie('admin_view_company_id')
 
     redirect('/admin')
 }

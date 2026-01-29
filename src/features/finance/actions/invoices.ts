@@ -1,17 +1,14 @@
 'use server'
 
-import { prisma } from '@/lib/prisma'
+import { prisma } from '@/server/db'
 import { revalidatePath } from 'next/cache'
 import { auth } from '@/auth'
-import { getErrorMessage, getZodErrorMessage, isPrismaUniqueConstraintError, validatePagination } from '@/lib/action-types'
+import { getErrorMessage, getZodErrorMessage, isPrismaUniqueConstraintError, validatePagination, invalidateCache, logger, redis } from '@/shared/lib'
+import { checkRateLimit, getClientIp } from '@/shared/lib/rate-limit'
 import { z } from 'zod'
-import { getUserCompanyId, requireTenantAccess } from '@/lib/guards/tenant-guard'
-import { invalidateCache } from '@/lib/cache'
-import { logger } from '@/lib/logger'
+import { getUserCompanyId, requireTenantAccess } from '@/features/system/lib/guards/tenant-guard'
 import { AuditAction, InvoiceStatus, PaymentMethod } from '@prisma/client'
 import { Decimal } from 'decimal.js'
-import { redis } from '@/lib/redis'
-import { checkRateLimit, getClientIp } from '@/lib/rate-limit'
 
 export interface InvoiceInput {
     companyId: string

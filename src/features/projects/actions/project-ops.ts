@@ -1,7 +1,7 @@
 'use server'
 
-import { getCloudflareService, getDefaultServerIp } from '@/lib/cloudflare'
-import { prisma } from '@/lib/prisma'
+import { getCloudflareService, getDefaultServerIp } from '@/server/integrations/cloudflare'
+import { prisma } from '@/server/db'
 import { revalidatePath } from 'next/cache'
 import { auth } from '@/auth'
 

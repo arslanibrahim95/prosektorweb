@@ -1,4 +1,4 @@
-import { prisma } from '@/lib/prisma'
+import { prisma } from '@/server/db'
 import { createService } from '@/features/finance/actions/services'
 import Link from 'next/link'
 import { ChevronLeft, Save } from 'lucide-react'

@@ -1,12 +1,13 @@
 'use server'
 
-import { prisma } from '@/lib/prisma'
-import { requireAuth } from '@/lib/auth-guard'
+import { prisma } from '@/server/db'
+import { requireAuth } from '@/features/auth/lib/auth-guard'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 import bcrypt from 'bcryptjs'
 import { UserRole, AuditAction } from '@prisma/client'
 import { auth } from '@/auth'
+import { getErrorMessage, getZodErrorMessage, validatePagination, logger } from '@/shared/lib'
 
 // Types
 export interface SystemUserInput {

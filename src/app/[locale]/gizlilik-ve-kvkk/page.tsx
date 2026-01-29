@@ -46,7 +46,7 @@ export default function PrivacyPolicyPage() {
                             <section className="mb-8">
                                 <h3>1. Gizliliğe Yaklaşımımız</h3>
                                 <p>
-                                    Prosektorweb olarak, platformumuzu kullanan kişi ve kurumların gizliliğine önem veririz.
+                                    <p>ProSektorWeb olarak (&quot;Biz&quot;, &quot;Şirket&quot;), gizliliğinize ve kişisel verilerinizin güvenliğine büyük önem veriyoruz.</p>
                                     Kullanıcılara ait kişisel veriler, firma bilgileri ve hizmet kapsamında paylaşılan içerikler gizli kabul edilir.
                                 </p>
                                 <p>Bu bilgiler;</p>

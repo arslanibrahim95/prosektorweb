@@ -1,6 +1,6 @@
 import { auth } from '@/auth'
 import { getClientInvoices } from '@/features/auth/actions/portal'
-import { prisma } from '@/lib/prisma'
+import { prisma } from '@/server/db'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { Receipt, Calendar, CheckCircle, Clock, AlertCircle } from 'lucide-react'

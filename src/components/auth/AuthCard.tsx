@@ -22,7 +22,7 @@ export function AuthCard({ title, description, icon, children }: AuthCardProps) 
                         {icon}
                     </div>
                     <h1 className="text-2xl font-bold text-white font-serif mb-2">{title}</h1>
-                    <p className="text-brand-100 text-sm flex items-center justify-center gap-2">
+                    <p className="text-white/80 text-sm flex items-center justify-center gap-2">
                         <Sparkles className="w-4 h-4" />
                         {description}
                     </p>

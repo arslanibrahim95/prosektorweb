@@ -2,9 +2,9 @@ import NextAuth from "next-auth"
 import Credentials from "next-auth/providers/credentials"
 import { z } from "zod"
 import { authConfig } from "./auth.config"
-import { prisma } from "@/lib/prisma"
+import { prisma } from '@/server/db'
 import bcrypt from "bcryptjs"
-import { verifyRootPassword } from "@/lib/auth/root-admin"
+import { verifyRootPassword } from '@/features/auth/lib/root-admin'
 
 async function getUser(email: string) {
     try {

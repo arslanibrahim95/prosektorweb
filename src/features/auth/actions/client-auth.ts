@@ -1,7 +1,9 @@
 'use server'
 
 import { z } from 'zod'
-import { constantTimeCompare } from '@/lib/auth/crypto'
+
+import { checkRateLimit, getClientIp } from '@/shared/lib/rate-limit'
+import { constantTimeCompare } from '@/shared/lib/security'
 
 const verifySchema = z.object({
     osgbName: z.string().min(1, 'OSGB adı zorunludur'),
@@ -21,7 +23,7 @@ const AUTHORIZED_CLIENTS = [
     }
 ]
 
-import { checkRateLimit, getClientIp } from '@/lib/rate-limit'
+
 
 export async function verifyClientAccess(osgbName: string, code: string): Promise<VerifyResult> {
     const ip = await getClientIp()
@@ -61,7 +63,7 @@ export async function verifyClientAccess(osgbName: string, code: string): Promis
 
     if (isValid) {
         // Log Success
-        await import('@/lib/audit').then(m => m.createAuditLog({
+        await import('@/shared/lib').then(m => m.createAuditLog({
             action: 'LOGIN_SUCCESS',
             entity: 'Client',
             entityId: authorizedClient.name,
@@ -70,7 +72,7 @@ export async function verifyClientAccess(osgbName: string, code: string): Promis
         }))
     } else {
         // Log Failure
-        await import('@/lib/audit').then(m => m.createAuditLog({
+        await import('@/shared/lib').then(m => m.createAuditLog({
             action: 'LOGIN_FAILED',
             entity: 'Client',
             details: { osgbName, ip, error: 'Invalid Credentials' },

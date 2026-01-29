@@ -27,6 +27,7 @@ import {
 import { usePathname } from 'next/navigation'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { AdminBreadcrumbs } from './AdminBreadcrumbs'
+import { SystemHealthWidget } from './SystemHealthWidget'
 
 interface AdminShellProps {
     children: React.ReactNode
@@ -56,7 +57,7 @@ export function AdminShell({ children, userEmail }: AdminShellProps) {
 
             {/* Sidebar */}
             <aside className={`
-                w-72 bg-gradient-to-b from-neutral-900 to-neutral-800 
+                w-72 bg-gradient-to-b from-neutral-900 to-neutral-800 dark:from-neutral-950 dark:to-neutral-900
                 fixed inset-y-0 left-0 z-50 flex flex-col transition-transform duration-300 ease-in-out
                 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
             `}>
@@ -75,6 +76,7 @@ export function AdminShell({ children, userEmail }: AdminShellProps) {
                     <button
                         onClick={() => setIsSidebarOpen(false)}
                         className="lg:hidden text-white/50 hover:text-white"
+                        aria-label="Close Sidebar"
                     >
                         <X className="w-6 h-6" />
                     </button>
@@ -139,29 +141,7 @@ export function AdminShell({ children, userEmail }: AdminShellProps) {
                 </nav>
 
                 {/* PLATFORM HEALTH MONITOR */}
-                <div className="p-4 mx-4 mb-4 bg-white/5 rounded-2xl border border-white/5 backdrop-blur-md">
-                    <div className="flex items-center justify-between mb-3">
-                        <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider">Sistem Durumu</span>
-                        <div className="flex gap-1">
-                            <div className="w-1 h-1 bg-green-500 rounded-full" />
-                            <div className="w-1 h-1 bg-green-500 rounded-full" />
-                            <div className="w-1 h-1 bg-green-500 rounded-full" />
-                        </div>
-                    </div>
-                    <div className="space-y-2">
-                        <div className="flex items-center justify-between text-[11px]">
-                            <span className="text-neutral-500">API Gateway</span>
-                            <span className="text-green-400 font-mono">ONLINE</span>
-                        </div>
-                        <div className="flex items-center justify-between text-[11px]">
-                            <span className="text-neutral-500">AI Engine</span>
-                            <span className="text-green-400 font-mono">READY</span>
-                        </div>
-                        <div className="w-full bg-white/10 h-1 rounded-full overflow-hidden mt-2">
-                            <div className="bg-brand-500 h-full w-[85%]" />
-                        </div>
-                    </div>
-                </div>
+                <SystemHealthWidget />
 
                 {/* Footer Actions */}
                 <div className="p-4 border-t border-white/10 flex items-center justify-between gap-2">
@@ -187,9 +167,12 @@ export function AdminShell({ children, userEmail }: AdminShellProps) {
                         <button
                             className="lg:hidden p-2 -ml-2 text-neutral-500 hover:bg-neutral-100 rounded-lg"
                             onClick={() => setIsSidebarOpen(true)}
+                            aria-label="Open Sidebar"
+                            aria-expanded={isSidebarOpen}
                         >
                             <Menu className="w-6 h-6" />
                         </button>
+
 
                         <div className="relative hidden sm:block">
                             <Search className="w-5 h-5 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" />
@@ -202,9 +185,12 @@ export function AdminShell({ children, userEmail }: AdminShellProps) {
                     </div>
                     <div className="flex items-center gap-2 lg:gap-4">
                         <ThemeToggle />
-                        <button className="relative p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors">
+                        <button
+                            className="relative p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors"
+                            aria-label="View Notifications"
+                        >
                             <Bell className="w-5 h-5" />
-                            <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                            {/* <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span> */}
                         </button>
                         <div className="h-8 w-px bg-border hidden lg:block"></div>
                         <div className="flex items-center gap-2">
@@ -235,15 +221,15 @@ function NavLink({ href, icon: Icon, label, isActive, badge }: any) {
             className={`
                 group flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all relative overflow-hidden
                 ${isActive
-                    ? 'bg-white/10 text-white'
-                    : 'text-neutral-400 hover:bg-white/5 hover:text-white'
+                    ? 'bg-white/10 text-white shadow-sm'
+                    : 'text-neutral-300 hover:bg-white/5 hover:text-white'
                 }
             `}
         >
             {isActive && (
                 <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-brand-500 rounded-r-lg" />
             )}
-            <Icon className={`w-5 h-5 transition-transform group-hover:scale-110 ${isActive ? 'text-brand-400' : 'text-neutral-500 transition-colors group-hover:text-brand-400'}`} />
+            <Icon className={`w-5 h-5 transition-transform group-hover:scale-110 ${isActive ? 'text-brand-400' : 'text-neutral-400 transition-colors group-hover:text-brand-400'}`} />
             <span className="flex-1 text-sm">{label}</span>
             {badge && (
                 <span className="text-[10px] bg-brand-500/20 text-brand-400 px-2 py-0.5 rounded-full font-black uppercase tracking-tighter">

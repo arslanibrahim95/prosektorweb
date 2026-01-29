@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { ChevronLeft } from 'lucide-react'
 import { NewProjectForm } from '@/features/projects/components/NewProjectForm'
-import { prisma } from '@/lib/prisma'
+import { prisma } from '@/server/db'
 
 export default async function NewProjectPage() {
     // Get companies and domains for dropdowns

@@ -25,17 +25,18 @@ export function Navbar({ variant = 'landing', onOpenLogin }: NavbarProps) {
             setMobileMenuOpen(false)
             onOpenLogin()
         } else {
-            // Default fallback
-            window.location.href = '/login'
+            // Default fallback - use locale-aware path
+            // English disabled as per user request (OSGB sector is TR only)
+            window.location.href = `/tr/portal`
         }
     }
 
     return (
-        <nav className="fixed top-0 left-0 right-0 z-50 bg-background/70 backdrop-blur-xl border-b border-border shadow-sm supports-[backdrop-filter]:bg-background/60">
+        <nav className="fixed top-0 left-0 right-0 z-50 bg-background/70 backdrop-blur-xl border-b border-border shadow-sm supports-[backdrop-filter]:bg-background/60" aria-label="Ana navigasyon">
             <Container className="h-16 flex items-center justify-between">
-                <Link href="/" className="flex items-center gap-2 group leading-none">
-                    <span className="text-2xl font-bold tracking-tighter text-foreground group-hover:text-brand-600 transition-colors">
-                        psw
+                <Link href="/" className="flex items-center gap-2 group leading-none" aria-label="ProSektorWeb Ana Sayfa">
+                    <span className="text-xl font-bold tracking-tighter text-foreground group-hover:text-brand-600 transition-colors">
+                        ProSektorWeb
                     </span>
                 </Link>
 

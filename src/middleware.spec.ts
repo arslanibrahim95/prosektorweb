@@ -1,11 +1,11 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { NextRequest, NextResponse } from 'next/server'
-import { RATE_LIMIT_TIERS } from '@/lib/rate-limit'
+import { RATE_LIMIT_TIERS } from '@/shared/lib/rate-limit'
 
 // Mock dependencies BEFORE importing middleware
 const mockCheckRateLimit = vi.fn()
-vi.mock('@/lib/rate-limit', () => ({
+vi.mock('@/shared/lib/rate-limit', () => ({
     checkRateLimit: (...args: any[]) => mockCheckRateLimit(...args),
     RATE_LIMIT_TIERS: {
         API: { limit: 100, window: 60 },
@@ -17,7 +17,7 @@ vi.mock('@/lib/rate-limit', () => ({
 }))
 
 // Mock Prisma to prevent DB connection
-vi.mock('@/lib/prisma', () => ({
+vi.mock('@/server/db', () => ({
     prisma: {}
 }))
 
@@ -29,7 +29,7 @@ vi.mock('./auth.config', () => ({
     }
 }))
 
-vi.mock('@/lib/logger', () => ({
+vi.mock('@/shared/lib/logger', () => ({
     logger: {
         info: vi.fn(),
         warn: vi.fn(),

@@ -1,16 +1,14 @@
 'use server'
 
-import { prisma } from '@/lib/prisma'
-import { requireAuth } from '@/lib/auth-guard'
-import { logAudit } from '@/lib/audit'
-import { getErrorMessage, getZodErrorMessage } from '@/lib/action-types'
+import { prisma } from '@/server/db'
+import { requireAuth, logAudit, getErrorMessage, getZodErrorMessage } from '@/shared/lib'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 import {
     requireCompanyAccess,
     TenantAccessError,
     UnauthorizedError
-} from '@/lib/guards/tenant-guard'
+} from '@/features/system/lib/guards/tenant-guard'
 import {
     createPipelineRunner,
     PipelineState,
@@ -26,7 +24,7 @@ import {
     ADD_ON_FEATURES,
     AI_PROVIDERS,
     STAGE_AI_CONFIG
-} from '@/lib/pipeline'
+} from '@/features/ai-generation/lib/pipeline'
 
 // ==========================================
 // TYPES

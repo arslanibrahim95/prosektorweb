@@ -9,11 +9,11 @@
  * - TypeScript Connector (fallback)
  */
 
-import { prisma } from '@/lib/prisma';
-import { getContentGenerator } from '@/lib/ai';
-import { executeWithRetry } from '@/lib/resiliency';
+import { prisma } from '@/server/db';
+import { getContentGenerator } from '@/features/ai-generation/lib/ai';
+import { executeWithRetry } from '@/shared/lib';
 import { revalidatePath } from 'next/cache';
-import type { ContentType, CompanyInfo } from '@/lib/ai/types';
+import type { ContentType, CompanyInfo } from '@/features/ai-generation/lib/ai/types';
 import { ContentType as PrismaContentType, ContentStatus } from '@prisma/client';
 import { spawn } from 'child_process';
 import path from 'path';

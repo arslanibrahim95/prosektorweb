@@ -1,5 +1,9 @@
 import { MetadataRoute } from 'next'
-import { prisma } from '@/lib/prisma'
+import { prisma } from '@/server/db'
+import { getAllProvinces, getAllServices, getIndustrialProvinces, generateLocalUrl } from '@/features/ai-generation/lib/pipeline/seo'
+
+// Sitemap bolme limiti (Next.js limit: 50,000 URL)
+const SITEMAP_URL_LIMIT = 45000
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const baseUrl = 'https://prosektorweb.com'
@@ -45,5 +49,42 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         })
     )
 
-    return [...staticPages, ...dynamicPages]
+    // Local SEO pages - sadece oncelikli iller (build suresini optimize et)
+    const priorityProvinces = getIndustrialProvinces()
+    const services = getAllServices()
+    const localSeoPages: MetadataRoute.Sitemap = []
+
+    for (const province of priorityProvinces) {
+        for (const service of services) {
+            // Province-level page
+            localSeoPages.push({
+                url: `${baseUrl}${generateLocalUrl(service, province)}`,
+                lastModified: new Date(),
+                changeFrequency: 'weekly' as const,
+                priority: 0.9,
+            })
+
+            // District-level pages - sadece merkez ilceler (ilk 3)
+            const centerDistricts = province.districts.slice(0, 3)
+            for (const district of centerDistricts) {
+                localSeoPages.push({
+                    url: `${baseUrl}${generateLocalUrl(service, province, district)}`,
+                    lastModified: new Date(),
+                    changeFrequency: 'monthly' as const,
+                    priority: 0.7,
+                })
+            }
+        }
+    }
+
+    const allPages = [...staticPages, ...dynamicPages, ...localSeoPages]
+
+    // Eger limiti asarsa, sadece oncelikli sayfalari dondur
+    if (allPages.length > SITEMAP_URL_LIMIT) {
+        console.warn(`Sitemap limit asildi: ${allPages.length} URL. Sadece ilk ${SITEMAP_URL_LIMIT} URL ekleniyor.`)
+        return allPages.slice(0, SITEMAP_URL_LIMIT)
+    }
+
+    return allPages
 }
+

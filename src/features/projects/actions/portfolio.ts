@@ -1,8 +1,8 @@
 'use server'
 
-import { prisma } from '@/lib/prisma'
+import { prisma } from '@/server/db'
 import { revalidatePath } from 'next/cache'
-import { requireAuth } from '@/lib/auth-guard'
+import { requireAuth } from '@/shared/lib'
 
 function generateSlug(title: string): string {
     return title

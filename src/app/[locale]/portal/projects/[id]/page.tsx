@@ -1,7 +1,7 @@
 import { getProjectById } from '@/features/auth/actions/portal'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, ExternalLink, Globe, Calendar, CheckCircle, Clock, AlertCircle, FileText, Settings } from 'lucide-react'
+import { ArrowLeft, ExternalLink, Globe, Calendar, CheckCircle, Clock, AlertCircle, FileText, Settings, RotateCcw } from 'lucide-react'
 
 // Status config with colors and labels
 const statusConfig: Record<string, { label: string; color: string; bgColor: string }> = {
@@ -48,6 +48,13 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
                     </p>
                 </div>
                 <div className="flex items-center gap-3">
+                    <Link
+                        href={`/portal/projects/${id}/revisions`}
+                        className="flex items-center gap-2 px-4 py-2 bg-brand-50 text-brand-700 rounded-xl font-medium hover:bg-brand-100 transition-colors border border-brand-200"
+                    >
+                        <RotateCcw className="w-4 h-4" />
+                        Revizyonlar
+                    </Link>
                     <Link
                         href={`/portal/projects/${id}/settings`}
                         className="flex items-center gap-2 px-4 py-2 bg-neutral-100 text-neutral-700 rounded-xl font-medium hover:bg-neutral-200 transition-colors"

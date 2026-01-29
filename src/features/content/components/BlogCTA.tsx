@@ -1,8 +1,10 @@
 'use client'
 
 import React from 'react'
+import { useTranslations } from 'next-intl'
 
 export function BlogCTA() {
+    const t = useTranslations('Pricing')
     return (
         <div className="my-24 bg-brand-900 rounded-3xl p-8 md:p-12 text-center text-white relative overflow-hidden">
             {/* Background Pattern */}
@@ -21,7 +23,7 @@ export function BlogCTA() {
                     href="/#fiyatlandirma"
                     className="inline-block px-8 py-4 bg-white text-brand-900 font-bold rounded-xl hover:bg-brand-50 transition-colors shadow-lg shadow-black/20"
                 >
-                    Ücretsiz Önizleme Talep Edin
+                    {t('cta_button')}
                 </a>
             </div>
         </div>

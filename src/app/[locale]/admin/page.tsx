@@ -1,4 +1,5 @@
 import { getAdminDashboardStats, getRecentActivities, RecentActivity } from '@/features/system/actions/dashboard'
+import { getTranslations } from 'next-intl/server'
 import Link from 'next/link'
 import * as motion from "motion/react-client"
 import {
@@ -17,6 +18,7 @@ export const revalidate = 60; // Cache this page for 1 minute
 export default async function SuperAdminDashboard() {
     const stats = await getAdminDashboardStats()
     const recentActivities = await getRecentActivities(8)
+    const t = await getTranslations('AdminDashboard')
 
     // Quick currency formatter
     const formatCurrency = (amount: number) =>
@@ -49,25 +51,25 @@ export default async function SuperAdminDashboard() {
                     <div className="space-y-2">
                         <div className="flex items-center gap-2 text-brand-600 font-black text-xs uppercase tracking-[.3em]">
                             <Shield className="w-4 h-4" />
-                            Super Admin Command Center
+                            {t('command_center')}
                         </div>
                         <h1 className="text-5xl md:text-6xl font-black text-neutral-900 tracking-tighter">
-                            Kontrol <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-600 to-purple-600">Paneli</span>
+                            {t('title')} <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-600 to-purple-600">{t('title_highlight')}</span>
                         </h1>
                         <p className="text-neutral-500 text-lg max-w-2xl font-medium">
-                            Platform genelindeki tüm operasyonları, finansal akışı ve AI üretim hattını buradan yönetin.
+                            {t('subtitle')}
                         </p>
                     </div>
 
                     <div className="flex items-center gap-3">
                         <div className="hidden lg:flex flex-col items-end mr-4">
-                            <span className="text-[10px] font-black text-neutral-400 uppercase tracking-widest">Sistem Zamanı</span>
+                            <span className="text-[10px] font-black text-neutral-400 uppercase tracking-widest">{t('system_time')}</span>
                             <span className="text-sm font-mono font-bold text-neutral-900">
                                 {new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}
                             </span>
                         </div>
                         <div className="bg-white p-1 rounded-2xl border border-neutral-200 shadow-xl shadow-neutral-200/40 flex items-center gap-1">
-                            <span className="px-4 py-2 text-sm font-bold text-neutral-700">Canlı İzleme</span>
+                            <span className="px-4 py-2 text-sm font-bold text-neutral-700">{t('live_monitor')}</span>
                             <div className="w-8 h-8 bg-green-500 rounded-xl flex items-center justify-center animate-pulse">
                                 <ActivityIcon className="w-4 h-4 text-white" />
                             </div>
@@ -78,25 +80,25 @@ export default async function SuperAdminDashboard() {
                 {/* FINANCIAL PULSE - Premium Cards */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <motion.div variants={item} className="lg:col-span-2">
-                        <div className="bg-white rounded-[2.5rem] border border-neutral-200 p-8 shadow-sm h-full relative overflow-hidden group">
+                        <div className="bg-white rounded-3xl border border-neutral-200 p-8 shadow-sm h-full relative overflow-hidden group">
                             <div className="absolute top-0 right-0 p-8">
                                 <div className="w-16 h-16 bg-emerald-50 rounded-3xl flex items-center justify-center text-emerald-600 group-hover:scale-110 transition-transform">
                                     <TrendingUp className="w-8 h-8" />
                                 </div>
                             </div>
                             <div className="relative z-10">
-                                <span className="text-xs font-black text-neutral-400 uppercase tracking-widest mb-4 block">Toplam Ciro & Tahsilat</span>
+                                <span className="text-xs font-black text-neutral-400 uppercase tracking-widest mb-4 block">{t('total_revenue')}</span>
                                 <div className="text-6xl font-black text-neutral-900 mb-6 tracking-tighter">
                                     {formatCurrency(stats.totalRevenue)}
                                 </div>
 
                                 <div className="grid grid-cols-2 gap-8 border-t border-neutral-100 pt-8">
                                     <div>
-                                        <span className="text-[10px] font-black text-neutral-400 uppercase tracking-widest mb-1 block">Bekleyen Alacak</span>
+                                        <span className="text-[10px] font-black text-neutral-400 uppercase tracking-widest mb-1 block">{t('outstanding')}</span>
                                         <div className="text-2xl font-bold text-orange-600">{formatCurrency(stats.outstandingReceivables)}</div>
                                     </div>
                                     <div>
-                                        <span className="text-[10px] font-black text-neutral-400 uppercase tracking-widest mb-1 block">Aylık Hedef (MRR)</span>
+                                        <span className="text-[10px] font-black text-neutral-400 uppercase tracking-widest mb-1 block">{t('monthly_target')}</span>
                                         <div className="text-2xl font-bold text-brand-600">{formatCurrency(stats.mrr)}</div>
                                     </div>
                                 </div>
@@ -109,17 +111,17 @@ export default async function SuperAdminDashboard() {
                         <StatsCard
                             href="/admin/companies"
                             icon={Building2}
-                            label="Aktif Müşteri"
+                            label={t('active_clients')}
                             value={stats.companies}
                             color="brand"
                         />
                         <StatsCard
                             href="/admin/projects"
                             icon={Briefcase}
-                            label="Aktif AI Üretimi"
+                            label={t('active_generation')}
                             value={stats.pendingProjects}
                             color="purple"
-                            badge="Süreçte"
+                            badge={t('process')}
                         />
                     </div>
                 </div>
@@ -130,23 +132,23 @@ export default async function SuperAdminDashboard() {
                     <motion.div
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
-                        className="lg:col-span-3 bg-neutral-900 rounded-[2.5rem] p-8 border border-white/5 shadow-2xl relative overflow-hidden"
+                        className="lg:col-span-3 bg-neutral-900 rounded-3xl p-8 border border-white/5 shadow-2xl relative overflow-hidden"
                     >
                         <div className="absolute top-0 right-0 w-64 h-64 bg-brand-600/10 blur-[100px] rounded-full -mr-32 -mt-32" />
 
                         <div className="flex items-center justify-between mb-10 relative z-10">
                             <div>
-                                <h3 className="text-xl font-bold text-white">Gelir Analizi</h3>
-                                <p className="text-sm text-neutral-400">Son 6 aylık performans verisi</p>
+                                <h3 className="text-xl font-bold text-white">{t('revenue_analysis')}</h3>
+                                <p className="text-sm text-neutral-400">{t('revenue_desc')}</p>
                             </div>
                             <div className="flex items-center gap-4 bg-white/5 p-2 rounded-xl border border-white/10">
                                 <div className="flex items-center gap-2 px-2">
                                     <div className="w-2 h-2 bg-emerald-500 rounded-full" />
-                                    <span className="text-[10px] font-bold text-neutral-300 uppercase">Gelir</span>
+                                    <span className="text-[10px] font-bold text-neutral-300 uppercase">{t('legend_revenue')}</span>
                                 </div>
                                 <div className="flex items-center gap-2 px-2">
                                     <div className="w-2 h-2 bg-orange-500 rounded-full" />
-                                    <span className="text-[10px] font-bold text-neutral-300 uppercase">Alacak</span>
+                                    <span className="text-[10px] font-bold text-neutral-300 uppercase">{t('legend_receivables')}</span>
                                 </div>
                             </div>
                         </div>
@@ -160,12 +162,12 @@ export default async function SuperAdminDashboard() {
                     <motion.div
                         initial={{ opacity: 0, x: 20 }}
                         animate={{ opacity: 1, x: 0 }}
-                        className="lg:col-span-2 bg-white rounded-[2.5rem] border border-neutral-200 p-8 shadow-sm"
+                        className="lg:col-span-2 bg-white rounded-3xl border border-neutral-200 p-8 shadow-sm"
                     >
                         <div className="flex items-center justify-between mb-8">
                             <div>
-                                <h3 className="text-xl font-bold text-neutral-900">AI Üretim Hattı</h3>
-                                <p className="text-sm text-neutral-500">Son üretim aktiviteleri</p>
+                                <h3 className="text-xl font-bold text-neutral-900">{t('ai_production')}</h3>
+                                <p className="text-sm text-neutral-500">{t('ai_production_desc')}</p>
                             </div>
                             <div className="w-10 h-10 bg-purple-50 text-purple-600 rounded-xl flex items-center justify-center">
                                 <ActivityIcon className="w-5 h-5" />
@@ -173,7 +175,7 @@ export default async function SuperAdminDashboard() {
                         </div>
 
                         <div className="space-y-4">
-                            {recentActivities.filter(a => a.entity === 'WebProject' || a.action === 'CREATE').slice(0, 5).map((activity) => (
+                            {recentActivities.filter((a: RecentActivity) => a.entity === 'WebProject' || a.action === 'CREATE').slice(0, 5).map((activity: RecentActivity) => (
                                 <div key={activity.id} className="flex items-center gap-4 p-4 bg-neutral-50 rounded-2xl hover:bg-neutral-100 transition-colors group">
                                     <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${activity.action === 'CREATE' ? 'bg-green-100 text-green-600' : 'bg-brand-100 text-brand-600'
                                         }`}>
@@ -184,7 +186,7 @@ export default async function SuperAdminDashboard() {
                                             {activity.details?.name || activity.entity}
                                         </div>
                                         <div className="text-[10px] font-bold text-neutral-400 uppercase tracking-tighter">
-                                            {activity.action === 'CREATE' ? 'YENİ OLUŞTURULDU' : 'GÜNCELLENDİ'} • {new Date(activity.createdAt).toLocaleDateString('tr-TR')}
+                                            {activity.action === 'CREATE' ? t('new_created') : t('updated')} • {new Date(activity.createdAt).toLocaleDateString('tr-TR')}
                                         </div>
                                     </div>
                                     <ArrowRight className="w-4 h-4 text-neutral-300 group-hover:text-neutral-900 group-hover:translate-x-1 transition-all" />
@@ -192,7 +194,7 @@ export default async function SuperAdminDashboard() {
                             ))}
 
                             <Link href="/admin/audit" className="flex items-center justify-center gap-2 w-full py-4 text-sm font-bold text-neutral-400 hover:text-brand-600 transition-colors group">
-                                Tüm Aktiviteyi Gör
+                                {t('view_all')}
                                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-all" />
                             </Link>
                         </div>
@@ -200,15 +202,15 @@ export default async function SuperAdminDashboard() {
                 </div>
 
                 {/* QUICK ACTIONS - Command Style */}
-                <div className="bg-gradient-to-br from-neutral-900 to-neutral-800 rounded-[3rem] p-12 shadow-2xl relative overflow-hidden">
+                <div className="bg-gradient-to-br from-neutral-900 to-neutral-800 rounded-3xl p-12 shadow-2xl relative overflow-hidden">
                     <div className="absolute top-0 left-0 w-full h-full bg-[url('/grid.svg')] opacity-10" />
                     <div className="relative z-10 flex flex-col items-center">
-                        <h3 className="text-2xl font-black text-white mb-10 tracking-tight">Hızlı Komuta İşlemleri</h3>
+                        <h3 className="text-2xl font-black text-white mb-10 tracking-tight">{t('quick_actions')}</h3>
                         <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 w-full max-w-5xl">
-                            <QuickAction href="/admin/invoices/new" icon={DollarSign} label="Yeni Fatura" color="green" />
-                            <QuickAction href="/admin/companies/new" icon={Plus} label="Firma Kaydı" color="brand" />
-                            <QuickAction href="/admin/projects" icon={Globe} label="AI Site Üret" color="purple" />
-                            <QuickAction href="/admin/settings" icon={Settings} label="Sistem Ayarları" color="neutral" />
+                            <QuickAction href="/admin/invoices/new" icon={DollarSign} label={t('action_new_invoice')} color="green" />
+                            <QuickAction href="/admin/companies/new" icon={Plus} label={t('action_new_company')} color="brand" />
+                            <QuickAction href="/admin/projects" icon={Globe} label={t('action_ai_generate')} color="purple" />
+                            <QuickAction href="/admin/settings" icon={Settings} label={t('action_settings')} color="neutral" />
                         </div>
                     </div>
                 </div>

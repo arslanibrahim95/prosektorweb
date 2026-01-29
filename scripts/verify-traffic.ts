@@ -1,4 +1,4 @@
-import { checkRateLimit, RATE_LIMIT_TIERS } from '../src/lib/rate-limit';
+import { checkRateLimit, RATE_LIMIT_TIERS } from '@/shared/lib/rate-limit';
 
 // Simple script to simulate rate limit checks
 // Usage: npx tsx scripts/verify-traffic.ts

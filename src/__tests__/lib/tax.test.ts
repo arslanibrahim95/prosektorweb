@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { getTaxRate, calculateTax } from '../../lib/tax'
+import { getTaxRate, calculateTax } from '@/shared/lib'
 import { Decimal } from 'decimal.js'
 
 describe('Tax Utilities', () => {

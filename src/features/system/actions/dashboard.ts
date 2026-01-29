@@ -6,8 +6,8 @@
  */
 'use server'
 
-import { prisma } from '@/lib/prisma'
-import { getOrSet } from '@/lib/cache'
+import { prisma } from '@/server/db'
+import { getOrSet } from '@/shared/lib'
 
 export interface DashboardStats {
     companies: number

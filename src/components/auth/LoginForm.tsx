@@ -65,7 +65,7 @@ export function LoginForm() {
                         id="email"
                         type="email"
                         name="email"
-                        placeholder="ornek@firma.com"
+                        placeholder="örnek@firma.com"
                         required
                         leadingIcon={<Mail className="w-5 h-5" />}
                     />

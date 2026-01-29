@@ -1,9 +1,9 @@
 'use server'
 
-import { prisma } from '@/lib/prisma'
+import { prisma } from '@/server/db'
 import { auth } from '@/auth'
-import { requireAuth } from '@/lib/auth-guard'
-import { PAGINATION } from '@/lib/action-types'
+import { requireAuth } from '@/features/auth/lib/auth-guard'
+import { PAGINATION } from '@/shared/lib'
 
 async function getClientCompanyId(): Promise<string | null> {
     const session = await auth()

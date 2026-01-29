@@ -70,7 +70,7 @@ export default async function PortalDashboard() {
                         Destek Talebi
                     </Link>
                     <Link
-                        href="tel:+905551234567"
+                        href="tel:+905517038599"
                         className="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-brand-600 to-brand-500 text-white rounded-xl font-medium shadow-lg shadow-brand-600/30 hover:shadow-brand-600/50 hover:scale-[1.02] active:scale-[0.98] transition-all"
                     >
                         <Phone className="w-4 h-4" />
@@ -301,9 +301,9 @@ export default async function PortalDashboard() {
                         </div>
 
                         <div className="space-y-2 mb-4">
-                            <a href="tel:+905551234567" className="flex items-center gap-2 text-sm text-brand-100 hover:text-white transition-colors">
+                            <a href="tel:+905517038599" className="flex items-center gap-2 text-sm text-brand-100 hover:text-white transition-colors">
                                 <Phone className="w-4 h-4" />
-                                +90 555 123 45 67
+                                +90 551 703 85 99
                             </a>
                             <a href="mailto:destek@prosektorweb.com" className="flex items-center gap-2 text-sm text-brand-100 hover:text-white transition-colors">
                                 <Mail className="w-4 h-4" />

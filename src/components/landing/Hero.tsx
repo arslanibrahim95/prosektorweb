@@ -19,7 +19,7 @@ export function Hero() {
                         {t('badge')}
                     </div>
 
-                    <h1 className="text-5xl md:text-7xl font-bold font-serif leading-tight mb-8 text-neutral-900 tracking-tight drop-shadow-sm text-center justify-center animate-in fade-in zoom-in-95 duration-500">
+                    <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold font-serif leading-tight mb-8 text-neutral-900 tracking-tight drop-shadow-sm text-center justify-center animate-in fade-in zoom-in-95 duration-500">
                         {t('title')}
                     </h1>
 
@@ -29,7 +29,7 @@ export function Hero() {
                     <div className="flex flex-col items-center gap-4">
                         <OpenModalButton
                             step={ModalStep.INITIAL_CHOICE}
-                            className="group relative px-10 py-5 bg-brand-600 text-white rounded-full text-lg font-bold shadow-lg shadow-brand-600/30 hover:shadow-brand-600/50 hover:-translate-y-1 transition-all duration-300 overflow-hidden"
+                            className="group relative px-10 py-5 bg-brand-600 text-white rounded-2xl text-lg font-bold shadow-lg shadow-brand-600/30 hover:shadow-brand-600/50 hover:-translate-y-1 transition-all duration-300 overflow-hidden"
                         >
                             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
                             {t('cta_start')}

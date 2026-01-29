@@ -41,7 +41,7 @@ export function ForgotPasswordForm() {
                             id="email"
                             type="email"
                             name="email"
-                            placeholder="ornek@firma.com"
+                            placeholder="örnek@firma.com"
                             required
                             leadingIcon={<Mail className="w-5 h-5" />}
                         />
@@ -69,7 +69,7 @@ export function ForgotPasswordForm() {
                             href="/login"
                             className="text-sm text-neutral-500 hover:text-neutral-800 transition-colors"
                         >
-                            ← Giriş sayfasına dön
+                            ← {t('back_to_login')}
                         </Link>
                     </div>
                 </form>

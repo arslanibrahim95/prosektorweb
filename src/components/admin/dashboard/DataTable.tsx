@@ -9,7 +9,7 @@ import {
     Download,
     MoreHorizontal
 } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { cn } from '@/shared/lib'
 
 // Column definition
 export interface DataTableColumn<T> {

@@ -8,7 +8,7 @@
 import { useState } from 'react';
 import { Sparkles, Loader2 } from 'lucide-react';
 import { generateAllContent, generatePageContent } from '@/actions/generate';
-import type { ContentType } from '@/lib/ai/types';
+import type { ContentType } from '@/features/ai-generation/lib/ai/types';
 
 interface GenerateButtonProps {
     projectId: string;

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { checkRateLimit } from '../../lib/rate-limit'
+import { checkRateLimit } from '@/shared/lib/rate-limit'
 import { Ratelimit } from '@upstash/ratelimit'
 
 // Mock dependencies

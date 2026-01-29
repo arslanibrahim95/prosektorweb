@@ -1,4 +1,4 @@
-import { prisma } from '@/lib/prisma'
+import { prisma } from '@/server/db'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { DemoNavbar } from '@/features/projects/components/DemoNavbar'
@@ -25,6 +25,12 @@ export default async function DemoLayout({
 
     if (!project) {
         notFound()
+    }
+
+    // Preview expiry check
+    if (project.previewEndsAt && new Date(project.previewEndsAt) < new Date()) {
+        const { DemoExpired } = await import('./expired')
+        return <DemoExpired companyName={project.company.name || project.name} />
     }
 
     const designContent = project.generatedContents[0]?.content

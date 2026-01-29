@@ -1,9 +1,7 @@
 
-import { prisma } from '@/lib/prisma'
-import { sendRenewalReminder } from '@/lib/email'
-import { logger } from '@/lib/logger'
-import { safeApi } from '@/lib/safe-api'
-import { redis } from '@/lib/redis'
+import { prisma } from '@/server/db'
+import { sendRenewalReminder, logger, redis } from '@/shared/lib'
+import { safeApi } from '@/shared/lib/safe-api'
 import { renewService } from '@/features/finance/actions/services'
 
 export const GET = safeApi(async (request, { requestId }) => {

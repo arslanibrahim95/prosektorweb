@@ -11,7 +11,8 @@ import {
     AlertCircle,
     Clock
 } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { cn } from '@/shared/lib'
+import { useTranslations } from 'next-intl'
 
 // Notification types
 export type NotificationType = 'info' | 'success' | 'warning' | 'error'
@@ -63,8 +64,29 @@ export function NotificationPanel({
     onMarkAllAsRead,
     onDismiss
 }: NotificationPanelProps) {
+    const t = useTranslations('NotificationPanel')
     const [isOpen, setIsOpen] = useState(false)
     const unreadCount = notifications.filter(n => !n.read).length
+
+    // Helper function to format timestamp
+    function formatTimestamp(date: Date): string {
+        const now = new Date()
+        const diffMs = now.getTime() - date.getTime()
+        const diffMins = Math.floor(diffMs / 60000)
+        const diffHours = Math.floor(diffMs / 3600000)
+        const diffDays = Math.floor(diffMs / 86400000)
+
+        if (diffMins < 1) return t('just_now')
+        if (diffMins < 60) return t('min_ago', { count: diffMins })
+        if (diffHours < 24) return t('hour_ago', { count: diffHours })
+        if (diffDays < 7) return t('day_ago', { count: diffDays })
+
+        return date.toLocaleDateString('tr-TR', {
+            day: 'numeric',
+            month: 'short',
+            year: diffDays > 365 ? 'numeric' : undefined
+        })
+    }
 
     return (
         <div className="relative">
@@ -92,9 +114,9 @@ export function NotificationPanel({
                         {/* Header */}
                         <div className="flex items-center justify-between p-4 border-b border-border">
                             <div>
-                                <h3 className="font-semibold text-foreground">Bildirimler</h3>
+                                <h3 className="font-semibold text-foreground">{t('title')}</h3>
                                 <p className="text-xs text-muted-foreground">
-                                    {unreadCount} okunmamış bildirim
+                                    {t('unread_count', { count: unreadCount })}
                                 </p>
                             </div>
                             {unreadCount > 0 && (
@@ -102,7 +124,7 @@ export function NotificationPanel({
                                     onClick={onMarkAllAsRead}
                                     className="text-xs text-brand-600 hover:text-brand-700 font-medium"
                                 >
-                                    Tümünü Okundu İşaretle
+                                    {t('mark_all_read')}
                                 </button>
                             )}
                         </div>
@@ -113,7 +135,7 @@ export function NotificationPanel({
                                 <div className="p-8 text-center">
                                     <Bell className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
                                     <p className="text-sm text-muted-foreground">
-                                        Bildiriminiz yok
+                                        {t('no_notifications')}
                                     </p>
                                 </div>
                             ) : (
@@ -150,7 +172,7 @@ export function NotificationPanel({
                                                                     <button
                                                                         onClick={() => onMarkAsRead(notification.id)}
                                                                         className="p-1 rounded hover:bg-muted text-muted-foreground hover:text-foreground"
-                                                                        title="Okundu işaretle"
+                                                                        title={t('mark_read')}
                                                                     >
                                                                         <Check className="w-3 h-3" />
                                                                     </button>
@@ -158,7 +180,7 @@ export function NotificationPanel({
                                                                 <button
                                                                     onClick={() => onDismiss(notification.id)}
                                                                     className="p-1 rounded hover:bg-muted text-muted-foreground hover:text-foreground"
-                                                                    title="Kaldır"
+                                                                    title={t('dismiss')}
                                                                 >
                                                                     <X className="w-3 h-3" />
                                                                 </button>
@@ -177,7 +199,7 @@ export function NotificationPanel({
                                                                     href={notification.actionUrl}
                                                                     className="text-xs text-brand-600 hover:text-brand-700 font-medium ml-auto"
                                                                 >
-                                                                    {notification.actionLabel || 'Görüntüle'}
+                                                                    {notification.actionLabel || t('view')}
                                                                 </a>
                                                             )}
                                                         </div>
@@ -200,7 +222,7 @@ export function NotificationPanel({
                                 className="block w-full text-center text-sm text-muted-foreground hover:text-foreground py-2 rounded-lg hover:bg-muted transition-colors"
                                 onClick={() => setIsOpen(false)}
                             >
-                                Tüm Bildirimleri Gör
+                                {t('view_all')}
                             </a>
                         </div>
                     </div>
@@ -208,24 +230,4 @@ export function NotificationPanel({
             )}
         </div>
     )
-}
-
-// Helper function to format timestamp
-function formatTimestamp(date: Date): string {
-    const now = new Date()
-    const diffMs = now.getTime() - date.getTime()
-    const diffMins = Math.floor(diffMs / 60000)
-    const diffHours = Math.floor(diffMs / 3600000)
-    const diffDays = Math.floor(diffMs / 86400000)
-
-    if (diffMins < 1) return 'Az önce'
-    if (diffMins < 60) return `${diffMins} dk önce`
-    if (diffHours < 24) return `${diffHours} saat önce`
-    if (diffDays < 7) return `${diffDays} gün önce`
-
-    return date.toLocaleDateString('tr-TR', {
-        day: 'numeric',
-        month: 'short',
-        year: diffDays > 365 ? 'numeric' : undefined
-    })
 }

@@ -19,10 +19,10 @@ import {
     Loader2,
     type LucideIcon
 } from 'lucide-react';
-import { sanitizeHtml } from '@/lib/security/sanitize';
+import { sanitizeHtml } from '@/shared/lib/security';
 import { approveContent, rejectContent, generatePageContent } from '@/actions/generate';
 import type { GeneratedContent } from '@prisma/client';
-import type { ContentType } from '@/lib/ai/types';
+import type { ContentType } from '@/features/ai-generation/lib/ai/types';
 
 interface ContentCardProps {
     projectId: string;

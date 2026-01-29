@@ -2,11 +2,11 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { ArrowLeft, ArrowRight, Calendar, Share2, User } from 'lucide-react'
 import { notFound } from 'next/navigation'
-import { sanitizeHtml } from '@/lib/security/sanitize'
+import { sanitizeHtml } from '@/shared/lib/security'
 
 import { Navbar } from '@/components/layout/Navbar'
 import { Footer } from '@/components/layout/Footer'
-import { prisma } from '@/lib/prisma'
+import { prisma } from '@/server/db'
 import TrustBadges from '@/components/ui/TrustBadges'
 import { BlogCTA } from '@/features/content/components/BlogCTA'
 

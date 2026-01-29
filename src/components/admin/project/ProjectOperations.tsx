@@ -8,13 +8,17 @@ import {
     Mail,
     Rocket,
     CheckCircle2,
-    AlertCircle
+    AlertCircle,
+    Copy,
+    Share2,
+    MessageCircle
 } from 'lucide-react'
 
 interface Props {
     project: {
         id: string
         name: string
+        slug?: string | null
         domain?: { name: string } | null
         previewUrl?: string | null
         status: string
@@ -106,6 +110,44 @@ export function ProjectOperations({ project }: Props) {
                     </div>
                 )}
             </div>
+
+            {/* Demo Link Sharing */}
+            {project.slug && (
+                <div className="bg-white rounded-2xl border border-neutral-200 p-6">
+                    <h2 className="text-lg font-bold text-neutral-900 mb-4 flex items-center gap-2">
+                        <Share2 className="w-5 h-5 text-emerald-600" />
+                        Demo Linki Paylas
+                    </h2>
+                    <div className="bg-emerald-50 p-4 rounded-xl mb-4">
+                        <div className="text-sm text-emerald-700 font-semibold mb-1">Demo URL</div>
+                        <div className="text-emerald-600 font-mono text-sm break-all">
+                            {typeof window !== 'undefined' ? window.location.origin : ''}/demo/{project.slug}
+                        </div>
+                    </div>
+                    <div className="flex gap-2">
+                        <button
+                            onClick={() => {
+                                const url = `${window.location.origin}/demo/${project.slug}`
+                                navigator.clipboard.writeText(url)
+                                setResult({ success: true, message: 'Link kopyalandi!' })
+                            }}
+                            className="flex-1 px-4 py-3 bg-neutral-100 text-neutral-700 rounded-xl font-medium hover:bg-neutral-200 flex items-center justify-center gap-2"
+                        >
+                            <Copy className="w-4 h-4" />
+                            Kopyala
+                        </button>
+                        <a
+                            href={`https://wa.me/?text=${encodeURIComponent(`${project.name} - Demo: ${typeof window !== 'undefined' ? window.location.origin : ''}/demo/${project.slug}`)}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex-1 px-4 py-3 bg-green-600 text-white rounded-xl font-medium hover:bg-green-700 flex items-center justify-center gap-2"
+                        >
+                            <MessageCircle className="w-4 h-4" />
+                            WhatsApp
+                        </a>
+                    </div>
+                </div>
+            )}
 
             {/* Email Setup */}
             {project.domain && (

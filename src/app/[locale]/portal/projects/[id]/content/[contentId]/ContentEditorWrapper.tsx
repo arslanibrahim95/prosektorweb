@@ -4,7 +4,8 @@ import { useState } from 'react'
 import { ContentEditor } from '@/components/ui/ContentEditor'
 import { FileText, Save, X, Edit2, Loader2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { sanitizeHtml } from '@/lib/security/sanitize'
+import { sanitizeHtml } from '@/shared/lib/security'
+import { logger } from '@/shared/lib/logger'
 
 interface ContentEditorWrapperProps {
     contentId: string

@@ -40,7 +40,9 @@ export function ContactForm() {
                     <p className="text-neutral-600 mb-6">{state.message}</p>
                     <button
                         onClick={() => {
-                            window.location.reload()
+                            // Reset form state without page reload
+                            formRef.current?.reset()
+                            window.history.replaceState({}, document.title, window.location.pathname)
                         }}
                         className="text-sm text-brand-600 font-semibold hover:text-brand-700 flex items-center justify-center gap-2 mx-auto"
                     >

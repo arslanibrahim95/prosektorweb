@@ -1,9 +1,10 @@
 'use server'
 
-import { prisma } from '@/lib/prisma'
+import { prisma } from '@/server/db'
 import { auth } from '@/auth'
 import { TicketPriority, TicketCategory } from '@prisma/client'
-import { validatePagination } from '@/lib/action-types'
+import { validatePagination } from '@/shared/lib'
+import { getCookie } from '@/shared/lib/headers'
 
 async function getClientCompanyId(): Promise<string | null> {
     const session = await auth()
@@ -16,9 +17,7 @@ async function getClientCompanyId(): Promise<string | null> {
 
     // 2. If user is ADMIN, check for impersonation cookie
     if (user?.role === 'ADMIN') {
-        const { cookies } = await import('next/headers')
-        const cookieStore = await cookies()
-        const impersonatingId = cookieStore.get('admin_view_company_id')?.value
+        const impersonatingId = await getCookie('admin_view_company_id')
 
         // If admin selected a company to view
         if (impersonatingId) {

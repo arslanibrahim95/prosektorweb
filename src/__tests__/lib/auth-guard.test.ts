@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { requireAuth, getSession } from '@/lib/auth-guard'
+import { requireAuth, getSession } from '@/features/auth/lib/auth-guard'
 
 // Mock the auth function
 vi.mock('@/auth', () => ({

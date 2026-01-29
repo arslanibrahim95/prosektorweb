@@ -1,8 +1,8 @@
 /** @vitest-environment node */
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { createInvoice } from './invoices'
-import { prisma } from '@/lib/prisma'
-import { redis } from '@/lib/redis'
+import { prisma } from '@/server/db'
+import { redis } from '@/shared/lib'
 import { auth } from '@/auth'
 import { Decimal } from 'decimal.js'
 

@@ -3,13 +3,13 @@ import { authConfig } from "./auth.config"
 import createMiddleware from 'next-intl/middleware';
 import { routing } from '@/i18n/routing';
 import { NextRequest, NextResponse } from "next/server";
-
-import { logger } from "@/lib/logger"
+import { logger } from '@/shared/lib'
+import { RATE_LIMIT_TIERS, checkRateLimit } from '@/shared/lib/rate-limit'
+// Note: Middleware'de next/headers kullanılamaz, NextRequest.headers kullanılır
+// checkRateLimit ve getClientIp içe aktarılmaz, bunun yerine doğrudan IP middleware'den alınır
 
 const { auth } = NextAuth(authConfig)
 const intlMiddleware = createMiddleware(routing);
-
-import { checkRateLimit, RATE_LIMIT_TIERS } from "@/lib/rate-limit"
 
 export default auth(async (req) => {
     // [TODO-OBS-002] Middleware Request ID & Logging
@@ -45,6 +45,7 @@ export default auth(async (req) => {
     }
 
     // 0. Rate Limiting (Security)
+    // Middleware'de next/headers kullanılamaz, NextRequest.headers kullanılır
     const forwardedFor = req.headers.get('x-forwarded-for')
     const ip = forwardedFor ? forwardedFor.split(',')[0].trim() : '127.0.0.1'
 

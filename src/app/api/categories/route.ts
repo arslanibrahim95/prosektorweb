@@ -1,5 +1,5 @@
-import { prisma } from '@/lib/prisma'
-import { safeApi } from '@/lib/safe-api'
+import { prisma } from '@/server/db'
+import { safeApi } from '@/shared/lib/safe-api'
 
 export const GET = safeApi(async () => {
     const categories = await prisma.blogCategory.findMany({

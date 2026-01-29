@@ -1,5 +1,5 @@
 import { getWorkplace } from '@/features/crm/actions/workplaces'
-import { prisma } from '@/lib/prisma'
+import { prisma } from '@/server/db'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { ChevronLeft, Layers, Users, MapPin, Building2, Pencil, Trash2 } from 'lucide-react'

@@ -30,7 +30,7 @@ export function Features() {
                         <p className="text-lg text-neutral-500 max-w-2xl mx-auto">{t('why_subtitle')}</p>
                     </div>
 
-                    <div className="grid md:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                         {whyUsItems.map((item, i) => (
                             <SpotlightCard key={i} className="group border-white/50 bg-white/40 backdrop-blur-xl hover:shadow-xl hover:bg-white/60 transition-all duration-300" spotlightColor="rgba(220, 38, 38, 0.1)">
                                 <div className="w-14 h-14 bg-brand-50 rounded-xl flex items-center justify-center text-brand-600 mb-6 group-hover:scale-110 group-hover:bg-brand-600 group-hover:text-white transition-all duration-300">
@@ -54,7 +54,7 @@ export function Features() {
                         <p className="text-lg text-neutral-500">{t('how_subtitle')}</p>
                     </div>
 
-                    <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-6">
                         {steps.map((step, i) => (
                             <div key={i} className="bg-neutral-50 p-8 rounded-2xl border border-neutral-200 hover:-translate-y-2 transition-transform duration-300 shadow-fluent-card hover:shadow-fluent-hover">
                                 <div className="text-5xl font-black text-brand-100 mb-4 font-mono">{step.num}</div>

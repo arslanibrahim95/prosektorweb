@@ -1,9 +1,9 @@
 'use server'
 
-import { prisma } from '@/lib/prisma'
+import { prisma } from '@/server/db'
 import { revalidatePath } from 'next/cache'
 import { auth } from '@/auth'
-import { getErrorMessage, getZodErrorMessage } from '@/lib/action-types'
+import { getErrorMessage, getZodErrorMessage } from '@/shared/lib'
 import { z } from 'zod'
 import { AuditAction, DangerClass } from '@prisma/client'
 

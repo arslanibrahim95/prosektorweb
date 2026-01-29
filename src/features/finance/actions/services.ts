@@ -1,9 +1,9 @@
 'use server'
 
-import { prisma } from '@/lib/prisma'
+import { prisma } from '@/server/db'
 import { revalidatePath } from 'next/cache'
 import { auth } from '@/auth'
-import { getErrorMessage, getZodErrorMessage, validatePagination } from '@/lib/action-types'
+import { getErrorMessage, getZodErrorMessage, validatePagination, toDecimal, calculateTaxPrecise } from '@/shared/lib'
 import { z } from 'zod'
 import { AuditAction, ServiceStatus, BillingCycle, ServiceType } from '@prisma/client'
 
@@ -181,8 +181,9 @@ export async function deleteService(id: string): Promise<ActionResult> {
         return { success: false, error: 'Silme işlemi başarısız' }
     }
 }
+
 import { generateInvoiceNo } from './invoices'
-import { toDecimal, calculateTaxPrecise } from '@/lib/money'
+
 
 export async function renewService(id: string): Promise<ActionResult> {
     try {

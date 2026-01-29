@@ -1,11 +1,11 @@
 'use server'
 
-import { prisma } from '@/lib/prisma'
+import { prisma } from '@/server/db'
 import { z } from 'zod'
-import { verifyIdempotency } from '@/lib/security/idempotency'
-import { headers } from 'next/headers'
+import { verifyIdempotency } from '@/features/system/lib/security/idempotency'
 import DOMPurify from 'isomorphic-dompurify'
-import { getClientIp } from '@/lib/rate-limit'
+import { getClientIp } from '@/shared/lib/rate-limit'
+import { getUserAgent } from '@/shared/lib/headers'
 
 const contactSchema = z.object({
     name: z.string().min(2, 'Ad Soyad en az 2 karakter olmalıdır'),
@@ -36,9 +36,8 @@ export async function submitContact(prevState: ContactState, formData: FormData)
     }
 
     // 1. Get Security Context (IP & User Agent)
-    const headersList = await headers()
     const ip = await getClientIp()
-    const userAgent = headersList.get('user-agent') || 'Unknown'
+    const userAgent = await getUserAgent() || 'Unknown'
 
     // 2. Rate Limiting (Max 5 requests per hour per IP)
     try {

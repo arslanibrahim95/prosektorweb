@@ -1,4 +1,4 @@
-import { prisma } from '@/lib/prisma'
+import { prisma } from '@/server/db'
 import { notFound } from 'next/navigation'
 import { DynamicPageRenderer } from '@/features/projects/components/DynamicPageRenderer'
 import { ContentType } from '@prisma/client'

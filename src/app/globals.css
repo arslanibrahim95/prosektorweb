@@ -2,11 +2,10 @@
 
 :root {
   /* ========================================================================
-     Fluent UI Design Tokens (Fluent Blue #0078D4)
+     Fluent UI Design Tokens (Brand Red #DC2626)
      Source: fluentui-master/packages/tokens
      ======================================================================== */
 
-  /* --- Colors: Brand (Blue #0078D4) --- */
   /* --- Colors: Brand (Red #DC2626) --- */
   --colorBrandBackground: #dc2626;
   /* Primary Red */
@@ -108,26 +107,38 @@
   --colorBrandBackgroundPressed: #dc2626;
 
   /* --- Colors: Neutral (Dark Mode - Slate Palette) --- */
-  --colorNeutralForeground1: #f8fafc; /* Slate 50 */
-  --colorNeutralForeground2: #e2e8f0; /* Slate 200 */
-  --colorNeutralForeground3: #cbd5e1; /* Slate 300 */
-  --colorNeutralForeground4: #94a3b8; /* Slate 400 */
+  --colorNeutralForeground1: #f8fafc;
+  /* Slate 50 */
+  --colorNeutralForeground2: #e2e8f0;
+  /* Slate 200 */
+  --colorNeutralForeground3: #cbd5e1;
+  /* Slate 300 */
+  --colorNeutralForeground4: #94a3b8;
+  /* Slate 400 */
 
-  --colorNeutralBackground1: #020617; /* Slate 950 (Main BG) */
-  --colorNeutralBackground2: #0f172a; /* Slate 900 (Cards) */
-  --colorNeutralBackground3: #1e293b; /* Slate 800 (Hover/Muted) */
-  --colorNeutralBackground4: #334155; /* Slate 700 */
+  --colorNeutralBackground1: #020617;
+  /* Slate 950 (Main BG) */
+  --colorNeutralBackground2: #0f172a;
+  /* Slate 900 (Cards) */
+  --colorNeutralBackground3: #1e293b;
+  /* Slate 800 (Hover/Muted) */
+  --colorNeutralBackground4: #334155;
+  /* Slate 700 */
 
-  --colorNeutralStroke1: #1e293b; /* Slate 800 */
-  --colorNeutralStroke2: #334155; /* Slate 700 */
+  --colorNeutralStroke1: #1e293b;
+  /* Slate 800 */
+  --colorNeutralStroke2: #334155;
+  /* Slate 700 */
 
   /* --- Legacy/Compat Variables (Dark Mode) --- */
   --background: var(--colorNeutralBackground1);
   --foreground: var(--colorNeutralForeground1);
   --primary: var(--colorBrandBackground);
-  --primary-foreground: #020617; /* Dark text on primary */
+  --primary-foreground: #020617;
+  /* Dark text on primary */
   --muted: var(--colorNeutralBackground3);
-  --muted-foreground: var(--colorNeutralForeground4); /* Muted text should be dimmer */
+  --muted-foreground: var(--colorNeutralForeground4);
+  /* Muted text should be dimmer */
   --card: var(--colorNeutralBackground2);
   --card-foreground: var(--colorNeutralForeground1);
   --popover: var(--colorNeutralBackground1);
@@ -188,7 +199,6 @@
   --shadow-fluent-card: var(--shadow-4);
   --shadow-fluent-hover: var(--shadow-8);
 
-  /* Fluent Brand Palette */
   /* Fluent Brand Palette (Royal Red Theme) */
   --color-brand-50: #fdf2f2;
   --color-brand-100: #fde8e8;

@@ -27,13 +27,13 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
                 <div className="space-y-6 text-center">
                     <div className="p-4 bg-green-50 text-green-700 rounded-2xl border border-green-100 flex flex-col items-center gap-3 animate-in zoom-in-95">
                         <CheckCircle2 className="w-12 h-12 text-green-500" />
-                        <p className="font-semibold">{state.message}</p>
+                        <p className="font-semibold">{t('reset_success_desc')}</p>
                     </div>
                     <Link
                         href="/login"
                         className="inline-flex items-center btn bg-brand-600 text-white px-6 py-3 rounded-xl gap-2 hover:bg-brand-700 transition-all shadow-lg shadow-brand-600/20"
                     >
-                        Giriş Yap
+                        {t('signin')}
                         <ArrowRight className="w-5 h-5" />
                     </Link>
                 </div>
@@ -47,19 +47,19 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
                             id="password"
                             type="password"
                             name="password"
-                            placeholder="••••••••"
+                            placeholder={t('placeholder_password')}
                             required
                             leadingIcon={<Lock className="w-5 h-5" />}
                         />
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="confirmPassword">Şifre Tekrar</Label>
+                        <Label htmlFor="confirmPassword">{t('password_confirm')}</Label>
                         <Input
                             id="confirmPassword"
                             type="password"
                             name="confirmPassword"
-                            placeholder="••••••••"
+                            placeholder={t('placeholder_password')}
                             required
                             leadingIcon={<Lock className="w-5 h-5" />}
                         />

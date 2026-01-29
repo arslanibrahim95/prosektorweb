@@ -1,6 +1,6 @@
-import { prisma } from '@/lib/prisma'
-import { validatePagination } from '@/lib/action-types'
-import { safeApi } from '@/lib/safe-api'
+import { prisma } from '@/server/db'
+import { validatePagination } from '@/shared/lib'
+import { safeApi } from '@/shared/lib/safe-api'
 
 export const GET = safeApi(async (request) => {
     const { searchParams } = new URL(request.url)

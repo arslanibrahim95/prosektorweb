@@ -210,7 +210,7 @@ export function ModalSystem({ isOpen, onClose, initialState = ModalStep.INITIAL_
             >
                 <button
                     onClick={onClose}
-                    className="absolute top-4 right-4 p-2 text-neutral-400 hover:text-neutral-900 hover:bg-neutral-100 rounded-full transition-all z-10 focus:ring-2 focus:ring-brand-500 focus:outline-none"
+                    className="absolute top-3 right-3 w-11 h-11 min-w-[44px] min-h-[44px] flex items-center justify-center text-neutral-400 hover:text-neutral-900 hover:bg-neutral-100 rounded-full transition-all z-10 focus:ring-2 focus:ring-brand-500 focus:outline-none"
                     aria-label="Kapat"
                 >
                     <X className="w-6 h-6" />
@@ -301,37 +301,50 @@ export function ModalSystem({ isOpen, onClose, initialState = ModalStep.INITIAL_
 
                     {/* Request Form */}
                     {step === ModalStep.REQUEST_FORM && (
-                        <div>
+                        <form
+                            onSubmit={(e) => {
+                                e.preventDefault()
+                                handlePreviewRequest()
+                            }}
+                        >
                             <h2 id="modal-title" className="text-2xl font-bold mb-2 text-neutral-900">Önizleme Talebi</h2>
                             <p className="text-sm text-neutral-500 mb-6">Erişim yalnızca OSGB yetkililerine açılır.</p>
                             <div className="space-y-4 mb-8">
                                 {/* Added Labels for A11y */}
                                 <div>
-                                    <label htmlFor="req_company" className="block text-sm font-semibold text-neutral-700 mb-1">OSGB Ticari Ünvanı</label>
-                                    <input id="req_company" type="text" placeholder="OSGB Ticari Ünvanı" className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none" />
+                                    <label htmlFor="req_company" className="block text-sm font-semibold text-neutral-700 mb-1">
+                                        OSGB Ticari Ünvanı <span className="text-red-500">*</span>
+                                    </label>
+                                    <input id="req_company" required type="text" placeholder="OSGB Ticari Ünvanı" className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none" />
                                 </div>
                                 <div>
-                                    <label htmlFor="req_name" className="block text-sm font-semibold text-neutral-700 mb-1">Yetkili Adı Soyadı</label>
-                                    <input id="req_name" type="text" placeholder="Yetkili Adı Soyadı" className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none" />
+                                    <label htmlFor="req_name" className="block text-sm font-semibold text-neutral-700 mb-1">
+                                        Yetkili Adı Soyadı <span className="text-red-500">*</span>
+                                    </label>
+                                    <input id="req_name" required type="text" placeholder="Yetkili Adı Soyadı" className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none" />
                                 </div>
                                 <div>
-                                    <label htmlFor="req_email" className="block text-sm font-semibold text-neutral-700 mb-1">E-posta Adresi</label>
-                                    <input id="req_email" type="email" placeholder="E-posta Adresi" className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none" />
+                                    <label htmlFor="req_email" className="block text-sm font-semibold text-neutral-700 mb-1">
+                                        E-posta Adresi <span className="text-red-500">*</span>
+                                    </label>
+                                    <input id="req_email" required type="email" placeholder="E-posta Adresi" className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none" />
                                 </div>
                                 <div>
-                                    <label htmlFor="req_phone" className="block text-sm font-semibold text-neutral-700 mb-1">Cep Telefonu</label>
-                                    <input id="req_phone" type="tel" placeholder="Cep Telefonu (WhatsApp için)" className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none" />
+                                    <label htmlFor="req_phone" className="block text-sm font-semibold text-neutral-700 mb-1">
+                                        Cep Telefonu <span className="text-red-500">*</span>
+                                    </label>
+                                    <input id="req_phone" required type="tel" placeholder="Cep Telefonu (WhatsApp için)" className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none" />
                                 </div>
                                 <div className="flex items-start gap-3">
-                                    <input id="req_auth" type="checkbox" className="mt-1 w-4 h-4 text-brand-600 rounded focus:ring-brand-500" />
+                                    <input id="req_auth" required type="checkbox" className="mt-1 w-4 h-4 text-brand-600 rounded focus:ring-brand-500" />
                                     <label htmlFor="req_auth" className="text-sm text-neutral-500">OSGB adına web sitesi önizleme talebinde bulunmaya yetkiliyim.</label>
                                 </div>
                             </div>
-                            <button onClick={handlePreviewRequest} className="w-full py-4 bg-brand-600 text-white rounded-xl font-bold hover:bg-brand-700 transition-colors focus:ring-4 focus:ring-brand-200 focus:outline-none">
+                            <button type="submit" className="w-full py-4 bg-brand-600 text-white rounded-xl font-bold hover:bg-brand-700 transition-colors focus:ring-4 focus:ring-brand-200 focus:outline-none">
                                 Talebi Gönder
                             </button>
                             <BackButton to={ModalStep.REQUEST_INTRO} setStep={setStep} />
-                        </div>
+                        </form>
                     )}
 
                     {/* Success */}

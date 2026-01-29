@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Loader2, AlertCircle, Globe, Building2, DollarSign } from 'lucide-react'
+import { Loader2, AlertCircle, Globe, Building2, DollarSign, Sparkles } from 'lucide-react'
 import { createProject, ActionResult } from '@/features/projects/actions/projects'
 
 interface Props {
@@ -34,7 +34,29 @@ export function NewProjectForm({ companies, domains }: Props) {
     }
 
     return (
-        <form onSubmit={handleSubmit} className="space-y-6 max-w-2xl">
+        <div className="space-y-6 max-w-2xl">
+            {/* AI Wizard Link */}
+            <Link
+                href="/admin/projects/new/wizard"
+                className="block bg-gradient-to-r from-brand-50 to-purple-50 border-2 border-dashed border-brand-300 rounded-2xl p-6 hover:border-brand-500 transition-colors group"
+            >
+                <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-gradient-to-br from-brand-500 to-purple-600 rounded-xl flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform">
+                        <Sparkles className="w-6 h-6" />
+                    </div>
+                    <div>
+                        <h3 className="font-bold text-neutral-900">AI Site Olusturma Sihirbazi</h3>
+                        <p className="text-sm text-neutral-500">Firma bilgilerini girin, AI otomatik site olusturusun</p>
+                    </div>
+                </div>
+            </Link>
+
+            <div className="relative">
+                <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-neutral-200" /></div>
+                <div className="relative flex justify-center"><span className="bg-neutral-50 px-4 text-sm text-neutral-500">veya manuel olustur</span></div>
+            </div>
+
+        <form onSubmit={handleSubmit} className="space-y-6">
             {error && (
                 <div className="p-4 bg-red-50 border border-red-200 rounded-xl flex items-center gap-3 text-red-700">
                     <AlertCircle className="w-5 h-5" />
@@ -155,5 +177,6 @@ export function NewProjectForm({ companies, domains }: Props) {
                 </button>
             </div>
         </form>
+        </div>
     )
 }
