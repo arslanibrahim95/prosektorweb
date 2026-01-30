@@ -1,0 +1,3 @@
+## 2026-01-30 - Accessible Password Toggle
+**Learning:** The existing password toggle implementation was completely inaccessible to keyboard users (tabIndex="-1") and screen readers (no label, raw SVG). Also, testing UI components that import from barrel files mixing server/client code (like `@/shared/lib`) causes test failures due to server-side dependencies (Prisma) leaking into client tests.
+**Action:** Replaced the custom toggle with a standard `button` using `lucide-react` icons, proper ARIA attributes (`aria-label`, `aria-pressed`), and keyboard focus styles. For testing, imported utility functions directly from their source (`@/shared/lib/utils`) or mocked the barrel file to avoid initializing server-side modules.
