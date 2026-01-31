@@ -1,8 +1,8 @@
 'use client'
 
-import { AuthLayout } from '@/components/auth/AuthLayout'
-import { AuthCard } from '@/components/auth/AuthCard'
-import { LoginForm } from '@/components/auth/LoginForm'
+import { AuthLayout } from '@/features/auth/components/AuthLayout'
+import { AuthCard } from '@/features/auth/components/AuthCard'
+import { LoginForm } from '@/features/auth/components/LoginForm'
 import { User } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 

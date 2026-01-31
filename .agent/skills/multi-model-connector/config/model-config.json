@@ -1,0 +1,115 @@
+{
+  "use_cli": true,
+  "models": {
+    "claude": {
+      "provider": "anthropic",
+      "model_id": "claude-sonnet-4-20250514",
+      "env_key": "ANTHROPIC_API_KEY",
+      "cli_command": "claude",
+      "use_cli": true,
+      "content_types": ["blog", "service", "article"],
+      "max_tokens": 8192,
+      "temperature": 0.7,
+      "rate_limit": {
+        "rpm": 50,
+        "tpm": 100000
+      },
+      "cost_per_1k_tokens": {
+        "input": 0.003,
+        "output": 0.015
+      }
+    },
+    "gemini": {
+      "provider": "google",
+      "model_id": "gemini-2.0-flash",
+      "env_key": "GOOGLE_API_KEY",
+      "cli_command": "gemini",
+      "use_cli": true,
+      "content_types": ["landing", "faq", "comparison"],
+      "max_tokens": 8192,
+      "temperature": 0.7,
+      "rate_limit": {
+        "rpm": 60,
+        "tpm": 120000
+      },
+      "cost_per_1k_tokens": {
+        "input": 0.0005,
+        "output": 0.0015
+      }
+    },
+    "glm": {
+      "provider": "zhipu",
+      "model_id": "glm-4",
+      "env_key": "ZHIPU_API_KEY",
+      "cli_command": "zhipu",
+      "use_cli": true,
+      "content_types": ["product", "description"],
+      "max_tokens": 4096,
+      "temperature": 0.7,
+      "rate_limit": {
+        "rpm": 100,
+        "tpm": 200000
+      },
+      "cost_per_1k_tokens": {
+        "input": 0.001,
+        "output": 0.002
+      }
+    },
+    "gpt4": {
+      "provider": "openai",
+      "model_id": "gpt-4o",
+      "env_key": "OPENAI_API_KEY",
+      "cli_command": "openai",
+      "use_cli": true,
+      "role": "reviewer",
+      "content_types": [],
+      "max_tokens": 4096,
+      "temperature": 0.3,
+      "rate_limit": {
+        "rpm": 40,
+        "tpm": 80000
+      },
+      "cost_per_1k_tokens": {
+        "input": 0.005,
+        "output": 0.015
+      }
+    }
+  },
+  "fallback_chain": ["claude", "gemini", "gpt4", "glm"],
+  "content_routes": {
+    "blog": ["claude", "gemini", "gpt4"],
+    "service": ["claude", "gemini", "gpt4"],
+    "article": ["claude", "gemini", "gpt4"],
+    "landing": ["gemini", "claude", "gpt4"],
+    "faq": ["gemini", "glm", "claude"],
+    "comparison": ["gemini", "claude", "gpt4"],
+    "product": ["glm", "gemini", "claude"],
+    "description": ["glm", "gemini", "claude"]
+  },
+  "retry_config": {
+    "max_retries": 3,
+    "base_delay": 1.0,
+    "max_delay": 60.0,
+    "exponential_base": 2
+  },
+  "circuit_breaker": {
+    "failure_threshold": 5,
+    "reset_timeout": 60,
+    "half_open_requests": 1
+  },
+  "cache": {
+    "enabled": true,
+    "ttl": {
+      "blog": 3600,
+      "service": 3600,
+      "landing": 7200,
+      "faq": 86400,
+      "product": 43200,
+      "description": 43200
+    }
+  },
+  "defaults": {
+    "timeout": 120,
+    "max_context_tokens": 4000
+  }
+}

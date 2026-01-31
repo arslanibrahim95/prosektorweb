@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { TrafficChart, TrafficSources, PerformanceGauge } from '@/components/portal/AnalyticsCharts'
+import { TrafficChart, TrafficSources, PerformanceGauge } from '@/features/analytics/components/AnalyticsCharts'
 import Link from 'next/link'
 import {
     ArrowLeft, Users, Eye, Clock, TrendingDown, RefreshCw, CheckCircle,

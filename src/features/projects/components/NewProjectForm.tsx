@@ -25,7 +25,7 @@ export function NewProjectForm({ companies, domains }: Props) {
         const result = await createProject(formData)
 
         if (result.success) {
-            router.push(`/admin/projects/${result.data.id}`)
+            router.push(`/admin/projects/${(result.data as any).id}`)
             router.refresh()
         } else {
             setError(result.error || 'Bir hata oluştu')

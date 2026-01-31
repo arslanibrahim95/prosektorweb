@@ -64,7 +64,9 @@ export async function getClientProjects(page = 1, limit = 10) {
     const companyId = await getClientCompanyId()
     if (!companyId) return { data: [], total: 0, pages: 0, currentPage: 1 }
 
-    const { skip, limit: validatedLimit } = validatePagination(page, limit)
+    const currentPage = Math.max(1, page)
+    const validatedLimit = Math.min(100, Math.max(1, limit))
+    const skip = (currentPage - 1) * validatedLimit
 
     const [data, total] = await Promise.all([
         prisma.webProject.findMany({
@@ -89,7 +91,9 @@ export async function getClientInvoices(page = 1, limit = 10) {
     const companyId = await getClientCompanyId()
     if (!companyId) return { data: [], total: 0, pages: 0, currentPage: 1 }
 
-    const { skip, limit: validatedLimit } = validatePagination(page, limit)
+    const currentPage = Math.max(1, page)
+    const validatedLimit = Math.min(100, Math.max(1, limit))
+    const skip = (currentPage - 1) * validatedLimit
 
     const [data, total] = await Promise.all([
         prisma.invoice.findMany({
@@ -114,7 +118,9 @@ export async function getClientServices(page = 1, limit = 10) {
     const companyId = await getClientCompanyId()
     if (!companyId) return { data: [], total: 0, pages: 0, currentPage: 1 }
 
-    const { skip, limit: validatedLimit } = validatePagination(page, limit)
+    const currentPage = Math.max(1, page)
+    const validatedLimit = Math.min(100, Math.max(1, limit))
+    const skip = (currentPage - 1) * validatedLimit
 
     const [data, total] = await Promise.all([
         prisma.service.findMany({
@@ -139,7 +145,9 @@ export async function getClientTickets(page = 1, limit = 10) {
     const companyId = await getClientCompanyId()
     if (!companyId) return { data: [], total: 0, pages: 0, currentPage: 1 }
 
-    const { skip, limit: validatedLimit } = validatePagination(page, limit)
+    const currentPage = Math.max(1, page)
+    const validatedLimit = Math.min(100, Math.max(1, limit))
+    const skip = (currentPage - 1) * validatedLimit
 
     const [data, total] = await Promise.all([
         prisma.ticket.findMany({

@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import Particles from '@/components/ui/Particles'
+import { Particles } from '@/shared/components/ui'
 
 export function ResponsiveParticles() {
     const [isMobile, setIsMobile] = useState(false)

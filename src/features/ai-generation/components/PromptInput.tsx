@@ -6,7 +6,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
-import { Button } from '@/components/ui/Button';
+import { Button } from '@/shared/components/ui';
 import { validatePrompt, GENERATION_LIMITS, type PromptValidationResult } from '../lib/validation';
 import { createGeneration } from '../actions/generation';
 import { Loader2, Sparkles, AlertCircle, CheckCircle, Info } from 'lucide-react';

@@ -1,7 +1,7 @@
 'use client'
 
 import { createSystemUser } from '@/features/system/actions/system-users'
-import { GradientButton } from '@/components/ui/GradientButton'
+import { GradientButton } from '@/shared/components/ui'
 import Link from 'next/link'
 import { ArrowLeft, Save, Shield, User } from 'lucide-react'
 import { useState, useTransition } from 'react'

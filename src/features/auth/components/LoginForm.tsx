@@ -4,9 +4,9 @@ import { useState } from 'react'
 import { signIn } from 'next-auth/react'
 import { AlertCircle, ArrowRight, Lock, Mail } from 'lucide-react'
 import { useTranslations } from 'next-intl'
-import { Button } from '@/components/ui/Button'
-import { Input } from '@/components/ui/Input'
-import { Label } from '@/components/ui/Label'
+import { Button } from '@/shared/components/ui'
+import { Input } from '@/shared/components/ui'
+import { Label } from '@/shared/components/ui'
 import { Link } from '@/i18n/routing'
 
 export function LoginForm() {

@@ -8,7 +8,7 @@ import {
     Phone, Mail, Headphones,
     Image as ImageIcon, BookOpen, Search, Palette, Eye, EyeOff, FileText
 } from 'lucide-react'
-import SpotlightCard from '@/components/ui/SpotlightCard'
+import { SpotlightCard } from '@/shared/components/ui'
 
 // Status config for projects
 const statusConfig: Record<string, { label: string; color: string; bgColor: string }> = {

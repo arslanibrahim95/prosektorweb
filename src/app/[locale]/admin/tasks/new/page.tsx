@@ -2,7 +2,7 @@ import { createTask } from '@/features/system/actions/tasks'
 import { prisma } from '@/server/db'
 import Link from 'next/link'
 import { ChevronLeft, Save } from 'lucide-react'
-import { SubmitButton } from '@/components/ui/SubmitButton'
+import { SubmitButton } from '@/shared/components/ui'
 
 export default async function NewTaskPage() {
     const projects = await prisma.webProject.findMany({

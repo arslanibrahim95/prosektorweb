@@ -15,7 +15,7 @@ export async function impersonateCompany(companyId: string) {
     }
 
     const ipAddress = await getClientIp()
-    const userAgent = headers().get('user-agent') || undefined
+    const userAgent = (await headers()).get('user-agent') || undefined
 
     // Audit Log: Start Impersonation (DB-backed)
     await logAudit({
@@ -50,7 +50,7 @@ export async function exitImpersonation() {
     }
 
     const ipAddress = await getClientIp()
-    const userAgent = headers().get('user-agent') || undefined
+    const userAgent = (await headers()).get('user-agent') || undefined
 
     // Audit Log: End Impersonation (DB-backed)
     await logAudit({

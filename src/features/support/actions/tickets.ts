@@ -183,7 +183,10 @@ export async function getTickets(options?: {
     limit?: number
 }) {
     const { status, search = '' } = options || {}
-    const { page, limit, skip } = validatePagination(options?.page, options?.limit)
+    const currentPage = Math.max(1, options?.page || 1)
+    const limit = Math.min(100, Math.max(1, options?.limit || 20))
+    const skip = (currentPage - 1) * limit
+    const page = currentPage
 
     try {
         const session = await auth()

@@ -9,6 +9,7 @@ interface EditorProps {
     content: string
     onChange: (content: string) => void
     editable?: boolean
+    enableMediaPicker?: boolean
 }
 
 export function ContentEditor({ content, onChange, editable = true }: EditorProps) {
@@ -20,7 +21,7 @@ export function ContentEditor({ content, onChange, editable = true }: EditorProp
                 HTMLAttributes: {
                     class: 'text-brand-600 hover:underline',
                 },
-                validate: href => /^((https?|mailto|tel):)/.test(href),
+                validate: (href: string) => /^((https?|mailto|tel):)/.test(href),
             }),
         ],
         content,
@@ -30,7 +31,7 @@ export function ContentEditor({ content, onChange, editable = true }: EditorProp
                 class: 'prose prose-neutral max-w-none focus:outline-none min-h-[300px] p-4',
             },
         },
-        onUpdate: ({ editor }) => {
+        onUpdate: ({ editor }: { editor: any }) => {
             onChange(editor.getHTML())
         },
     })

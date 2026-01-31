@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
-import { Navbar } from "@/components/layout/Navbar";
-import { Footer } from "@/components/layout/Footer";
+import { Navbar } from "@/shared/components/layout/navbar/Navbar";
+import { Footer } from "@/shared/components/layout/footer/Footer";
 import { LocalSeoPage } from "@/features/seo/components/LocalSeoPage";
 import { WebVitalsTracker } from "@/features/performance/components/WebVitalsTracker";
 import {

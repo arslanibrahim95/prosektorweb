@@ -28,25 +28,25 @@ export async function generateMetadata({
   const { locale } = await params;
   return {
     title: {
-      default: "ProSektorWeb | OSGB Web Sitesi",
-      template: "%s | ProSektorWeb"
+      default: "ProsektorWeb | 11 Yıllık İş Güvenliği Uzmanlığı",
+      template: "%s | ProsektorWeb"
     },
-    description: "OSGB'niz için profesyonel web sitesi. 7 gün ücretsiz önizleme, tek fiyat ve tam sektör uyumu.",
-    keywords: ["isg", "iş güvenliği", "iş sağlığı", "osgb", "risk analizi", "mevzuat", "6331"],
-    authors: [{ name: "ProSektorWeb" }],
-    creator: "ProSektorWeb",
+    description: "ProsektorWeb, 11 yıllık iş güvenliği deneyimi ile OSGB sektörünün lider web sitesi çözümleri. İş güvenliği uzmanı kadrosu, mevzuat uyumu ve dijital dönüşüm.",
+    keywords: ["iş güvenliği", "osgb", "iş sağlığı", "6331 sayılı kanun", "iş güvenliği uzmanı", "işyeri hekimi", "risk analizi", "osgb web sitesi"],
+    authors: [{ name: "ProsektorWeb" }],
+    creator: "ProsektorWeb",
     openGraph: {
       type: "website",
       locale: locale === 'tr' ? 'tr_TR' : 'en_US',
       url: "https://prosektorweb.com",
-      siteName: "ProSektorWeb",
-      title: "ProSektorWeb | OSGB Web Sitesi",
-      description: "OSGB'niz için profesyonel web sitesi",
+      siteName: "ProsektorWeb",
+      title: "ProsektorWeb | 11 Yıllık İş Güvenliği Uzmanlığı",
+      description: "11 yıllık iş güvenliği deneyimi ile OSGB sektörünün lider web sitesi çözümleri.",
     },
     twitter: {
       card: "summary_large_image",
-      title: "ProSektorWeb | OSGB Web Sitesi",
-      description: "OSGB'niz için profesyonel web sitesi. 7 gün ücretsiz önizleme, tek fiyat ve tam sektör uyumu.",
+      title: "ProsektorWeb | 11 Yıllık İş Güvenliği Uzmanlığı",
+      description: "11 yıllık iş güvenliği deneyimi ile OSGB sektörü için profesyonel web sitesi çözümleri.",
     },
     robots: {
       index: true,
@@ -63,8 +63,8 @@ export async function generateMetadata({
   };
 }
 
-import { ThemeProvider } from "@/components/ui/ThemeProvider";
-import { JsonLd } from "@/features/seo/components/JsonLd";
+import { ThemeProvider } from "@/shared/components/providers/ThemeProvider";
+import { GlobalSeoSchemas } from "@/features/seo/components/GlobalSeoSchemas";
 
 export default async function RootLayout({
   children,
@@ -75,7 +75,7 @@ export default async function RootLayout({
 }>) {
   const { locale } = await params;
   const messages = await getMessages();
-  const nonce = headers().get('x-nonce') || undefined;
+  const nonce = (await headers()).get('x-nonce') || undefined;
 
   return (
     <html lang={locale} className={`${inter.variable} ${playfair.variable}`} suppressHydrationWarning>
@@ -87,18 +87,7 @@ export default async function RootLayout({
         <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:z-[100] focus:top-4 focus:left-4 bg-brand-600 text-white px-4 py-2 rounded-lg font-bold shadow-lg">
           Skip to content
         </a>
-        <JsonLd nonce={nonce} data={{
-          "@context": "https://schema.org",
-          "@type": "Organization",
-          "name": "ProSektorWeb",
-          "url": "https://prosektorweb.com",
-          "logo": "https://prosektorweb.com/logo.png",
-          "contactPoint": {
-            "@type": "ContactPoint",
-            "telephone": "+90-555-123-4567",
-            "contactType": "customer service"
-          }
-        }} />
+        <GlobalSeoSchemas />
         <NextIntlClientProvider messages={messages}>
           <AuthProvider>
             <AnalyticsProvider nonce={nonce}>

@@ -1,0 +1,125 @@
+{
+  "default_threshold": 70,
+  "max_revision_iterations": 2,
+  "content_types": {
+    "blog": {
+      "threshold": 75,
+      "criteria": ["accuracy", "engagement", "seo", "clarity", "eeat"],
+      "weights": {
+        "accuracy": 0.25,
+        "engagement": 0.25,
+        "seo": 0.20,
+        "clarity": 0.15,
+        "eeat": 0.15
+      },
+      "critical_criteria": ["accuracy"]
+    },
+    "service": {
+      "threshold": 75,
+      "criteria": ["clarity", "tone", "seo", "eeat", "engagement"],
+      "weights": {
+        "clarity": 0.25,
+        "tone": 0.20,
+        "seo": 0.20,
+        "eeat": 0.20,
+        "engagement": 0.15
+      },
+      "critical_criteria": ["clarity", "eeat"]
+    },
+    "landing": {
+      "threshold": 70,
+      "criteria": ["engagement", "clarity", "cta", "tone", "seo"],
+      "weights": {
+        "engagement": 0.30,
+        "clarity": 0.25,
+        "cta": 0.20,
+        "tone": 0.15,
+        "seo": 0.10
+      },
+      "critical_criteria": ["cta"]
+    },
+    "faq": {
+      "threshold": 80,
+      "criteria": ["accuracy", "clarity", "structure", "seo"],
+      "weights": {
+        "accuracy": 0.35,
+        "clarity": 0.35,
+        "structure": 0.20,
+        "seo": 0.10
+      },
+      "critical_criteria": ["accuracy", "clarity"]
+    },
+    "product": {
+      "threshold": 70,
+      "criteria": ["accuracy", "clarity", "engagement", "seo"],
+      "weights": {
+        "accuracy": 0.30,
+        "clarity": 0.30,
+        "engagement": 0.20,
+        "seo": 0.20
+      },
+      "critical_criteria": ["accuracy"]
+    },
+    "description": {
+      "threshold": 65,
+      "criteria": ["clarity", "accuracy", "engagement"],
+      "weights": {
+        "clarity": 0.40,
+        "accuracy": 0.35,
+        "engagement": 0.25
+      },
+      "critical_criteria": []
+    }
+  },
+  "criteria_definitions": {
+    "accuracy": {
+      "description": "Factual correctness and claims verification",
+      "min_score_for_pass": 60
+    },
+    "clarity": {
+      "description": "Readability and ease of understanding",
+      "min_score_for_pass": 60
+    },
+    "tone": {
+      "description": "Appropriate voice and style",
+      "min_score_for_pass": 50
+    },
+    "seo": {
+      "description": "SEO optimization elements",
+      "min_score_for_pass": 50
+    },
+    "engagement": {
+      "description": "Reader interest and retention",
+      "min_score_for_pass": 50
+    },
+    "eeat": {
+      "description": "E-E-A-T signals",
+      "min_score_for_pass": 50
+    },
+    "cta": {
+      "description": "Call-to-action effectiveness",
+      "min_score_for_pass": 60
+    },
+    "structure": {
+      "description": "Logical organization and hierarchy",
+      "min_score_for_pass": 60
+    },
+    "grammar": {
+      "description": "Grammar and spelling",
+      "min_score_for_pass": 70
+    }
+  },
+  "score_bands": {
+    "excellent": {"min": 90, "max": 100, "action": "approve"},
+    "good": {"min": 80, "max": 89, "action": "approve"},
+    "acceptable": {"min": 70, "max": 79, "action": "conditional_approve"},
+    "needs_work": {"min": 60, "max": 69, "action": "revise"},
+    "poor": {"min": 0, "max": 59, "action": "reject"}
+  },
+  "auto_fail_conditions": [
+    "factual_errors",
+    "plagiarism_detected",
+    "offensive_content",
+    "missing_required_elements"
+  ]
+}

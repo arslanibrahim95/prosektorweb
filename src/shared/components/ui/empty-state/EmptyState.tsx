@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { LucideIcon, Plus } from 'lucide-react'
-import { Button } from '@/components/ui/Button'
+import { Button } from '@/shared/components/ui'
 
 interface EmptyStateProps {
     title: string

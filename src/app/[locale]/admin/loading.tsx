@@ -1,4 +1,4 @@
-import { Skeleton } from "@/components/ui/Skeleton"
+import { Skeleton } from "@/shared/components/ui"
 import { Shield } from "lucide-react"
 
 export default function AdminDashboardLoading() {

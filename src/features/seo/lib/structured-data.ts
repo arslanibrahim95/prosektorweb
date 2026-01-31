@@ -1,12 +1,12 @@
 /**
  * Structured Data (Schema.org) Expansion
- * 
- * FAQPage, HowTo, Service types
+ *
+ * FAQPage, HowTo, Service, Organization, Article types
  * Dynamic generation based on page content
  * Breadcrumb integration
  */
 
-import type { LocalPage, ContentSection } from '@/features/ai-generation/lib/pipeline/seo';
+import type { LocalPage, ContentSection } from '@/features/seo/lib/pipeline/seo';
 
 // Schema.org types
 interface SchemaBase {
@@ -62,6 +62,68 @@ interface BreadcrumbSchema extends SchemaBase {
         name: string;
         item: string;
     }>;
+}
+
+interface OrganizationSchema extends SchemaBase {
+    '@type': 'Organization';
+    name: string;
+    url: string;
+    logo: string;
+    description?: string;
+    address?: {
+        '@type': 'PostalAddress';
+        streetAddress?: string;
+        addressLocality: string;
+        addressRegion?: string;
+        postalCode?: string;
+        addressCountry: string;
+    };
+    contactPoint?: {
+        '@type': 'ContactPoint';
+        telephone: string;
+        contactType: string;
+        availableLanguage?: string[];
+    };
+    sameAs?: string[];
+}
+
+interface ArticleSchema extends SchemaBase {
+    '@type': 'Article';
+    headline: string;
+    description?: string;
+    image?: string[];
+    datePublished: string;
+    dateModified: string;
+    author?: {
+        '@type': 'Person' | 'Organization';
+        name: string;
+    };
+    publisher?: {
+        '@type': 'Organization';
+        name: string;
+        logo?: {
+            '@type': 'ImageObject';
+            url: string;
+        };
+    };
+    mainEntityOfPage?: {
+        '@type': 'WebPage';
+        '@id': string;
+    };
+}
+
+interface WebSiteSchema extends SchemaBase {
+    '@type': 'WebSite';
+    name: string;
+    url: string;
+    potentialAction?: {
+        '@type': 'SearchAction';
+        target: {
+            '@type': 'EntryPoint';
+            urlTemplate: string;
+        };
+        'query-input': string;
+    };
 }
 
 /**
@@ -153,7 +215,131 @@ export function generateBreadcrumbSchema(page: LocalPage): BreadcrumbSchema {
 }
 
 /**
- * Tüm schema'ları birleştir
+ * Organization schema oluştur (site geneli için)
+ */
+export function generateOrganizationSchema(
+    options: {
+        name: string;
+        url: string;
+        logo: string;
+        description?: string;
+        address?: {
+            streetAddress?: string;
+            addressLocality: string;
+            addressRegion?: string;
+            postalCode?: string;
+            addressCountry: string;
+        };
+        phone?: string;
+        socialLinks?: string[];
+    }
+): OrganizationSchema {
+    return {
+        '@context': 'https://schema.org',
+        '@type': 'Organization',
+        name: options.name,
+        url: options.url,
+        logo: options.logo,
+        description: options.description,
+        address: options.address
+            ? {
+                '@type': 'PostalAddress',
+                ...options.address,
+            }
+            : undefined,
+        contactPoint: options.phone
+            ? {
+                '@type': 'ContactPoint',
+                telephone: options.phone,
+                contactType: 'customer service',
+                availableLanguage: ['Turkish', 'English'],
+            }
+            : undefined,
+        sameAs: options.socialLinks,
+    };
+}
+
+/**
+ * Article schema oluştur (blog yazıları için)
+ */
+export function generateArticleSchema(
+    options: {
+        headline: string;
+        description?: string;
+        image?: string;
+        datePublished: string;
+        dateModified: string;
+        authorName?: string;
+        publisherName?: string;
+        publisherLogo?: string;
+        url?: string;
+    }
+): ArticleSchema {
+    return {
+        '@context': 'https://schema.org',
+        '@type': 'Article',
+        headline: options.headline,
+        description: options.description,
+        image: options.image ? [options.image] : undefined,
+        datePublished: options.datePublished,
+        dateModified: options.dateModified,
+        author: options.authorName
+            ? {
+                '@type': 'Organization',
+                name: options.authorName,
+            }
+            : undefined,
+        publisher: options.publisherName
+            ? {
+                '@type': 'Organization',
+                name: options.publisherName,
+                logo: options.publisherLogo
+                    ? {
+                        '@type': 'ImageObject',
+                        url: options.publisherLogo,
+                    }
+                    : undefined,
+            }
+            : undefined,
+        mainEntityOfPage: options.url
+            ? {
+                '@type': 'WebPage',
+                '@id': options.url,
+            }
+            : undefined,
+    };
+}
+
+/**
+ * WebSite schema oluştur (site araması için)
+ */
+export function generateWebSiteSchema(
+    options: {
+        name: string;
+        url: string;
+        searchUrl?: string;
+    }
+): WebSiteSchema {
+    return {
+        '@context': 'https://schema.org',
+        '@type': 'WebSite',
+        name: options.name,
+        url: options.url,
+        potentialAction: options.searchUrl
+            ? {
+                '@type': 'SearchAction',
+                target: {
+                    '@type': 'EntryPoint',
+                    urlTemplate: options.searchUrl,
+                },
+                'query-input': 'required name=search_term_string',
+            }
+            : undefined,
+    };
+}
+
+/**
+ * Tüm schema'ları birleştir (local pages için)
  */
 export function generateAllSchemas(page: LocalPage): unknown[] {
     const schemas: unknown[] = [];
@@ -284,4 +470,7 @@ export type {
     HowToSchema,
     ServiceSchema,
     BreadcrumbSchema,
+    OrganizationSchema,
+    ArticleSchema,
+    WebSiteSchema,
 };

@@ -3,8 +3,8 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Save, Eye, EyeOff, Image as ImageIcon, X } from 'lucide-react'
-import { ContentEditor } from '@/components/ui/ContentEditor'
-import { MediaPickerModal } from '@/components/portal/media/MediaPickerModal'
+import { ContentEditor } from '@/shared/components/ui'
+import { MediaPickerModal } from '@/features/projects/components/portal/media/MediaPickerModal'
 
 interface BlogPostFormProps {
     projectId: string
@@ -167,9 +167,8 @@ export function BlogPostForm({ projectId, companyId, basePath = '/portal/project
                             <span className="font-medium text-neutral-700">Yayınla</span>
                             <button
                                 onClick={() => setPublished(!published)}
-                                className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-                                    published ? 'bg-green-100 text-green-700' : 'bg-neutral-100 text-neutral-600'
-                                }`}
+                                className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${published ? 'bg-green-100 text-green-700' : 'bg-neutral-100 text-neutral-600'
+                                    }`}
                             >
                                 {published ? <><Eye className="w-4 h-4" /> Yayında</> : <><EyeOff className="w-4 h-4" /> Taslak</>}
                             </button>
@@ -261,7 +260,7 @@ export function BlogPostForm({ projectId, companyId, basePath = '/portal/project
                 onClose={() => setShowCoverPicker(false)}
                 category="BLOG"
                 companyId={companyId}
-                onSelect={(asset) => {
+                onSelect={(asset: any) => {
                     setCoverImageId(asset.id)
                     setCoverImageUrl(asset.url)
                 }}

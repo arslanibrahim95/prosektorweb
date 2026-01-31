@@ -8,7 +8,7 @@ import {
 } from 'lucide-react'
 import { logoutAction } from '@/features/auth/actions/auth'
 import { prisma } from '@/server/db'
-import Particles from '@/components/ui/Particles'
+import { Particles } from '@/shared/components/ui'
 import { getTranslations } from 'next-intl/server'
 
 async function getCompanyName(companyId: string | null) {

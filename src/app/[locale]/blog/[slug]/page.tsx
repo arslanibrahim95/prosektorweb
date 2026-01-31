@@ -4,11 +4,13 @@ import { ArrowLeft, ArrowRight, Calendar, Share2, User } from 'lucide-react'
 import { notFound } from 'next/navigation'
 import { sanitizeHtml } from '@/shared/lib/sanitize'
 
-import { Navbar } from '@/components/layout/Navbar'
-import { Footer } from '@/components/layout/Footer'
+import { Navbar } from '@/shared/components/layout/navbar/Navbar'
+import { Footer } from '@/shared/components/layout/footer/Footer'
 import { prisma } from '@/server/db'
-import TrustBadges from '@/components/ui/TrustBadges'
+import { TrustBadges } from '@/shared/components/ui'
 import { BlogCTA } from '@/features/content/components/BlogCTA'
+import { JsonLd } from '@/features/seo/components/JsonLd'
+import { generateArticleSchema } from '@/features/seo/lib/structured-data'
 
 // --- Types ---
 type Props = {
@@ -100,6 +102,19 @@ export default async function BlogDetailPage({ params }: Props) {
     const tags = parseTags(post.tags)
     const cleanContent = sanitizeHtml(post.content)
 
+    // Generate Article schema for rich snippets
+    const articleSchema = generateArticleSchema({
+        headline: post.title,
+        description: (post.excerpt || post.metaDescription) ?? undefined,
+        image: post.coverImage || undefined,
+        datePublished: post.publishedAt.toISOString(),
+        dateModified: post.updatedAt.toISOString(),
+        authorName: post.authorName || 'ProSektorWeb',
+        publisherName: 'ProSektorWeb',
+        publisherLogo: 'https://prosektorweb.com/logo.png',
+        url: `https://prosektorweb.com/blog/${post.slug}`,
+    })
+
     // Check for quality/trust related content
     const showsTrustBadges = tags.some(t =>
         ['Kurumsal Kimlik', 'Güven', 'Kalite', 'Sertifika', 'Yönetmelik'].some(kw => t.includes(kw))
@@ -108,6 +123,7 @@ export default async function BlogDetailPage({ params }: Props) {
     return (
         <div className="min-h-screen bg-neutral-50 text-neutral-900 font-sans selection:bg-brand-100 selection:text-brand-900">
             <Navbar variant="inner" />
+            <JsonLd data={articleSchema} />
 
             {/* Hero Section */}
             <section className="pt-24 pb-0 relative">

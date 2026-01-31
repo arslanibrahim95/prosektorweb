@@ -1,11 +1,11 @@
 import Link from 'next/link'
 import { ChevronRight, Search, Calendar, Clock, User } from 'lucide-react'
-import { Navbar } from '@/components/layout/Navbar'
-import { Footer } from '@/components/layout/Footer'
+import { Navbar } from '@/shared/components/layout/navbar/Navbar'
+import { Footer } from '@/shared/components/layout/footer/Footer'
 import { prisma } from '@/server/db'
 import { Prisma } from '@prisma/client'
-import SpotlightCard from '@/components/ui/SpotlightCard'
-import { CursorPagination } from '@/components/ui/CursorPagination'
+import { SpotlightCard } from '@/shared/components/ui'
+import { CursorPagination } from '@/shared/components/ui'
 import { BlogCardImage } from '@/features/content/components/BlogCardImage'
 
 // Helper to format date

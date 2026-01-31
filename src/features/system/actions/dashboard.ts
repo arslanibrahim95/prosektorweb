@@ -31,6 +31,17 @@ export interface DashboardStats {
     totalMessages: number
     blogPosts: number
 
+    // AI Production Metrics
+    aiGeneratedSites: number
+    aiPendingGeneration: number
+    aiCompletedToday: number
+    aiFailedCount: number
+
+    // Quick Actions Stats
+    newCompaniesThisMonth: number
+    proposalsSentThisMonth: number
+    proposalWinRate: number
+
     error: boolean
 }
 
@@ -66,6 +77,14 @@ export async function getAdminDashboardStats(): Promise<DashboardStats> {
                     paidInvoices,
                     pendingInvoices,
                     services,
+                    // AI Production Metrics (using existing ProjectStatus)
+                    liveProjects,
+                    deployingProjects,
+                    approvedProjects,
+                    // Quick Actions Stats
+                    newCompaniesThisMonth,
+                    proposals,
+                    acceptedProposals,
                     // Monthly Revenue
                     monthlyStats
                 ] = await Promise.all([
@@ -93,6 +112,30 @@ export async function getAdminDashboardStats(): Promise<DashboardStats> {
                         where: { status: 'ACTIVE' },
                         select: { price: true, billingCycle: true }
                     }),
+
+                    // AI Production Metrics (using existing statuses)
+                    prisma.webProject.count({ where: { status: 'LIVE' } }),
+                    prisma.webProject.count({ where: { status: 'DEPLOYING' } }),
+                    prisma.webProject.count({ where: { status: 'APPROVED' } }),
+
+                    // Quick Actions Stats
+                    prisma.company.count({
+                        where: {
+                            createdAt: { gte: new Date(new Date().setDate(new Date().getDate() - 30)) }
+                        }
+                    }),
+                    prisma.proposal.count({
+                        where: {
+                            createdAt: { gte: new Date(new Date().setDate(new Date().getDate() - 30)) }
+                        }
+                    }),
+                    prisma.proposal.count({
+                        where: {
+                            status: 'ACCEPTED',
+                            updatedAt: { gte: new Date(new Date().setDate(new Date().getDate() - 30)) }
+                        }
+                    }),
+
                     // Last 6 months simplified
                     prisma.invoice.findMany({
                         where: {
@@ -154,6 +197,15 @@ export async function getAdminDashboardStats(): Promise<DashboardStats> {
                     outstandingReceivables: Number(pendingInvoices._sum.total || 0),
                     mrr,
                     chartData,
+                    // AI Production Metrics
+                    aiGeneratedSites: liveProjects,
+                    aiPendingGeneration: pendingProjects,
+                    aiCompletedToday: approvedProjects,
+                    aiFailedCount: 0,
+                    // Quick Actions Stats
+                    newCompaniesThisMonth,
+                    proposalsSentThisMonth: proposals,
+                    proposalWinRate: proposals > 0 ? Math.round((acceptedProposals / proposals) * 100) : 0,
                     error: false
                 }
             } catch (e) {
@@ -164,6 +216,15 @@ export async function getAdminDashboardStats(): Promise<DashboardStats> {
                     activeTickets: 0, pendingProjects: 0, activeServices: 0,
                     totalRevenue: 0, outstandingReceivables: 0, mrr: 0,
                     chartData: [],
+                    // AI Production Metrics
+                    aiGeneratedSites: 0,
+                    aiPendingGeneration: 0,
+                    aiCompletedToday: 0,
+                    aiFailedCount: 0,
+                    // Quick Actions Stats
+                    newCompaniesThisMonth: 0,
+                    proposalsSentThisMonth: 0,
+                    proposalWinRate: 0,
                     error: true
                 }
             }

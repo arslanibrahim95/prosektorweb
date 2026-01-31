@@ -3,8 +3,8 @@ export const dynamic = 'force-dynamic'
 import { getTickets } from '@/features/support/actions/tickets'
 import Link from 'next/link'
 import { Plus, MessageSquare, Clock, CheckCircle, AlertCircle } from 'lucide-react'
-import { PageHeader } from '@/components/ui/PageHeader'
-import { EmptyState } from '@/components/ui/EmptyState'
+import { PageHeader } from '@/shared/components/ui'
+import { EmptyState } from '@/shared/components/ui'
 
 const priorityConfig: Record<string, { label: string, color: string, icon: any }> = {
     LOW: { label: 'Düşük', color: 'bg-neutral-100 text-neutral-600', icon: Clock },

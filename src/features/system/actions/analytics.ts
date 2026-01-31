@@ -81,7 +81,7 @@ export async function getProjectLeads(projectId: string, limit = 20) {
     if (!companyId) return []
 
     // Validate limit (max 100)
-    const validLimit = Math.min(Math.max(limit, PAGINATION.MIN_LIMIT), PAGINATION.MAX_LIMIT)
+    const validLimit = Math.min(Math.max(limit, 1), PAGINATION.MAX_LIMIT)
 
     // Verify project belongs to client
     const project = await prisma.webProject.findFirst({

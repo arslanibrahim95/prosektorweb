@@ -82,7 +82,7 @@ export async function getProjects(page: number = 1, limit: number = 20, search?:
         }
 
         if (status) {
-            where.status = status
+            where.status = status as ProjectStatus
         }
 
         const [data, total] = await Promise.all([
@@ -186,7 +186,7 @@ export async function createProject(input: ProjectInput | FormData): Promise<Act
         return { success: true, data: project }
     } catch (e) {
         if (e instanceof z.ZodError) return { success: false, error: getZodErrorMessage(e) }
-        logger.error('createProject Error', e)
+        logger.error({ error: e }, 'createProject Error')
         return { success: false, error: 'Proje oluşturulamadı' }
     }
 }
@@ -274,7 +274,7 @@ export async function updateProject(id: string, input: Partial<ProjectInput> | F
         revalidatePath(`/admin/projects/${id}`)
         return { success: true, data: project }
     } catch (e) {
-        logger.error('updateProject Error', e)
+        logger.error({ error: e }, 'updateProject Error')
         if (e instanceof Error && 'code' in e && e.code === 'P2025') {
             return { success: false, error: 'Kayıt güncel değil, lütfen yenileyin.' }
         }

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { ContentEditor } from '@/components/ui/ContentEditor'
+import { ContentEditor } from '@/shared/components/ui'
 import { FileText, Save, X, Edit2, Loader2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { sanitizeHtml } from '@/shared/lib/sanitize'

@@ -4,10 +4,11 @@ import { safeApi } from '@/shared/lib/safe-api'
 
 export const GET = safeApi(async (request) => {
     const { searchParams } = new URL(request.url)
-    const { page, limit, skip } = validatePagination(
-        searchParams.get('page'),
-        searchParams.get('limit') || '12'
-    )
+    const pageParam = searchParams.get('page')
+    const limitParam = searchParams.get('limit') || '12'
+    const page = Math.max(1, parseInt(pageParam || '1'))
+    const limit = Math.min(100, Math.max(1, parseInt(limitParam)))
+    const skip = (page - 1) * limit
     const category = searchParams.get('category')
     const search = searchParams.get('search')
 

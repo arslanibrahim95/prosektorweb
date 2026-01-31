@@ -1,0 +1,37 @@
+{
+  "security": {
+    "max_critical": 0,
+    "max_high": 0
+  },
+  "lint": {
+    "must_pass": true
+  },
+  "tests": {
+    "min_coverage": 0,
+    "must_pass": true
+  },
+  "schema": {
+    "must_valid": true
+  },
+  "ux": {
+    "min_score": 60
+  },
+  "seo": {
+    "min_score": 60
+  },
+  "geo": {
+    "min_score": 50
+  },
+  "a11y": {
+    "min_score": 70
+  },
+  "lighthouse": {
+    "min_performance": 50,
+    "min_accessibility": 70,
+    "min_best_practices": 70,
+    "min_seo": 70
+  },
+  "e2e": {
+    "must_pass": true
+  }
+}

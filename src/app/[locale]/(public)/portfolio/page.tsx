@@ -3,8 +3,8 @@ export const dynamic = 'force-dynamic'
 import { getPortfolios } from '@/features/projects/actions/portfolio'
 import Link from 'next/link'
 import { ArrowRight, ExternalLink, Quote } from 'lucide-react'
-import { Navbar } from '@/components/layout/Navbar'
-import { Footer } from '@/components/layout/Footer'
+import { Navbar } from '@/shared/components/layout/navbar/Navbar'
+import { Footer } from '@/shared/components/layout/footer/Footer'
 
 export default async function PublicPortfolioPage() {
     const portfolios = await getPortfolios(true) // Only published

@@ -2,7 +2,7 @@
 
 import { useFormStatus } from 'react-dom'
 import { LucideIcon } from 'lucide-react'
-import { Button, ButtonProps } from '@/components/ui/Button'
+import { Button, ButtonProps } from '@/shared/components/ui'
 import { cn } from '@/shared/lib'
 
 interface SubmitButtonProps extends Omit<ButtonProps, 'loading'> {

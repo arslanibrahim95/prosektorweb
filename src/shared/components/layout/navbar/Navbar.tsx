@@ -3,8 +3,8 @@
 import React, { useState } from 'react'
 import Link from 'next/link'
 import { Menu, X } from 'lucide-react'
-import { Container } from '@/components/ui/Container'
-import { ThemeToggle } from '@/components/ui/ThemeToggle'
+import { Container } from '@/shared/components/ui'
+import { ThemeToggle } from '@/shared/components/ui'
 
 interface NavbarProps {
     variant?: 'landing' | 'inner'

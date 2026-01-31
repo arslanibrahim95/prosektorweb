@@ -7,10 +7,11 @@ import {
     TrendingUp, TrendingDown, AlertTriangle, Clock,
     ArrowRight, Plus, Eye, Database, Server, Globe, Shield,
     DollarSign, Briefcase, Activity as ActivityIcon,
-    Wallet, CreditCard, PieChart, Settings
+    Wallet, CreditCard, PieChart, Settings,
+    Zap, Target, Users as UsersIcon, CheckCircle, XCircle, Rocket
 } from 'lucide-react'
-import SpotlightCard from '@/components/ui/SpotlightCard'
-import { GradientButton } from '@/components/ui/GradientButton'
+import { SpotlightCard } from '@/shared/components/ui'
+import { GradientButton } from '@/shared/components/ui'
 import { DashboardChart } from '@/features/system/components/DashboardChart'
 
 export const revalidate = 60; // Cache this page for 1 minute
@@ -80,49 +81,36 @@ export default async function SuperAdminDashboard() {
                 {/* FINANCIAL PULSE - Premium Cards */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <motion.div variants={item} className="lg:col-span-2">
-                        <div className="bg-white rounded-3xl border border-neutral-200 p-8 shadow-sm h-full relative overflow-hidden group">
-                            <div className="absolute top-0 right-0 p-8">
-                                <div className="w-16 h-16 bg-emerald-50 rounded-3xl flex items-center justify-center text-emerald-600 group-hover:scale-110 transition-transform">
-                                    <TrendingUp className="w-8 h-8" />
+                        <div className="bg-white rounded-2xl border border-neutral-200 p-6 h-full relative overflow-hidden">
+                            <div className="absolute top-0 right-0 p-6">
+                                <div className="w-14 h-14 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-600">
+                                    <TrendingUp className="w-7 h-7" />
                                 </div>
                             </div>
                             <div className="relative z-10">
-                                <span className="text-xs font-black text-neutral-400 uppercase tracking-widest mb-4 block">{t('total_revenue')}</span>
-                                <div className="text-6xl font-black text-neutral-900 mb-6 tracking-tighter">
+                                <span className="text-xs font-medium text-neutral-500 uppercase tracking-wider mb-3 block">{t('total_revenue')}</span>
+                                <div className="text-5xl font-bold text-neutral-900 mb-5 tracking-tight">
                                     {formatCurrency(stats.totalRevenue)}
                                 </div>
 
-                                <div className="grid grid-cols-2 gap-8 border-t border-neutral-100 pt-8">
+                                <div className="grid grid-cols-2 gap-6 border-t border-neutral-100 pt-5">
                                     <div>
-                                        <span className="text-[10px] font-black text-neutral-400 uppercase tracking-widest mb-1 block">{t('outstanding')}</span>
-                                        <div className="text-2xl font-bold text-orange-600">{formatCurrency(stats.outstandingReceivables)}</div>
+                                        <span className="text-xs font-medium text-neutral-500 uppercase tracking-wider mb-1 block">{t('outstanding')}</span>
+                                        <div className="text-xl font-semibold text-orange-600">{formatCurrency(stats.outstandingReceivables)}</div>
                                     </div>
                                     <div>
-                                        <span className="text-[10px] font-black text-neutral-400 uppercase tracking-widest mb-1 block">{t('monthly_target')}</span>
-                                        <div className="text-2xl font-bold text-brand-600">{formatCurrency(stats.mrr)}</div>
+                                        <span className="text-xs font-medium text-neutral-500 uppercase tracking-wider mb-1 block">{t('monthly_target')}</span>
+                                        <div className="text-xl font-semibold text-brand-600">{formatCurrency(stats.mrr)}</div>
                                     </div>
                                 </div>
                             </div>
-                            <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-brand-500 via-emerald-500 to-purple-500" />
+                            <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-brand-500 to-emerald-500" />
                         </div>
                     </motion.div>
 
-                    <div className="space-y-6">
-                        <StatsCard
-                            href="/admin/companies"
-                            icon={Building2}
-                            label={t('active_clients')}
-                            value={stats.companies}
-                            color="brand"
-                        />
-                        <StatsCard
-                            href="/admin/projects"
-                            icon={Briefcase}
-                            label={t('active_generation')}
-                            value={stats.pendingProjects}
-                            color="purple"
-                            badge={t('process')}
-                        />
+                    <div className="space-y-4">
+                        <StatsCard href="/admin/companies" icon={Building2} label={t('active_clients')} value={stats.companies} color="brand" />
+                        <StatsCard href="/admin/projects" icon={Briefcase} label={t('active_generation')} value={stats.pendingProjects} color="purple" badge={t('process')} />
                     </div>
                 </div>
 
@@ -158,7 +146,7 @@ export default async function SuperAdminDashboard() {
                         </div>
                     </motion.div>
 
-                    {/* AI PRODUCTION LINE */}
+                    {/* ISG EXPERTISE METRICS */}
                     <motion.div
                         initial={{ opacity: 0, x: 20 }}
                         animate={{ opacity: 1, x: 0 }}
@@ -166,38 +154,41 @@ export default async function SuperAdminDashboard() {
                     >
                         <div className="flex items-center justify-between mb-8">
                             <div>
-                                <h3 className="text-xl font-bold text-neutral-900">{t('ai_production')}</h3>
-                                <p className="text-sm text-neutral-500">{t('ai_production_desc')}</p>
+                                <h3 className="text-xl font-bold text-neutral-900">İş Güvenliği Uzmanlığı</h3>
+                                <p className="text-sm text-neutral-500">11 yıllık deneyim ve uzmanlık</p>
                             </div>
-                            <div className="w-10 h-10 bg-purple-50 text-purple-600 rounded-xl flex items-center justify-center">
-                                <ActivityIcon className="w-5 h-5" />
+                            <div className="w-10 h-10 bg-brand-50 text-brand-600 rounded-xl flex items-center justify-center">
+                                <Shield className="w-5 h-5" />
                             </div>
                         </div>
 
-                        <div className="space-y-4">
-                            {recentActivities.filter((a: RecentActivity) => a.entity === 'WebProject' || a.action === 'CREATE').slice(0, 5).map((activity: RecentActivity) => (
-                                <div key={activity.id} className="flex items-center gap-4 p-4 bg-neutral-50 rounded-2xl hover:bg-neutral-100 transition-colors group">
-                                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${activity.action === 'CREATE' ? 'bg-green-100 text-green-600' : 'bg-brand-100 text-brand-600'
-                                        }`}>
-                                        {activity.entity === 'WebProject' ? <Globe className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
+                        {/* Metrics Grid */}
+                        <div className="grid grid-cols-2 gap-4 mb-8">
+                            <MetricCard icon={Globe} label="Canlı" value={stats.aiGeneratedSites} color="emerald" />
+                            <MetricCard icon={Clock} label="Bekleyen" value={stats.aiPendingGeneration} color="amber" />
+                            <MetricCard icon={CheckCircle} label="Onaylanan" value={stats.aiCompletedToday} color="brand" />
+                            <MetricCard icon={Target} label="Kazanma %" value={`${stats.proposalWinRate}`} color="purple" />
+                        </div>
+
+                        {/* Recent Activities */}
+                        <div className="space-y-3">
+                            <span className="text-[10px] font-black text-neutral-400 uppercase tracking-widest">Son Aktiviteler</span>
+                            {recentActivities.filter((a: RecentActivity) => a.entity === 'WebProject' || a.action === 'CREATE').slice(0, 4).map((activity: RecentActivity) => (
+                                <div key={activity.id} className="flex items-center gap-3 p-3 bg-neutral-50 rounded-xl hover:bg-neutral-100 transition-colors group">
+                                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${activity.action === 'CREATE' ? 'bg-green-100 text-green-600' : 'bg-brand-100 text-brand-600'}`}>
+                                        {activity.entity === 'WebProject' ? <Globe className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                        <div className="font-bold text-neutral-900 truncate text-sm">
-                                            {activity.details?.name || activity.entity}
-                                        </div>
-                                        <div className="text-[10px] font-bold text-neutral-400 uppercase tracking-tighter">
-                                            {activity.action === 'CREATE' ? t('new_created') : t('updated')} • {new Date(activity.createdAt).toLocaleDateString('tr-TR')}
-                                        </div>
+                                        <div className="font-semibold text-neutral-900 text-xs truncate">{activity.details?.name || activity.entity}</div>
+                                        <div className="text-[10px] font-bold text-neutral-400 uppercase">{new Date(activity.createdAt).toLocaleDateString('tr-TR')}</div>
                                     </div>
-                                    <ArrowRight className="w-4 h-4 text-neutral-300 group-hover:text-neutral-900 group-hover:translate-x-1 transition-all" />
                                 </div>
                             ))}
-
-                            <Link href="/admin/audit" className="flex items-center justify-center gap-2 w-full py-4 text-sm font-bold text-neutral-400 hover:text-brand-600 transition-colors group">
-                                {t('view_all')}
-                                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-all" />
-                            </Link>
                         </div>
+
+                        <Link href="/admin/audit" className="flex items-center justify-center gap-2 w-full py-3 mt-4 text-sm font-bold text-neutral-400 hover:text-brand-600 transition-colors">
+                            {t('view_all')} <ArrowRight className="w-4 h-4" />
+                        </Link>
                     </motion.div>
                 </div>
 
@@ -293,6 +284,7 @@ function QuickAction({ href, icon: Icon, label, color }: any) {
         purple: "group-hover:bg-purple-600 group-hover:text-white text-purple-600 bg-purple-50",
         green: "group-hover:bg-green-600 group-hover:text-white text-green-600 bg-green-50",
         red: "group-hover:bg-red-600 group-hover:text-white text-red-600 bg-red-50",
+        neutral: "group-hover:bg-neutral-600 group-hover:text-white text-neutral-600 bg-neutral-50",
     }
 
     return (
@@ -302,6 +294,27 @@ function QuickAction({ href, icon: Icon, label, color }: any) {
             </div>
             <span className="text-xs font-bold text-neutral-700 uppercase tracking-wider">{label}</span>
         </Link>
+    )
+}
+
+function MetricCard({ icon: Icon, label, value, color }: { icon: any; label: string; value: number | string; color: string }) {
+    const colors: any = {
+        emerald: "bg-emerald-50 text-emerald-600",
+        amber: "bg-amber-50 text-amber-600",
+        brand: "bg-brand-50 text-brand-600",
+        purple: "bg-purple-50 text-purple-600",
+    }
+
+    return (
+        <div className="bg-neutral-50 rounded-2xl p-4 flex items-center gap-3">
+            <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${colors[color]}`}>
+                <Icon className="w-5 h-5" />
+            </div>
+            <div>
+                <div className="text-xl font-bold text-neutral-900">{value}</div>
+                <div className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider">{label}</div>
+            </div>
+        </div>
     )
 }
 

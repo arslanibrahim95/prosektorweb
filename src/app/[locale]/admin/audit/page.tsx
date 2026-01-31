@@ -4,7 +4,7 @@ import { formatDistanceToNow } from 'date-fns'
 import { tr } from 'date-fns/locale'
 import { FileText, Plus, Trash2, Edit, LogIn, LogOut } from 'lucide-react'
 import { AuditFilters } from '@/features/system/components/AuditFilters'
-import { CursorPagination } from '@/components/ui/CursorPagination'
+import { CursorPagination } from '@/shared/components/ui'
 import { Suspense } from 'react'
 
 const ACTION_ICONS: Record<AuditAction, React.ComponentType<{ className?: string }>> = {
@@ -110,9 +110,9 @@ export default async function AuditPage({
                             </tr>
                         ) : (
                             logs.map((log) => {
-                                const Icon = ACTION_ICONS[log.action]
-                                const colorClass = ACTION_COLORS[log.action]
-                                const label = ACTION_LABELS[log.action]
+                                const Icon = (ACTION_ICONS as any)[log.action]
+                                const colorClass = (ACTION_COLORS as any)[log.action]
+                                const label = (ACTION_LABELS as any)[log.action]
 
                                 return (
                                     <tr key={log.id} className="hover:bg-gray-50">

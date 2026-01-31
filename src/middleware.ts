@@ -88,7 +88,7 @@ export default auth(async (req) => {
         // If it's a general API request (and NOT auth POST), check API Limit
         else if (req.nextUrl.pathname.startsWith('/api')) {
             let limitKey = `api:${ip}`
-            let limitConfig = RATE_LIMIT_TIERS.API
+            let limitConfig: { limit: number, window: number } = RATE_LIMIT_TIERS.API
 
             if (isLoggedIn && req.auth?.user?.id) {
                 limitKey = `user:${req.auth.user.id}`

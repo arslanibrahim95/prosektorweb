@@ -138,28 +138,29 @@ export async function getInvoices(cursor?: string, limit: number = 20, search?: 
     }
 }
 
-try {
-    const invoice = await prisma.invoice.findUnique({
-        where: { id },
-        include: {
-            company: true,
-            payments: true
+export async function getInvoice(id: string) {
+    try {
+        const invoice = await prisma.invoice.findUnique({
+            where: { id },
+            include: {
+                company: true,
+                payments: true
+            }
+        })
+
+        if (!invoice) return null
+
+        const total = new Decimal(invoice.total)
+        const paidAmount = new Decimal(invoice.paidAmount)
+        const remainingAmount = total.minus(paidAmount)
+
+        return {
+            ...invoice,
+            remainingAmount: remainingAmount.toString()
         }
-    })
-
-    if (!invoice) return null
-
-    const total = new Decimal(invoice.total)
-    const paidAmount = new Decimal(invoice.paidAmount)
-    const remainingAmount = total.minus(paidAmount)
-
-    return {
-        ...invoice,
-        remainingAmount: remainingAmount.toString()
+    } catch (e) {
+        return null
     }
-} catch (e) {
-    return null
-}
 }
 
 export async function createInvoice(input: InvoiceInput | FormData): Promise<ActionResult> {

@@ -1,6 +1,6 @@
 import { getDomains, getDomainStats } from '@/features/projects/actions/domains'
 import Link from 'next/link'
-import { CursorPagination } from '@/components/ui/CursorPagination'
+import { CursorPagination } from '@/shared/components/ui'
 import {
     Globe,
     Plus,

@@ -1,5 +1,5 @@
 import { getPortfolios } from '@/features/projects/actions/portfolio'
-import { PageHeader } from '@/components/ui/PageHeader'
+import { PageHeader } from '@/shared/components/ui'
 import Link from 'next/link'
 import { Plus, ExternalLink, Star, Eye, EyeOff, Image as ImageIcon } from 'lucide-react'
 
