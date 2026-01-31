@@ -36,10 +36,10 @@ const ProjectSchema = z.object({
 export interface ActionResult {
     success: boolean
     error?: string
-    data?: any
+    data?: unknown
 }
 
-async function logActivity(action: AuditAction, entity: string, entityId: string, details?: any) {
+async function logActivity(action: AuditAction, entity: string, entityId: string, details?: Record<string, unknown>) {
     const session = await auth()
     try {
         await prisma.auditLog.create({
@@ -64,7 +64,7 @@ export async function getProjects(page: number = 1, limit: number = 20, search?:
         if (!session?.user) return { data: [], meta: { total: 0, page: 1, limit: 20, totalPages: 0 } }
 
         const skip = (page - 1) * limit
-        const where: any = {
+        const where: Prisma.WebProjectWhereInput = {
             deletedAt: null
         }
 
@@ -184,8 +184,9 @@ export async function createProject(input: ProjectInput | FormData): Promise<Act
         await logActivity('CREATE', 'WebProject', project.id, { name: project.name })
         revalidatePath('/admin/projects')
         return { success: true, data: project }
-    } catch (e: any) {
+    } catch (e) {
         if (e instanceof z.ZodError) return { success: false, error: getZodErrorMessage(e) }
+        logger.error('createProject Error', e)
         return { success: false, error: 'Proje oluşturulamadı' }
     }
 }
@@ -272,8 +273,11 @@ export async function updateProject(id: string, input: Partial<ProjectInput> | F
         revalidatePath('/admin/projects')
         revalidatePath(`/admin/projects/${id}`)
         return { success: true, data: project }
-    } catch (e: any) {
-        if (e.code === 'P2025') return { success: false, error: 'Kayıt güncel değil, lütfen yenileyin.' }
+    } catch (e) {
+        logger.error('updateProject Error', e)
+        if (e instanceof Error && 'code' in e && e.code === 'P2025') {
+            return { success: false, error: 'Kayıt güncel değil, lütfen yenileyin.' }
+        }
         return { success: false, error: 'Güncelleme başarısız' }
     }
 }

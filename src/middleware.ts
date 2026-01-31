@@ -101,14 +101,15 @@ export default auth(async (req) => {
             }
         }
 
-        // 1. API Protection (Auth & Roles)
+        // 1. API Protection (Auth & Roles) - Direct Response (Skip Intl)
         if (req.nextUrl.pathname.startsWith('/api')) {
-            // Unprotected APIs
-            if (
+            // Unprotected APIs logic...
+            const isUnprotectedApi =
                 req.nextUrl.pathname.startsWith('/api/auth') ||
                 req.nextUrl.pathname.startsWith('/api/contact') ||
-                req.nextUrl.pathname.startsWith('/api/webhooks')
-            ) {
+                req.nextUrl.pathname.startsWith('/api/webhooks');
+
+            if (isUnprotectedApi) {
                 const requestHeaders = new Headers(req.headers)
                 requestHeaders.set('x-nonce', nonce)
                 const response = NextResponse.next({ request: { headers: requestHeaders } })
@@ -130,13 +131,7 @@ export default auth(async (req) => {
             return applySecurityHeaders(response)
         }
 
-        // 2. Intl Middleware (For Pages)
-        const intlResponse = intlMiddleware(req);
-        if (intlResponse.headers.get('location')) {
-            return applySecurityHeaders(intlResponse);
-        }
-
-        // 3. Page Access Protection
+        // 2. Page Access Protection (Before Intl)
         const pathname = req.nextUrl.pathname;
         const localeMatch = pathname.match(/^\/(tr|en)(\/|$)/);
         const pathWithoutLocale = localeMatch
@@ -147,6 +142,7 @@ export default auth(async (req) => {
         const isOnAdmin = pathWithoutLocale.startsWith('/admin')
         const isOnPortal = pathWithoutLocale.startsWith('/portal')
 
+        // Redirect Logic
         if (isOnLogin && isLoggedIn) {
             const target = userRole === 'ADMIN' ? '/admin' : '/portal'
             return applySecurityHeaders(NextResponse.redirect(new URL(target, req.nextUrl)))
@@ -160,22 +156,25 @@ export default auth(async (req) => {
             return applySecurityHeaders(NextResponse.redirect(new URL('/login', req.nextUrl)))
         }
 
-        // Return intl response
+        // 3. Intl Middleware (The Final Step for Pages)
+        // We MUST pass the x-nonce header to the intlMiddleware so it persists in the rewrite/render
+
+        // Clone headers and add nonce
         const requestHeaders = new Headers(req.headers)
         requestHeaders.set('x-nonce', nonce)
-        const response = NextResponse.next({ request: { headers: requestHeaders } })
 
-        intlResponse.headers.forEach((value, key) => {
-            if (key.toLowerCase() === 'content-security-policy') return
-            if (key.toLowerCase() === 'x-request-id') return
-            response.headers.set(key, value)
+        // Construct a new request with modified headers. 
+        // We must pass the body for POST requests (Server Actions), otherwise they will fail.
+        const reqWithNonce = new NextRequest(req.url, {
+            headers: requestHeaders,
+            method: req.method,
+            body: req.body
         })
 
-        if (intlResponse.cookies.getAll) {
-            intlResponse.cookies.getAll().forEach((cookie) => response.cookies.set(cookie))
-        }
+        const intlResponse = intlMiddleware(reqWithNonce);
 
-        return applySecurityHeaders(response);
+        // Apply CSP and Security Headers to the Intl Response (Rewrite/Next/Redirect)
+        return applySecurityHeaders(intlResponse);
 
     } finally {
         const duration = Date.now() - requestStart
