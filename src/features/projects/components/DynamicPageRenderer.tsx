@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { Sparkles, CheckCircle2, Phone, Mail, MapPin } from 'lucide-react';
+import { sanitizeHtml } from '@/shared/lib/sanitize';
 
 interface Section {
     id: string;
@@ -24,8 +25,8 @@ export function DynamicPageRenderer({
     design,
     contentType,
 }: DynamicPageRendererProps) {
-    // Basic HTML parser/cleaner logic could go here
-    // For now, we trust the AI-generated HTML but wrap it in nice tailwind containers
+    // Sanitize HTML before rendering
+    const sanitizedContent = sanitizeHtml(htmlContent);
 
     return (
         <div className="animate-in fade-in duration-700">
@@ -44,7 +45,7 @@ export function DynamicPageRenderer({
             <div className="container mx-auto px-4 py-16 md:py-24">
                 <div
                     className="prose prose-lg max-w-none prose-brand prose-headings:font-serif prose-headings:text-neutral-900 prose-p:text-neutral-600 prose-li:text-neutral-600 prose-strong:text-neutral-900 prose-img:rounded-3xl shadow-sm"
-                    dangerouslySetInnerHTML={{ __html: htmlContent }}
+                    dangerouslySetInnerHTML={{ __html: sanitizedContent }}
                 />
             </div>
 

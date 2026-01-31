@@ -1,8 +1,8 @@
 'use client'
 
-import { AuthLayout } from '@/components/auth/AuthLayout'
-import { AuthCard } from '@/components/auth/AuthCard'
-import { ResetPasswordForm } from '@/components/auth/ResetPasswordForm'
+import { AuthLayout } from '@/features/auth/components/AuthLayout'
+import { AuthCard } from '@/features/auth/components/AuthCard'
+import { ResetPasswordForm } from '@/features/auth/components/ResetPasswordForm'
 import { ShieldCheck } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { use } from 'react'

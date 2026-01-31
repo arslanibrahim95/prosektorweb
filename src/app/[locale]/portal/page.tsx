@@ -1,11 +1,12 @@
-import { getClientDashboardStats, getClientServices, getClientProjects, getClientProfile } from '@/features/auth/actions/portal'
+import { getClientDashboardStats, getClientServices, getClientProjects, getClientProfile, getClientSiteManagementStats, getClientRecentBlogPosts } from '@/features/auth/actions/portal'
 import { auth } from '@/auth'
 import Link from 'next/link'
 import {
     Layers, Ticket, Receipt, ArrowRight, ExternalLink,
     Plus, MessageSquare, Calendar, Globe, Clock,
     Sparkles, ChevronRight, AlertCircle, CheckCircle,
-    Phone, Mail, Headphones
+    Phone, Mail, Headphones,
+    Image as ImageIcon, BookOpen, Search, Palette, Eye, EyeOff, FileText
 } from 'lucide-react'
 import SpotlightCard from '@/components/ui/SpotlightCard'
 
@@ -24,10 +25,14 @@ const statusConfig: Record<string, { label: string; color: string; bgColor: stri
 
 export default async function PortalDashboard() {
     const session = await auth()
-    const stats = await getClientDashboardStats()
-    const servicesData = await getClientServices(1, 10)
-    const { data: projects } = await getClientProjects(1, 10)
-    const profile = await getClientProfile()
+    const [stats, servicesData, { data: projects }, profile, siteStats, recentPosts] = await Promise.all([
+        getClientDashboardStats(),
+        getClientServices(1, 10),
+        getClientProjects(1, 10),
+        getClientProfile(),
+        getClientSiteManagementStats(),
+        getClientRecentBlogPosts(5),
+    ])
 
     const services = servicesData.data || []
 
@@ -177,6 +182,91 @@ export default async function PortalDashboard() {
                     </SpotlightCard>
                 </Link>
             </div>
+
+            {/* Site Management Quick Actions */}
+            {projects.length > 0 && (
+                <div className="bg-white border border-neutral-200 rounded-2xl p-6">
+                    <div className="flex items-center justify-between mb-5">
+                        <h2 className="text-lg font-bold text-neutral-900">Site Yönetimi</h2>
+                        {siteStats && (
+                            <div className="flex items-center gap-3 text-xs text-neutral-500">
+                                <span>{siteStats.mediaCount} medya</span>
+                                <span>•</span>
+                                <span>{siteStats.publishedBlogCount}/{siteStats.blogCount} blog yayında</span>
+                            </div>
+                        )}
+                    </div>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                        {[
+                            { href: `/portal/projects/${projects[0].id}/media`, icon: ImageIcon, label: 'Medya', desc: 'Görselleri yönetin', color: 'bg-purple-50 text-purple-600' },
+                            { href: `/portal/projects/${projects[0].id}/blog`, icon: BookOpen, label: 'Blog', desc: 'Yazılarınız', color: 'bg-emerald-50 text-emerald-600' },
+                            { href: `/portal/projects/${projects[0].id}/seo`, icon: Search, label: 'SEO', desc: 'Arama optimizasyonu', color: 'bg-amber-50 text-amber-600' },
+                            { href: `/portal/projects/${projects[0].id}/design`, icon: Palette, label: 'Tasarım', desc: 'Renk ve yazı tipi', color: 'bg-pink-50 text-pink-600' },
+                        ].map(({ href, icon: Icon, label, desc, color }) => (
+                            <Link
+                                key={href}
+                                href={href}
+                                className="group flex flex-col items-center text-center p-4 rounded-xl border border-neutral-100 hover:border-neutral-200 hover:shadow-sm transition-all"
+                            >
+                                <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${color} mb-3 group-hover:scale-110 transition-transform`}>
+                                    <Icon className="w-6 h-6" />
+                                </div>
+                                <span className="font-bold text-neutral-800 text-sm">{label}</span>
+                                <span className="text-xs text-neutral-500 mt-0.5">{desc}</span>
+                            </Link>
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            {/* Recent Blog Posts */}
+            {recentPosts.length > 0 && (
+                <div className="bg-white border border-neutral-200 rounded-2xl p-6">
+                    <div className="flex items-center justify-between mb-5">
+                        <h2 className="text-lg font-bold text-neutral-900 flex items-center gap-2">
+                            <BookOpen className="w-5 h-5 text-brand-600" />
+                            Son Blog Yazıları
+                        </h2>
+                        <Link
+                            href={`/portal/projects/${recentPosts[0].webProject.id}/blog`}
+                            className="text-sm text-brand-600 hover:text-brand-700 flex items-center gap-1"
+                        >
+                            Tümünü Gör <ArrowRight className="w-4 h-4" />
+                        </Link>
+                    </div>
+                    <div className="space-y-3">
+                        {recentPosts.slice(0, 3).map((post: any) => (
+                            <Link
+                                key={post.id}
+                                href={`/portal/projects/${post.webProject.id}/blog/${post.id}`}
+                                className="flex items-center gap-4 p-3 rounded-xl hover:bg-neutral-50 transition-colors group"
+                            >
+                                {post.coverImage?.url ? (
+                                    <img src={post.coverImage.url} alt="" className="w-14 h-10 rounded-lg object-cover shrink-0" />
+                                ) : (
+                                    <div className="w-14 h-10 bg-neutral-100 rounded-lg flex items-center justify-center shrink-0">
+                                        <FileText className="w-4 h-4 text-neutral-400" />
+                                    </div>
+                                )}
+                                <div className="flex-1 min-w-0">
+                                    <p className="font-medium text-neutral-800 text-sm truncate group-hover:text-brand-600 transition-colors">
+                                        {post.title}
+                                    </p>
+                                    <div className="flex items-center gap-2 mt-0.5">
+                                        <span className={`inline-flex items-center gap-1 text-xs ${post.published ? 'text-green-600' : 'text-neutral-500'}`}>
+                                            {post.published ? <><Eye className="w-3 h-3" /> Yayında</> : <><EyeOff className="w-3 h-3" /> Taslak</>}
+                                        </span>
+                                        <span className="text-xs text-neutral-400">
+                                            {new Date(post.createdAt).toLocaleDateString('tr-TR')}
+                                        </span>
+                                    </div>
+                                </div>
+                                <ChevronRight className="w-4 h-4 text-neutral-400 group-hover:text-brand-600 transition-colors shrink-0" />
+                            </Link>
+                        ))}
+                    </div>
+                </div>
+            )}
 
             {/* Main Content Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

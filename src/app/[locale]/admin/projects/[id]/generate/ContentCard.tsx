@@ -19,8 +19,8 @@ import {
     Loader2,
     type LucideIcon
 } from 'lucide-react';
-import { sanitizeHtml } from '@/shared/lib/security';
-import { approveContent, rejectContent, generatePageContent } from '@/actions/generate';
+import { sanitizeHtml } from '@/shared/lib/sanitize';
+import { approveContent, rejectContent, generatePageContent } from '@/features/ai-generation/actions/legacy-generate';
 import type { GeneratedContent } from '@prisma/client';
 import type { ContentType } from '@/features/ai-generation/lib/ai/types';
 

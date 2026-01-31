@@ -7,7 +7,7 @@ import {
     ChevronRight, ChevronLeft, Loader2, AlertCircle,
     Sparkles
 } from 'lucide-react'
-import { createSiteFromWizard, type SiteCreationInput } from '@/actions/site-creation'
+import { createSiteFromWizard, type SiteCreationInput } from '@/features/projects/actions/site-creation'
 import { ADD_ON_FEATURES, PRICING_TIERS } from '@/features/ai-generation/lib/pipeline/quote-generator'
 
 interface Props {

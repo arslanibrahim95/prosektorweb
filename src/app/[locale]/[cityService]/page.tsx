@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
-import { LocalSeoPage } from "@/components/seo/LocalSeoPage";
+import { LocalSeoPage } from "@/features/seo/components/LocalSeoPage";
 import { WebVitalsTracker } from "@/features/performance/components/WebVitalsTracker";
 import {
   getAllProvinces,

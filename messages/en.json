@@ -183,7 +183,12 @@
         "logout": "Sign Out",
         "simulation_banner": "SIMULATION MODE: You are currently logged in as {company}.",
         "simulation_exit": "RETURN TO ADMIN",
-        "customer_panel": "Client Portal"
+        "customer_panel": "Client Portal",
+        "menu_site_management": "SITE MANAGEMENT",
+        "media": "Media",
+        "blog": "Blog",
+        "seo": "SEO",
+        "design": "Design"
     },
     "AdminBreadcrumbs": {
         "admin": "Management",
@@ -195,7 +200,11 @@
         "settings": "Settings",
         "generate": "AI Production",
         "edit": "Edit",
-        "new": "New Record"
+        "new": "New Record",
+        "media": "Media",
+        "blog": "Blog",
+        "seo": "SEO",
+        "design": "Design"
     },
     "SystemHealth": {
         "title": "System Status",

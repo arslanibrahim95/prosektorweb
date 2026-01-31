@@ -5,8 +5,6 @@
  * Server-side tracking için privacy compliance
  */
 
-import { headers } from 'next/headers';
-
 // Analytics provider tipi
 type AnalyticsProvider = 'ga4' | 'plausible' | 'both';
 
@@ -73,6 +71,8 @@ export async function trackServerSidePageView(
     path: string,
     params: EventParams = {}
 ): Promise<void> {
+    // Dynamically import headers only when running on server
+    const { headers } = await import('next/headers');
     const headersList = await headers();
     const userAgent = headersList.get('user-agent') || '';
     const referer = headersList.get('referer') || '';
@@ -161,7 +161,7 @@ async function trackPlausibleServerSide(payload: {
 /**
  * Client ID oluştur (privacy-compliant)
  */
-async function generateClientId(headersList: Awaited<ReturnType<typeof headers>>): Promise<string> {
+async function generateClientId(headersList: { get: (name: string) => string | null }): Promise<string> {
     // Hash-based client ID (IP + User-Agent) - anonymized
     const data = `${headersList.get('x-forwarded-for') || ''}${headersList.get('user-agent') || ''}`;
 

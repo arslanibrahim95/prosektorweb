@@ -1,4 +1,4 @@
-import { getGeneratedContents } from '@/actions/generate';
+import { getGeneratedContents } from '@/features/ai-generation/actions/legacy-generate';
 import { prisma } from '@/server/db';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';

@@ -143,7 +143,7 @@ export async function getProposal(id: string) {
     }
 }
 
-export async function createProposal(input: ProposalInput | any): Promise<ActionResult> {
+export async function createProposal(input: ProposalInput): Promise<ActionResult> {
     try {
         const session = await auth()
         if (session?.user?.role !== 'ADMIN') return { success: false, error: 'Unauthorized' }
@@ -353,13 +353,13 @@ export async function getProposalByToken(token: string) {
                 items: proposal.items.map(item => ({
                     description: item.description,
                     quantity: item.quantity,
-                    unitPrice: Number(item.unitPrice),
-                    totalPrice: Number(item.totalPrice),
+                    unitPrice: item.unitPrice.toString(),
+                    totalPrice: item.totalPrice.toString(),
                 })),
-                subtotal: Number(proposal.subtotal),
-                taxRate: Number(proposal.taxRate),
-                taxAmount: Number(proposal.taxAmount),
-                total: Number(proposal.total),
+                subtotal: proposal.subtotal.toString(),
+                taxRate: proposal.taxRate.toString(),
+                taxAmount: proposal.taxAmount.toString(),
+                total: proposal.total.toString(),
                 currency: proposal.currency,
                 validUntil: proposal.validUntil,
                 notes: proposal.notes,

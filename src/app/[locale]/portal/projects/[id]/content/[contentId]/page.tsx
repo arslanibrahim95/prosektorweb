@@ -3,8 +3,8 @@ import { prisma } from '@/server/db'
 import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, FileText } from 'lucide-react'
-import { ContentApprovalButtons } from './ContentApprovalButtons'
-import { ContentEditorWrapper } from './ContentEditorWrapper'
+import { ContentApprovalButtons } from '@/features/projects/components/portal/content/ContentApprovalButtons'
+import { ContentEditorWrapper } from '@/features/projects/components/portal/content/ContentEditorWrapper'
 
 interface ContentDetailPageProps {
     params: Promise<{ id: string; contentId: string }>

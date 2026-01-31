@@ -2,7 +2,7 @@
 
 ## 1. High-Level Overview
 
-ProSektorWeb is a **B2B SaaS Monolith** built on Next.js 16 (App Router), focusing on server-side rendering and stateless scaling.
+ProSektorWeb is a **B2B SaaS Monolith** built on Next.js 15 (App Router), focusing on server-side rendering and stateless scaling.
 
 ```mermaid
 graph TD

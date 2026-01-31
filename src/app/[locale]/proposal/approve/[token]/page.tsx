@@ -12,8 +12,8 @@ interface Props {
 interface ProposalItem {
     description: string
     quantity: number
-    unitPrice: number
-    totalPrice: number
+    unitPrice: string
+    totalPrice: string
 }
 
 interface ProposalData {
@@ -21,10 +21,10 @@ interface ProposalData {
     subject: string
     companyName: string
     items: ProposalItem[]
-    subtotal: number
-    taxRate: number
-    taxAmount: number
-    total: number
+    subtotal: string
+    taxRate: string
+    taxAmount: string
+    total: string
     currency: string
     validUntil: Date | null
     notes: string | null
@@ -73,11 +73,11 @@ export default function ApproveProposalPage({ params }: Props) {
         }
     }
 
-    const formatCurrency = (amount: number, currency: string = 'TRY') => {
+    const formatCurrency = (amount: string | number, currency: string = 'TRY') => {
         return new Intl.NumberFormat('tr-TR', {
             style: 'currency',
             currency: currency,
-        }).format(amount)
+        }).format(Number(amount))
     }
 
     const formatDate = (date: Date | null) => {

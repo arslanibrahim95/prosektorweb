@@ -1,8 +1,8 @@
 'use client'
 
-import { AuthLayout } from '@/components/auth/AuthLayout'
-import { AuthCard } from '@/components/auth/AuthCard'
-import { ForgotPasswordForm } from '@/components/auth/ForgotPasswordForm'
+import { AuthLayout } from '@/features/auth/components/AuthLayout'
+import { AuthCard } from '@/features/auth/components/AuthCard'
+import { ForgotPasswordForm } from '@/features/auth/components/ForgotPasswordForm'
 import { KeyRound } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 

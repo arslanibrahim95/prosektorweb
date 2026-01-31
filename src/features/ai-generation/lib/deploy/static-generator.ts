@@ -5,7 +5,7 @@
 
 import { prisma } from '@/server/db';
 import type { GeneratedContent, WebProject, Company } from '@prisma/client';
-import { sanitizeHtml } from '@/features/system/lib/security/sanitize';
+import { sanitizeHtml } from '@/shared/lib/sanitize';
 
 // ================================
 // TYPES

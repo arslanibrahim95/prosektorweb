@@ -1,4 +1,4 @@
-import { getClientProposals } from '@/actions/clientServices'
+import { getClientProposals } from '@/features/crm/actions/client-portal'
 import Link from 'next/link'
 import {
     FileText, Calendar, Clock, CheckCircle, XCircle,

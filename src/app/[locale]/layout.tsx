@@ -62,8 +62,8 @@ export async function generateMetadata({
   };
 }
 
-import { ThemeProvider } from "@/components/ThemeProvider";
-import { JsonLd } from "@/components/seo/JsonLd";
+import { ThemeProvider } from "@/components/ui/ThemeProvider";
+import { JsonLd } from "@/features/seo/components/JsonLd";
 
 export default async function RootLayout({
   children,

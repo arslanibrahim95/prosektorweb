@@ -4,7 +4,7 @@ import React, { useState } from 'react'
 import Link from 'next/link'
 import { Menu, X } from 'lucide-react'
 import { Container } from '@/components/ui/Container'
-import { ThemeToggle } from '@/components/ThemeToggle'
+import { ThemeToggle } from '@/components/ui/ThemeToggle'
 
 interface NavbarProps {
     variant?: 'landing' | 'inner'

@@ -146,8 +146,8 @@ const styles = StyleSheet.create({
 interface ProposalItem {
     description: string
     quantity: number
-    unitPrice: number
-    totalPrice: number
+    unitPrice: number | string
+    totalPrice: number | string
 }
 
 interface ProposalCompany {
@@ -168,10 +168,10 @@ interface ProposalData {
     notes?: string | null
     items?: ProposalItem[]
     currency: string
-    subtotal: number
-    taxRate: number
-    taxAmount: number
-    total: number
+    subtotal: number | string
+    taxRate: number | string
+    taxAmount: number | string
+    total: number | string
 }
 
 interface ProposalDocumentProps {
@@ -183,11 +183,11 @@ export const ProposalDocument: React.FC<ProposalDocumentProps> = ({ data }) => {
         return new Date(date).toLocaleDateString('tr-TR')
     }
 
-    const formatCurrency = (amount: number, currency: string = 'TRY') => {
+    const formatCurrency = (amount: number | string, currency: string = 'TRY') => {
         return new Intl.NumberFormat('tr-TR', {
             style: 'currency',
             currency: currency,
-        }).format(amount)
+        }).format(Number(amount))
     }
 
     return (
@@ -268,7 +268,7 @@ export const ProposalDocument: React.FC<ProposalDocumentProps> = ({ data }) => {
                 {/* Footer */}
                 <View style={styles.footer}>
                     <Text style={styles.footerText}>Bu teklif bilişim sistemleri vasıtasıyla oluşturulmuştur. İslak imza gerektirmez.</Text>
-                    <Text style={styles.footerText}>ProSektor Yazılım ve Danışmanlık Hizmetleri</Text>
+                    <Text style={styles.footerText}>ProSektorWeb Yazılım ve Danışmanlık Hizmetleri</Text>
                 </View>
             </Page>
         </Document>

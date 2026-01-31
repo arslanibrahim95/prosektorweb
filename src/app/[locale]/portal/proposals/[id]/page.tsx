@@ -1,4 +1,4 @@
-import { getClientProposalById, approveClientProposal, rejectClientProposal } from '@/actions/clientServices'
+import { getClientProposalById, approveClientProposal, rejectClientProposal } from '@/features/crm/actions/client-portal'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { ChevronLeft, Calendar, Building2, CheckCircle, XCircle } from 'lucide-react'

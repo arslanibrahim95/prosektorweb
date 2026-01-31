@@ -11,9 +11,7 @@ const __dirname = path.dirname(__filename)
 
 dotenv.config()
 
-const connectionString = process.env.DATABASE_URL!
-const adapter = new PrismaMariaDb(connectionString)
-const prisma = new PrismaClient({ adapter })
+const prisma = new PrismaClient()
 
 async function main() {
     console.log('Start seeding from backup...')

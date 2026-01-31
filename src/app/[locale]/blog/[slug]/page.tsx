@@ -2,7 +2,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { ArrowLeft, ArrowRight, Calendar, Share2, User } from 'lucide-react'
 import { notFound } from 'next/navigation'
-import { sanitizeHtml } from '@/shared/lib/security'
+import { sanitizeHtml } from '@/shared/lib/sanitize'
 
 import { Navbar } from '@/components/layout/Navbar'
 import { Footer } from '@/components/layout/Footer'

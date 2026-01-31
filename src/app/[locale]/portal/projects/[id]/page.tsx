@@ -1,7 +1,7 @@
 import { getProjectById } from '@/features/auth/actions/portal'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, ExternalLink, Globe, Calendar, CheckCircle, Clock, AlertCircle, FileText, Settings, RotateCcw } from 'lucide-react'
+import { ArrowLeft, ExternalLink, Globe, Calendar, CheckCircle, Clock, AlertCircle, FileText, Settings, RotateCcw, Image as ImageIcon, BookOpen, Search, Palette } from 'lucide-react'
 
 // Status config with colors and labels
 const statusConfig: Record<string, { label: string; color: string; bgColor: string }> = {
@@ -47,25 +47,30 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
                         {project.company?.name}
                     </p>
                 </div>
-                <div className="flex items-center gap-3">
+                <span className={`px-4 py-2 rounded-full text-sm font-bold ${statusInfo.bgColor} ${statusInfo.color}`}>
+                    {statusInfo.label}
+                </span>
+            </div>
+
+            {/* Navigation Tabs */}
+            <div className="flex items-center gap-2 flex-wrap">
+                {[
+                    { href: `/portal/projects/${id}/revisions`, icon: RotateCcw, label: 'Revizyonlar', color: 'bg-brand-50 text-brand-700 border-brand-200' },
+                    { href: `/portal/projects/${id}/media`, icon: ImageIcon, label: 'Medya', color: 'bg-purple-50 text-purple-700 border-purple-200' },
+                    { href: `/portal/projects/${id}/blog`, icon: BookOpen, label: 'Blog', color: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
+                    { href: `/portal/projects/${id}/seo`, icon: Search, label: 'SEO', color: 'bg-amber-50 text-amber-700 border-amber-200' },
+                    { href: `/portal/projects/${id}/design`, icon: Palette, label: 'Tasarım', color: 'bg-pink-50 text-pink-700 border-pink-200' },
+                    { href: `/portal/projects/${id}/settings`, icon: Settings, label: 'Ayarlar', color: 'bg-neutral-100 text-neutral-700 border-neutral-200' },
+                ].map(({ href, icon: Icon, label, color }) => (
                     <Link
-                        href={`/portal/projects/${id}/revisions`}
-                        className="flex items-center gap-2 px-4 py-2 bg-brand-50 text-brand-700 rounded-xl font-medium hover:bg-brand-100 transition-colors border border-brand-200"
+                        key={href}
+                        href={href}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium hover:opacity-80 transition-opacity border ${color}`}
                     >
-                        <RotateCcw className="w-4 h-4" />
-                        Revizyonlar
+                        <Icon className="w-4 h-4" />
+                        {label}
                     </Link>
-                    <Link
-                        href={`/portal/projects/${id}/settings`}
-                        className="flex items-center gap-2 px-4 py-2 bg-neutral-100 text-neutral-700 rounded-xl font-medium hover:bg-neutral-200 transition-colors"
-                    >
-                        <Settings className="w-4 h-4" />
-                        Ayarlar
-                    </Link>
-                    <span className={`px-4 py-2 rounded-full text-sm font-bold ${statusInfo.bgColor} ${statusInfo.color}`}>
-                        {statusInfo.label}
-                    </span>
-                </div>
+                ))}
             </div>
 
             {/* Status Timeline */}

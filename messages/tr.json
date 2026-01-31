@@ -183,7 +183,12 @@
         "logout": "Çıkış Yap",
         "simulation_banner": "SİMÜLASYON MODU: Şu an {company} olarak sistemdesiniz.",
         "simulation_exit": "YÖNETİME DÖN",
-        "customer_panel": "Müşteri Paneli"
+        "customer_panel": "Müşteri Paneli",
+        "menu_site_management": "SİTE YÖNETİMİ",
+        "media": "Medya",
+        "blog": "Blog",
+        "seo": "SEO",
+        "design": "Tasarım"
     },
     "AdminBreadcrumbs": {
         "admin": "Yönetim",
@@ -195,7 +200,11 @@
         "settings": "Ayarlar",
         "generate": "AI Üretim",
         "edit": "Düzenle",
-        "new": "Yeni Kayıt"
+        "new": "Yeni Kayıt",
+        "media": "Medya",
+        "blog": "Blog",
+        "seo": "SEO",
+        "design": "Tasarım"
     },
     "SystemHealth": {
         "title": "Sistem Durumu",

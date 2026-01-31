@@ -1,7 +1,7 @@
 # AGENTS.md - ProsektorWeb Agent Guidelines
 
 > **Purpose:** Guide for AI agents working on this Next.js OSGB management platform
-> **Stack:** Next.js 16, TypeScript, Prisma, MariaDB, NextAuth v5, Tailwind CSS v4
+> **Stack:** Next.js 15, TypeScript, Prisma, MariaDB, NextAuth v5, Tailwind CSS
 > **Version:** 1.0
 
 ---

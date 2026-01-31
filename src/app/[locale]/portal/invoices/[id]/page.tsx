@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { ArrowLeft, Receipt, CreditCard, Calendar, CheckCircle, Clock, AlertCircle } from 'lucide-react'
 import { DownloadButton } from '@/components/pdf/DownloadButton'
 import { InvoiceDocument } from '@/components/pdf/InvoiceDocument'
-import { PaymentButton } from '@/components/portal/PaymentButton'
+import { PaymentButton } from '@/features/finance/components/PaymentButton'
 
 // Status config
 const statusConfig: Record<string, { label: string; color: string; bgColor: string }> = {
@@ -31,7 +31,7 @@ export default async function InvoiceDetailPage({ params }: { params: Promise<{ 
     }
 
     const statusInfo = statusConfig[invoice.status] || statusConfig.PENDING
-    const remainingAmount = Number(invoice.total) - Number(invoice.paidAmount)
+    const remainingAmount = Number(invoice.remainingAmount)
     const isPaid = invoice.status === 'PAID'
     const isOverdue = !isPaid && new Date(invoice.dueDate) < new Date()
 

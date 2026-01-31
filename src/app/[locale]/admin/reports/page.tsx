@@ -1,6 +1,6 @@
 import { getRevenueData, getProjectStats, getInvoiceStats, getTicketStats } from '@/features/system/actions/reports'
-import { RevenueChart } from '@/components/admin/reports/RevenueChart'
-import { ProjectPipeline } from '@/components/admin/reports/ProjectPipeline'
+import { RevenueChart } from '@/features/system/components/admin/reports/RevenueChart'
+import { ProjectPipeline } from '@/features/system/components/admin/reports/ProjectPipeline'
 import { PageHeader } from '@/components/ui/PageHeader'
 import { TrendingUp, Receipt, Ticket, Layers, DollarSign, AlertCircle, CheckCircle, Clock } from 'lucide-react'
 

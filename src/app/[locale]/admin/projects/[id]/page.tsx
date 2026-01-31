@@ -11,13 +11,17 @@ import {
     Clock,
     CheckCircle2,
     Link as LinkIcon,
-    Sparkles
+    Sparkles,
+    Image as ImageIcon,
+    BookOpen,
+    Search,
+    Palette
 } from 'lucide-react'
 import { ProjectStatusManager } from '@/features/projects/components/ProjectStatusManager'
 import { ProjectEditForm } from '@/features/projects/components/ProjectEditForm'
 import { ProjectOperations } from '@/features/projects/components/ProjectOperations'
-import { RevisionManager } from '@/components/admin/project/RevisionManager'
-import { getSitePackage } from '@/actions/site-package'
+import { RevisionManager } from '@/features/projects/components/admin/RevisionManager'
+import { getSitePackage } from '@/features/projects/actions/package-ops'
 
 interface ProjectDetailPageProps {
     params: Promise<{ id: string }>
@@ -159,6 +163,29 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
                             <div className="text-xl font-bold text-neutral-900">
                                 {project.completedAt ? new Date(project.completedAt).toLocaleDateString('tr-TR') : '-'}
                             </div>
+                        </div>
+                    </div>
+
+                    {/* Site Management */}
+                    <div className="bg-white rounded-2xl border border-neutral-200 p-6">
+                        <h2 className="text-lg font-bold text-neutral-900 mb-4">Site Yönetimi</h2>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                            {[
+                                { href: `/admin/projects/${id}/media`, icon: ImageIcon, label: 'Medya', desc: 'Görseller', color: 'bg-purple-50 text-purple-600 border-purple-100' },
+                                { href: `/admin/projects/${id}/blog`, icon: BookOpen, label: 'Blog', desc: 'Yazılar', color: 'bg-emerald-50 text-emerald-600 border-emerald-100' },
+                                { href: `/admin/projects/${id}/seo`, icon: Search, label: 'SEO', desc: 'Meta bilgileri', color: 'bg-amber-50 text-amber-600 border-amber-100' },
+                                { href: `/admin/projects/${id}/design`, icon: Palette, label: 'Tasarım', desc: 'Renk & font', color: 'bg-pink-50 text-pink-600 border-pink-100' },
+                            ].map(({ href, icon: Icon, label, desc, color }) => (
+                                <Link
+                                    key={href}
+                                    href={href}
+                                    className={`group flex flex-col items-center text-center p-4 rounded-xl border transition-all hover:shadow-sm ${color}`}
+                                >
+                                    <Icon className="w-7 h-7 mb-2 group-hover:scale-110 transition-transform" />
+                                    <span className="font-bold text-sm">{label}</span>
+                                    <span className="text-xs opacity-70 mt-0.5">{desc}</span>
+                                </Link>
+                            ))}
                         </div>
                     </div>
 

@@ -2,11 +2,11 @@
 
 > Modern, ölçeklenebilir ve feature-based mimari ile geliştirilmiş Next.js fullstack uygulaması.
 
-[![Next.js](https://img.shields.io/badge/Next.js-16.1.2-black)](https://nextjs.org/)
-[![React](https://img.shields.io/badge/React-19.2.3-blue)](https://react.dev/)
+[![Next.js](https://img.shields.io/badge/Next.js-15.1.2-black)](https://nextjs.org/)
+[![React](https://img.shields.io/badge/React-18.3.1-blue)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue)](https://www.typescriptlang.org/)
-[![Prisma](https://img.shields.io/badge/Prisma-7.2.0-2D3748)](https://www.prisma.io/)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind-4.0-38B2AC)](https://tailwindcss.com/)
+[![Prisma](https://img.shields.io/badge/Prisma-6.2.1-2D3748)](https://www.prisma.io/)
+[![MariaDB](https://img.shields.io/badge/MariaDB-10.11-003545)](https://mariadb.org/)
 
 ---
 

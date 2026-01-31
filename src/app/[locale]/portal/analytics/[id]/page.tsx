@@ -1,6 +1,6 @@
 import { getProjectAnalytics, getProjectDailyStats, getTrackingScript } from '@/features/system/actions/analytics'
 import { notFound } from 'next/navigation'
-import AnalyticsDetailClient from '@/components/portal/AnalyticsDetailClient'
+import AnalyticsDetailClient from '@/features/analytics/components/AnalyticsDetailClient'
 
 export default async function AnalyticsDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params

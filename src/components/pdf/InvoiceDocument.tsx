@@ -131,11 +131,12 @@ interface InvoiceData {
     } | null
     description: string
     notes?: string | null
-    subtotal: number
-    taxRate: number
-    taxAmount: number
-    total: number
-    paidAmount: number
+    subtotal: number | string
+    taxRate: number | string
+    taxAmount: number | string
+    total: number | string
+    paidAmount: number | string
+    remainingAmount?: string
 }
 
 interface InvoiceDocumentProps {
@@ -147,11 +148,11 @@ export const InvoiceDocument: React.FC<InvoiceDocumentProps> = ({ data }) => {
         return new Date(date).toLocaleDateString('tr-TR')
     }
 
-    const formatCurrency = (amount: number, currency: string = 'TRY') => {
+    const formatCurrency = (amount: number | string, currency: string = 'TRY') => {
         return new Intl.NumberFormat('tr-TR', {
             style: 'currency',
             currency: currency,
-        }).format(amount)
+        }).format(Number(amount))
     }
 
     return (
@@ -169,7 +170,7 @@ export const InvoiceDocument: React.FC<InvoiceDocumentProps> = ({ data }) => {
                         <Text style={styles.subtitle}>Tarih: {formatDate(data.issueDate)}</Text>
                         <Text style={styles.subtitle}>Vade: {formatDate(data.dueDate)}</Text>
                         <Text style={styles.subtitle}>
-                            Durum: {data.status === 'PAID' ? 'ÖDENDİ' : data.status === 'PARTIAL' ? 'KISMEN ÖDENDİ' : 'BEKLİYOR'}
+                            Durum: {data.status === 'PAID' ? 'ÖDENDİ' : data.status === 'PARTIAL' ? 'KISMİ ÖDENDİ' : 'BEKLİYOR'}
                         </Text>
                     </View>
                 </View>
@@ -213,7 +214,7 @@ export const InvoiceDocument: React.FC<InvoiceDocumentProps> = ({ data }) => {
                         <Text style={styles.totalValueLarge}>{formatCurrency(data.total)}</Text>
                     </View>
 
-                    {data.paidAmount > 0 && (
+                    {Number(data.paidAmount) > 0 && (
                         <View style={{ marginTop: 10, borderTopWidth: 1, borderTopColor: '#E5E7EB', paddingTop: 10 }}>
                             <View style={styles.totalRow}>
                                 <Text style={styles.totalLabel}>Ödenen Tutar</Text>
@@ -221,7 +222,7 @@ export const InvoiceDocument: React.FC<InvoiceDocumentProps> = ({ data }) => {
                             </View>
                             <View style={styles.totalRow}>
                                 <Text style={[styles.totalLabel, { color: '#DC2626' }]}>Kalan Tutar</Text>
-                                <Text style={[styles.totalValue, { color: '#DC2626' }]}>{formatCurrency(data.total - data.paidAmount)}</Text>
+                                <Text style={[styles.totalValue, { color: '#DC2626' }]}>{formatCurrency(data.remainingAmount || 0)}</Text>
                             </View>
                         </View>
                     )}
@@ -230,7 +231,7 @@ export const InvoiceDocument: React.FC<InvoiceDocumentProps> = ({ data }) => {
                 {/* Footer */}
                 <View style={styles.footer}>
                     <Text style={styles.footerText}>Bu belge bilişim sistemleri vasıtasıyla oluşturulmuştur. İslak imza gerektirmez.
-                        ProSektor Yazılım ve Danışmanlık Hizmetleri
+                        ProSektorWeb Yazılım ve Danışmanlık Hizmetleri
                     </Text>
                 </View>
             </Page>

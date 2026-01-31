@@ -5,8 +5,7 @@ import 'dotenv/config'
 const connectionString = process.env.DATABASE_URL || 'mysql://root:password@127.0.0.1:3306/prosektorweb'
 // Note: In verify context, if creating pool fails, we catch it.
 // Mimicking src/lib/prisma.ts simple form:
-const adapter = new PrismaMariaDb(connectionString)
-const prisma = new PrismaClient({ adapter })
+const prisma = new PrismaClient()
 
 async function main() {
     console.log('🔄 Verifying Database Connection...')

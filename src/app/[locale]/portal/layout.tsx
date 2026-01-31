@@ -3,7 +3,8 @@ import { redirect } from "next/navigation"
 import Link from 'next/link'
 import {
     LayoutDashboard, Layers, Receipt, Ticket, LogOut, Building2,
-    Globe, FileText, Settings, Clock, CreditCard, BarChart3
+    Globe, FileText, Settings, Clock, CreditCard, BarChart3,
+    Image as ImageIcon, BookOpen, Search, Palette
 } from 'lucide-react'
 import { logoutAction } from '@/features/auth/actions/auth'
 import { prisma } from '@/server/db'
@@ -19,6 +20,16 @@ async function getCompanyName(companyId: string | null) {
     return company?.name
 }
 
+async function getFirstProjectId(companyId: string | null) {
+    if (!companyId) return null
+    const project = await prisma.webProject.findFirst({
+        where: { companyId, status: { not: 'CANCELLED' } },
+        select: { id: true },
+        orderBy: { updatedAt: 'desc' }
+    })
+    return project?.id || null
+}
+
 export default async function PortalLayout({
     children,
 }: {
@@ -27,6 +38,7 @@ export default async function PortalLayout({
     const session = await auth()
     const companyId = session?.user?.companyId
     const companyName = await getCompanyName(companyId || null)
+    const firstProjectId = await getFirstProjectId(companyId || null)
     const t = await getTranslations('Portal')
 
     return (
@@ -118,6 +130,30 @@ export default async function PortalLayout({
                             <Globe className="w-5 h-5" />
                             {t('domains')}
                         </Link>
+
+                        {/* Site Yönetimi */}
+                        {firstProjectId && (
+                            <>
+                                <p className="px-4 py-2 mt-4 text-xs font-semibold text-neutral-500 uppercase tracking-wider">{t('menu_site_management')}</p>
+
+                                <Link href={`/portal/projects/${firstProjectId}/media`} className="flex items-center gap-3 px-4 py-3 rounded-xl text-neutral-300 hover:bg-white/5 hover:text-white font-medium transition-all">
+                                    <ImageIcon className="w-5 h-5" />
+                                    {t('media')}
+                                </Link>
+                                <Link href={`/portal/projects/${firstProjectId}/blog`} className="flex items-center gap-3 px-4 py-3 rounded-xl text-neutral-300 hover:bg-white/5 hover:text-white font-medium transition-all">
+                                    <BookOpen className="w-5 h-5" />
+                                    {t('blog')}
+                                </Link>
+                                <Link href={`/portal/projects/${firstProjectId}/seo`} className="flex items-center gap-3 px-4 py-3 rounded-xl text-neutral-300 hover:bg-white/5 hover:text-white font-medium transition-all">
+                                    <Search className="w-5 h-5" />
+                                    {t('seo')}
+                                </Link>
+                                <Link href={`/portal/projects/${firstProjectId}/design`} className="flex items-center gap-3 px-4 py-3 rounded-xl text-neutral-300 hover:bg-white/5 hover:text-white font-medium transition-all">
+                                    <Palette className="w-5 h-5" />
+                                    {t('design')}
+                                </Link>
+                            </>
+                        )}
 
                         {/* Finansal */}
                         <p className="px-4 py-2 mt-4 text-xs font-semibold text-neutral-500 uppercase tracking-wider">{t('menu_financial')}</p>

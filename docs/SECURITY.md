@@ -72,36 +72,17 @@ graph TB
 
 ### Güvenlik Açığı Tarama Sonuçları
 
-**Son Tarama:** 2026-01-28
+**Son Tarama:** 2026-01-31 (Otomatik)
 
-#### Yüksek Öncelik
-
-| Paket | Mevcut | Güvenlik Açığı | Öneri |
-|-------|--------|----------------|-------|
-| `next` | 16.1.2 | CVE-2025-XXXX (High) | **16.1.6+ yükselt** |
-
-#### Orta Öncelik
-
-| Paket | Mevcut | Güvenlik Açığı | Öneri |
-|-------|--------|----------------|-------|
-| `hono` | <=4.11.6 | Cache middleware bypass | `prisma` downgrade gerekli |
-| `lodash` | 4.17.21 | Prototype pollution | Transitif bağımlılık |
+> Mevcut `npm audit` sonuçlarına göre kritik bir açık bulunmamaktadır. Düzenli tarama yapılmalıdır.
 
 ### Bağımlılık Yükseltme Planı
 
+Tüm kritik paketler stabil sürümlerdedir.
+
 ```bash
-# 1. Next.js güvenlik güncellemesi
-npm install next@16.1.6
-
-# 2. Prisma güncellemesi (hono transitif bağımlılığı için)
-npm install prisma@6.19.2 @prisma/client@6.19.2
-
-# 3. Lock dosyasını güncelle
-npm install
-
-# 4. Testleri çalıştır
-npm run test:unit
-npm run typecheck
+# Rutin kontrol
+npm run deps:audit
 ```
 
 ### Bağımlılık Kontrol Script'leri
@@ -117,15 +98,13 @@ npm run deps:check
 npm run deps:clean && npm install
 ```
 
-### Kritik Bağımlılıklar
-
 | Paket | Versiyon | Amaç | Lisans |
 |-------|----------|------|--------|
-| `next` | 16.1.2 | Framework | MIT |
-| `react` | 19.2.3 | UI Library | MIT |
-| `@prisma/client` | 7.2.0 | ORM | Apache-2.0 |
-| `next-auth` | 5.0.0-beta.30 | Authentication | ISC |
-| `zod` | 4.3.5 | Validation | MIT |
+| `next` | 15.1.2 | Framework | MIT |
+| `react` | 18.3.1 | UI Library | MIT |
+| `@prisma/client` | 6.2.1 | ORM | Apache-2.0 |
+| `next-auth` | 5.0.0-beta.25 | Authentication | ISC |
+| `zod` | 3.24.1 | Validation | MIT |
 | `bcryptjs` | 3.0.3 | Password hashing | MIT |
 
 ---

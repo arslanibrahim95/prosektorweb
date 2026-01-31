@@ -15,14 +15,20 @@ export default auth(async (req) => {
     // [TODO-OBS-002] Middleware Request ID & Logging
     const requestId = crypto.randomUUID()
     const requestStart = Date.now()
+    const nonce = crypto.randomUUID()
 
-    // Helper for structured responses with headers
-    const createErrorResponse = (message: string | object, status: number) => {
-        const body = typeof message === 'string' ? message : JSON.stringify(message)
-        const res = new NextResponse(body, { status })
-        res.headers.set('X-Request-Id', requestId)
-        return res
-    }
+    const csp = [
+        "default-src 'self'",
+        `script-src 'self' 'nonce-${nonce}' https://www.googletagmanager.com https://plausible.io`,
+        `style-src 'self' 'nonce-${nonce}'`,
+        "img-src 'self' data: https://images.unsplash.com https://grainy-gradients.vercel.app blob:",
+        "font-src 'self' data:",
+        "object-src 'none'",
+        "base-uri 'self'",
+        "frame-ancestors 'self'",
+        "form-action 'self'",
+        "connect-src 'self' https://vitals.vercel-insights.com https://www.google-analytics.com https://plausible.io",
+    ].join('; ')
 
     // Structured log context
     const logContext = {
@@ -35,170 +41,141 @@ export default auth(async (req) => {
 
     logger.info({ ...logContext }, 'Request started')
 
-    const isLoggedIn = !!req.auth
-    const userRole = req.auth?.user?.role
-
-    // Helper for logging exit
-    const logExit = () => {
-        const duration = Date.now() - requestStart
-        logger.info({ ...logContext, duration }, 'Request processed')
+    const applySecurityHeaders = (res: NextResponse) => {
+        res.headers.set('Content-Security-Policy', csp)
+        res.headers.set('X-Request-Id', requestId)
+        return res
     }
 
-    // 0. Rate Limiting (Security)
-    // Middleware'de next/headers kullanılamaz, NextRequest.headers kullanılır
-    const forwardedFor = req.headers.get('x-forwarded-for')
-    const ip = forwardedFor ? forwardedFor.split(',')[0].trim() : '127.0.0.1'
+    // Helper for structured responses with headers
+    const createErrorResponse = (message: string | object, status: number) => {
+        const body = typeof message === 'string' ? message : JSON.stringify(message)
+        const res = new NextResponse(body, { status })
+        return applySecurityHeaders(res)
+    }
 
-    // Strict limit for Auth (Brute Force Protection)
-    // Only limit POST requests to /api/auth (Login, Register, etc.)
-    // Allow GET requests (CSRF, Session, Page Loads) to pass to standard limits
-    if (req.nextUrl.pathname.startsWith('/api/auth') && req.method === 'POST') {
-        const { success } = await checkRateLimit(`auth:${ip}`, { limit: 10, windowSeconds: 60 })
-        if (!success) {
-            logExit()
-            logExit()
-            return createErrorResponse('Too Many Requests', 429)
+    try {
+        const isLoggedIn = !!req.auth
+        const userRole = req.auth?.user?.role
+
+        // 0. Rate Limiting (Security)
+        const forwardedFor = req.headers.get('x-forwarded-for')
+        const ip = forwardedFor ? forwardedFor.split(',')[0].trim() : '127.0.0.1'
+
+        // 0.1 Bot & Abuse Protection
+        const userAgent = req.headers.get('user-agent') || ''
+
+        if (!userAgent) {
+            return createErrorResponse('Bad Request: User-Agent required', 400)
         }
-    }
 
-    // 0. Bot & Abuse Protection
-    const userAgent = req.headers.get('user-agent') || ''
+        const BAD_BOTS = ['GPTBot', 'AhrefsBot', 'SemrushBot', 'DotBot', 'MJ12bot', 'Bytespider', 'ClaudeBot', 'anthropic-ai']
+        if (BAD_BOTS.some(bot => userAgent.includes(bot))) {
+            return createErrorResponse('Forbidden: Bot access denied', 403)
+        }
 
-    // 0.1 Block Empty User-Agent (Common in simple scripts)
-    if (!userAgent) {
-        logExit()
-        logExit()
-        return createErrorResponse('Bad Request: User-Agent required', 400)
-    }
+        // 0.2 Rate Limits (Exclusive checks)
+        // If it's an Auth request, check Auth Limit only
+        if (req.nextUrl.pathname.startsWith('/api/auth') && req.method === 'POST') {
+            const { success } = await checkRateLimit(`auth:${ip}`, { limit: 10, windowSeconds: 60 })
+            if (!success) return createErrorResponse('Too Many Requests', 429)
+        }
+        // If it's a general API request (and NOT auth POST), check API Limit
+        else if (req.nextUrl.pathname.startsWith('/api')) {
+            let limitKey = `api:${ip}`
+            let limitConfig = RATE_LIMIT_TIERS.API
 
-    // 0.2 Block Known Bad Bots
-    const BAD_BOTS = ['GPTBot', 'AhrefsBot', 'SemrushBot', 'DotBot', 'MJ12bot', 'Bytespider', 'ClaudeBot', 'anthropic-ai']
-    if (BAD_BOTS.some(bot => userAgent.includes(bot))) {
-        logExit()
-        return createErrorResponse('Forbidden: Bot access denied', 403)
-    }
-
-
-    // 0.4 Rate Limit: Specific API Limits
-    if (req.nextUrl.pathname.startsWith('/api')) {
-        let limitKey = `api:${ip}`
-        let limitConfig: { limit: number; window: number } = RATE_LIMIT_TIERS.API
-
-        // Use User ID for authenticated users to avoid IP collisions
-        if (isLoggedIn && req.auth?.user?.id) {
-            limitKey = `user:${req.auth.user.id}`
-            if (userRole === 'ADMIN') {
-                limitConfig = RATE_LIMIT_TIERS.ADMIN
-            } else {
-                limitConfig = RATE_LIMIT_TIERS.AUTHENTICATED
+            if (isLoggedIn && req.auth?.user?.id) {
+                limitKey = `user:${req.auth.user.id}`
+                limitConfig = userRole === 'ADMIN' ? RATE_LIMIT_TIERS.ADMIN : RATE_LIMIT_TIERS.AUTHENTICATED
             }
-        }
 
-        const { limit, window } = limitConfig
-        const { success } = await checkRateLimit(limitKey, { limit, windowSeconds: window })
-        if (!success) {
-            logExit()
+            const { success } = await checkRateLimit(limitKey, { limit: limitConfig.limit, windowSeconds: limitConfig.window })
             if (!success) {
-                logExit()
                 return createErrorResponse({ error: 'Too Many Requests' }, 429)
             }
         }
-    }
 
-    // 1. API Protection (Skip Intl)
-    if (req.nextUrl.pathname.startsWith('/api')) {
-        // Public API routes
-        if (
-            req.nextUrl.pathname.startsWith('/api/auth') ||
-            req.nextUrl.pathname.startsWith('/api/contact') ||
-            req.nextUrl.pathname.startsWith('/api/webhooks')
-        ) {
-            logExit()
-            return null
-        }
+        // 1. API Protection (Auth & Roles)
+        if (req.nextUrl.pathname.startsWith('/api')) {
+            // Unprotected APIs
+            if (
+                req.nextUrl.pathname.startsWith('/api/auth') ||
+                req.nextUrl.pathname.startsWith('/api/contact') ||
+                req.nextUrl.pathname.startsWith('/api/webhooks')
+            ) {
+                const requestHeaders = new Headers(req.headers)
+                requestHeaders.set('x-nonce', nonce)
+                const response = NextResponse.next({ request: { headers: requestHeaders } })
+                return applySecurityHeaders(response)
+            }
 
-        // Require auth for all other API routes
-        if (!isLoggedIn) {
-            logExit()
+            // Protected APIs
             if (!isLoggedIn) {
-                logExit()
                 return createErrorResponse({ success: false, error: 'Unauthorized', code: 'UNAUTHORIZED' }, 401)
             }
-        }
 
-        // Admin-only API routes
-        if (req.nextUrl.pathname.startsWith('/api/admin') && userRole !== 'ADMIN') {
-            logExit()
             if (req.nextUrl.pathname.startsWith('/api/admin') && userRole !== 'ADMIN') {
-                logExit()
                 return createErrorResponse({ success: false, error: 'Forbidden', code: 'FORBIDDEN' }, 403)
             }
+
+            const requestHeaders = new Headers(req.headers)
+            requestHeaders.set('x-nonce', nonce)
+            const response = NextResponse.next({ request: { headers: requestHeaders } })
+            return applySecurityHeaders(response)
         }
 
-        logExit()
-        return null
-    }
-
-    // 2. Intl Middleware (For Pages)
-    // We run this first to handle redirects (e.g. / -> /tr)
-    // If it returns a redirect, we follow it immediately.
-    const intlResponse = intlMiddleware(req);
-    if (intlResponse.headers.get('location')) {
-        logExit()
-        return intlResponse;
-    }
-
-    // 3. Auth Protection for Pages
-    // Determine the actual path (ignoring locale prefix for checks)
-    // E.g. /tr/admin -> /admin
-    const pathname = req.nextUrl.pathname;
-    const localeMatch = pathname.match(/^\/(tr|en)(\/|$)/);
-    const pathWithoutLocale = localeMatch
-        ? pathname.replace(/^\/(tr|en)/, '') || '/'
-        : pathname;
-
-    const isOnLogin = pathWithoutLocale.startsWith('/login')
-    const isOnAdmin = pathWithoutLocale.startsWith('/admin')
-    const isOnPortal = pathWithoutLocale.startsWith('/portal')
-
-    // Public login page - redirect logged-in users
-    if (isOnLogin && isLoggedIn) {
-        if (userRole === 'CLIENT') {
-            logExit()
-            return Response.redirect(new URL('/portal', req.nextUrl)) // Auth middleware will handle keeping locale if we use relative? No, next-intl handles generic redirects better but here we force it.
-            // Ideally: return Response.redirect(new URL(`/${req.locale}/portal`, req.url))
-            // But req.locale is not available here easily (it's in intlResponse).
-            // We can assume default or extract from URL.
-            // For now, redirecting to /portal will trigger intlMiddleware again on next request to add locale.
+        // 2. Intl Middleware (For Pages)
+        const intlResponse = intlMiddleware(req);
+        if (intlResponse.headers.get('location')) {
+            return applySecurityHeaders(intlResponse);
         }
-        if (userRole === 'ADMIN') {
-            logExit()
-            return Response.redirect(new URL('/admin', req.nextUrl))
-        }
-    }
 
-    // Admin protection
-    if (isOnAdmin) {
-        if (!isLoggedIn || userRole !== 'ADMIN') {
-            logExit()
-            // Redirect to login
-            return Response.redirect(new URL('/login', req.nextUrl))
-        }
-    }
+        // 3. Page Access Protection
+        const pathname = req.nextUrl.pathname;
+        const localeMatch = pathname.match(/^\/(tr|en)(\/|$)/);
+        const pathWithoutLocale = localeMatch
+            ? pathname.replace(/^\/(tr|en)/, '') || '/'
+            : pathname;
 
-    // Portal protection
-    if (isOnPortal) {
-        if (!isLoggedIn || userRole !== 'CLIENT') {
-            logExit()
-            return Response.redirect(new URL('/login', req.nextUrl))
-        }
-    }
+        const isOnLogin = pathWithoutLocale.startsWith('/login')
+        const isOnAdmin = pathWithoutLocale.startsWith('/admin')
+        const isOnPortal = pathWithoutLocale.startsWith('/portal')
 
-    logExit()
-    // Return the response created by intl middleware (which contains rewrites/headers)
-    const response = intlResponse;
-    response.headers.set('X-Request-Id', requestId);
-    return response;
+        if (isOnLogin && isLoggedIn) {
+            const target = userRole === 'ADMIN' ? '/admin' : '/portal'
+            return applySecurityHeaders(NextResponse.redirect(new URL(target, req.nextUrl)))
+        }
+
+        if (isOnAdmin && (!isLoggedIn || userRole !== 'ADMIN')) {
+            return applySecurityHeaders(NextResponse.redirect(new URL('/login', req.nextUrl)))
+        }
+
+        if (isOnPortal && (!isLoggedIn || userRole !== 'CLIENT')) {
+            return applySecurityHeaders(NextResponse.redirect(new URL('/login', req.nextUrl)))
+        }
+
+        // Return intl response
+        const requestHeaders = new Headers(req.headers)
+        requestHeaders.set('x-nonce', nonce)
+        const response = NextResponse.next({ request: { headers: requestHeaders } })
+
+        intlResponse.headers.forEach((value, key) => {
+            if (key.toLowerCase() === 'content-security-policy') return
+            if (key.toLowerCase() === 'x-request-id') return
+            response.headers.set(key, value)
+        })
+
+        if (intlResponse.cookies.getAll) {
+            intlResponse.cookies.getAll().forEach((cookie) => response.cookies.set(cookie))
+        }
+
+        return applySecurityHeaders(response);
+
+    } finally {
+        const duration = Date.now() - requestStart
+        logger.info({ ...logContext, duration }, 'Request processed')
+    }
 })
 
 export const config = {

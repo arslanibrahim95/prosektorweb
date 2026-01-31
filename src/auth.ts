@@ -39,9 +39,12 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                 // 1. Check SystemUser (Admins/Staff)
                 const systemUser = await prisma.systemUser.findUnique({ where: { email: normalizedEmail } })
                 if (systemUser) {
-                    if (!systemUser.isActive) throw new Error('INACTIVE_ACCOUNT')
+                    // if (!systemUser.isActive) return null // Silent fail
+                    // Verify password even if inactive to behave identically timing-wise? (bcrypt is slow)
+                    // Better: check password first, then check active status?
+                    // Actually, if we return null, NextAuth handles it. 
                     const passwordsMatch = await bcrypt.compare(password, systemUser.password)
-                    if (passwordsMatch) {
+                    if (passwordsMatch && systemUser.isActive) {
                         return {
                             id: systemUser.id,
                             name: systemUser.name || systemUser.firstName, // Fallback
@@ -57,10 +60,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                 // 2. Check Client User (Customers)
                 const user = await getUser(normalizedEmail)
                 if (user) {
-                    if (user.deletedAt) throw new Error('INACTIVE_ACCOUNT')
                     const passwordsMatch = await bcrypt.compare(password, user.password)
 
-                    if (passwordsMatch) {
+                    if (passwordsMatch && !user.deletedAt) {
                         // Only allow CLIENT role here effectively
                         // (After migration, ADMINs shouldn't be here, but for safety we use existing role)
                         return {

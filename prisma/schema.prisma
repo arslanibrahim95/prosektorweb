@@ -7,6 +7,7 @@ generator client {
 
 datasource db {
   provider = "mysql"
+  url      = env("DATABASE_URL")
 }
 
 // ===============================
@@ -56,6 +57,8 @@ model Company {
   tickets     Ticket[]
   services    Service[]
   users       User[]
+  mediaAssets MediaAsset[]
+  blogPosts   CompanyBlogPost[]
 
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -621,6 +624,7 @@ model WebProject {
   generatedContents GeneratedContent[]
   pipelineRuns PipelineRun[]
   sitePackage SitePackage?
+  blogPosts   CompanyBlogPost[]
 
   progress    Int           @default(0)
   
@@ -1449,4 +1453,61 @@ model SiteRevision {
 
   @@index([packageId])
   @@index([status])
+}
+
+// ===============================
+// PORTAL MEDIA & BLOG
+// ===============================
+
+enum MediaCategory {
+  LOGO
+  GALLERY
+  TEAM
+  BLOG
+  GENERAL
+}
+
+model MediaAsset {
+  id           String        @id @default(uuid())
+  companyId    String
+  company      Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  filename     String
+  originalName String
+  mimeType     String
+  size         Int
+  path         String
+  url          String
+  alt          String?
+  category     MediaCategory @default(GENERAL)
+  createdAt    DateTime      @default(now())
+  blogPosts    CompanyBlogPost[]
+
+  @@index([companyId])
+  @@index([category])
+}
+
+model CompanyBlogPost {
+  id              String      @id @default(uuid())
+  companyId       String
+  company         Company     @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  webProjectId    String
+  webProject      WebProject  @relation(fields: [webProjectId], references: [id], onDelete: Cascade)
+  title           String      @db.VarChar(500)
+  slug            String      @db.VarChar(500)
+  excerpt         String?     @db.Text
+  content         String      @db.MediumText
+  coverImageId    String?
+  coverImage      MediaAsset? @relation(fields: [coverImageId], references: [id], onDelete: SetNull)
+  tags            Json?       @default("[]")
+  metaTitle       String?     @db.VarChar(100)
+  metaDescription String?     @db.VarChar(200)
+  published       Boolean     @default(false)
+  publishedAt     DateTime?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  @@unique([webProjectId, slug])
+  @@index([companyId])
+  @@index([webProjectId])
+  @@index([published])
 }

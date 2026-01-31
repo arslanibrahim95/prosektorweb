@@ -2,7 +2,7 @@ import { getSystemUser } from '@/features/system/actions/system-users'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { ChevronLeft } from 'lucide-react'
-import { UserForm } from '@/components/admin/user/UserForm'
+import { UserForm } from '@/features/system/components/admin/user/UserForm'
 
 interface UserIdPageProps {
     params: Promise<{ id: string }>

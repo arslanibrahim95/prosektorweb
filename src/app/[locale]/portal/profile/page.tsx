@@ -1,6 +1,6 @@
 import { auth } from '@/auth'
-import { ProfileForm } from '@/components/portal/settings/ProfileForm'
-import { PasswordForm } from '@/components/portal/settings/PasswordForm'
+import { ProfileForm } from '@/features/crm/components/portal/ProfileForm'
+import { PasswordForm } from '@/features/crm/components/portal/PasswordForm'
 import { Settings } from 'lucide-react'
 
 export default async function ProfilePage() {

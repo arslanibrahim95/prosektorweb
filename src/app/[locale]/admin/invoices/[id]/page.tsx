@@ -57,7 +57,7 @@ export default async function InvoiceDetailPage({ params }: InvoiceDetailPagePro
         }).format(Number(amount) || 0)
     }
 
-    const remaining = Number(invoice.total) - Number(invoice.paidAmount)
+    const remaining = Number(invoice.remainingAmount)
 
     return (
         <div className="space-y-6">

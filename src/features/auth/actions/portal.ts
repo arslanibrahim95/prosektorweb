@@ -251,6 +251,44 @@ export async function getInvoiceById(invoiceId: string) {
     })
 }
 
+// Get site management stats for dashboard
+export async function getClientSiteManagementStats() {
+    const companyId = await getClientCompanyId()
+    if (!companyId) return null
+
+    try {
+        const [mediaCount, blogCount, publishedBlogCount] = await Promise.all([
+            prisma.mediaAsset.count({ where: { companyId } }),
+            prisma.companyBlogPost.count({ where: { companyId } }),
+            prisma.companyBlogPost.count({ where: { companyId, published: true } }),
+        ])
+
+        return { mediaCount, blogCount, publishedBlogCount }
+    } catch {
+        return null
+    }
+}
+
+// Get recent blog posts for dashboard
+export async function getClientRecentBlogPosts(limit = 5) {
+    const companyId = await getClientCompanyId()
+    if (!companyId) return []
+
+    try {
+        return await prisma.companyBlogPost.findMany({
+            where: { companyId },
+            orderBy: { createdAt: 'desc' },
+            take: limit,
+            include: {
+                webProject: { select: { id: true, name: true } },
+                coverImage: { select: { url: true } },
+            },
+        })
+    } catch {
+        return []
+    }
+}
+
 // Get company profile
 export async function getClientProfile() {
     const companyId = await getClientCompanyId()

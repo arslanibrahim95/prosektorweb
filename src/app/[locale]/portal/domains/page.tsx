@@ -1,4 +1,4 @@
-import { getClientDomains } from '@/actions/clientServices'
+import { getClientDomains } from '@/features/crm/actions/client-portal'
 import {
     Globe, Shield, Calendar, AlertCircle, CheckCircle,
     ExternalLink, Lock, Unlock

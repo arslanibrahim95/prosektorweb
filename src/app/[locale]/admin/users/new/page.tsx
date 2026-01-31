@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { ChevronLeft } from 'lucide-react'
-import { UserForm } from '@/components/admin/user/UserForm'
+import { UserForm } from '@/features/system/components/admin/user/UserForm'
 
 export default function NewUserPage() {
     return (

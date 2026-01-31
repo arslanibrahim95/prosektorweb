@@ -1,8 +1,8 @@
-import { getSitePackage, requestRevision } from '@/actions/site-package'
+import { getSitePackage, requestRevision } from '@/features/projects/actions/package-ops'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, CheckCircle, Clock, XCircle, Play, Plus } from 'lucide-react'
-import { RevisionRequestForm } from './RevisionRequestForm'
+import { RevisionRequestForm } from '@/features/projects/components/portal/revisions/RevisionRequestForm'
 
 const STATUS_CONFIG: Record<string, { label: string; color: string }> = {
     REQUESTED: { label: 'Talep Edildi', color: 'bg-yellow-100 text-yellow-700' },

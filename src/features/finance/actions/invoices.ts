@@ -138,18 +138,28 @@ export async function getInvoices(cursor?: string, limit: number = 20, search?: 
     }
 }
 
-export async function getInvoice(id: string) {
-    try {
-        return await prisma.invoice.findUnique({
-            where: { id },
-            include: {
-                company: true,
-                payments: true
-            }
-        })
-    } catch (e) {
-        return null
+try {
+    const invoice = await prisma.invoice.findUnique({
+        where: { id },
+        include: {
+            company: true,
+            payments: true
+        }
+    })
+
+    if (!invoice) return null
+
+    const total = new Decimal(invoice.total)
+    const paidAmount = new Decimal(invoice.paidAmount)
+    const remainingAmount = total.minus(paidAmount)
+
+    return {
+        ...invoice,
+        remainingAmount: remainingAmount.toString()
     }
+} catch (e) {
+    return null
+}
 }
 
 export async function createInvoice(input: InvoiceInput | FormData): Promise<ActionResult> {
@@ -330,13 +340,13 @@ export async function getInvoiceStats() {
         ])
 
         return {
-            totalRevenue: Number(paid._sum.total || 0),
-            pendingAmount: Number(pending._sum.total || 0),
+            totalRevenue: paid._sum.total?.toString() || '0',
+            pendingAmount: pending._sum.total?.toString() || '0',
             paidCount: paid._count,
             pendingCount: pending._count
         }
     } catch (e) {
-        return { totalRevenue: 0, pendingAmount: 0, paidCount: 0, pendingCount: 0 }
+        return { totalRevenue: '0', pendingAmount: '0', paidCount: 0, pendingCount: 0 }
     }
 }
 

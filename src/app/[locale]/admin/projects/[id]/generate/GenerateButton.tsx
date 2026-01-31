@@ -7,7 +7,7 @@
 
 import { useState } from 'react';
 import { Sparkles, Loader2 } from 'lucide-react';
-import { generateAllContent, generatePageContent } from '@/actions/generate';
+import { generateAllContent, generatePageContent } from '@/features/ai-generation/actions/legacy-generate';
 import type { ContentType } from '@/features/ai-generation/lib/ai/types';
 
 interface GenerateButtonProps {
