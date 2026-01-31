@@ -3,6 +3,7 @@
 import { prisma } from '@/server/db'
 import { auth } from '@/auth'
 import { AuditAction } from '@prisma/client'
+import { CursorPaginatedResponse } from '@/shared/lib/action-types'
 
 export interface AuditLogFilters {
     search?: string
@@ -12,14 +13,13 @@ export interface AuditLogFilters {
     endDate?: string
 }
 
-export async function getAuditLogs(page: number = 1, limit: number = 20, filters?: AuditLogFilters) {
+export async function getAuditLogs(cursor?: string, limit: number = 20, filters?: AuditLogFilters): Promise<CursorPaginatedResponse<any>> {
     try {
         const session = await auth()
         if (session?.user?.role !== 'ADMIN') {
-            return { data: [], meta: { total: 0, page: 1, limit, totalPages: 0 } }
+            return { data: [], meta: { nextCursor: null, limit } }
         }
 
-        const skip = (page - 1) * limit
         const where: any = {}
 
         if (filters?.search) {
@@ -47,28 +47,29 @@ export async function getAuditLogs(page: number = 1, limit: number = 20, filters
             where.createdAt = { ...where.createdAt, lte: new Date(filters.endDate) }
         }
 
-        const [data, total] = await Promise.all([
-            prisma.auditLog.findMany({
-                where,
-                skip,
-                take: limit,
-                orderBy: { createdAt: 'desc' },
-            }),
-            prisma.auditLog.count({ where })
-        ])
+        const data = await prisma.auditLog.findMany({
+            where,
+            take: limit + 1, // Fetch one extra to check for next page
+            cursor: cursor ? { id: cursor } : undefined,
+            orderBy: { createdAt: 'desc' },
+        })
+
+        let nextCursor: string | null = null
+        if (data.length > limit) {
+            const nextItem = data.pop()
+            nextCursor = nextItem?.id || null
+        }
 
         return {
             data,
             meta: {
-                total,
-                page,
-                limit,
-                totalPages: Math.ceil(total / limit)
+                nextCursor,
+                limit
             }
         }
     } catch (e) {
         console.error('getAuditLogs Error:', e)
-        return { data: [], meta: { total: 0, page: 1, limit: 20, totalPages: 0 } }
+        return { data: [], meta: { nextCursor: null, limit } }
     }
 }
 

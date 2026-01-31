@@ -10,9 +10,10 @@ import Script from 'next/script';
 
 interface AnalyticsProviderProps {
     children: React.ReactNode;
+    nonce?: string;
 }
 
-export function AnalyticsProvider({ children }: AnalyticsProviderProps) {
+export function AnalyticsProvider({ children, nonce }: AnalyticsProviderProps) {
     const ga4Id = process.env.NEXT_PUBLIC_GA4_ID;
     const plausibleDomain = process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN;
     const plausibleHost = process.env.NEXT_PUBLIC_PLAUSIBLE_API_HOST || 'https://plausible.io';
@@ -27,8 +28,9 @@ export function AnalyticsProvider({ children }: AnalyticsProviderProps) {
                     <Script
                         src={`https://www.googletagmanager.com/gtag/js?id=${ga4Id}`}
                         strategy="afterInteractive"
+                        nonce={nonce}
                     />
-                    <Script id="ga4-init" strategy="afterInteractive">
+                    <Script id="ga4-init" strategy="afterInteractive" nonce={nonce}>
                         {`
               window.dataLayer = window.dataLayer || [];
               function gtag(){dataLayer.push(arguments);}
@@ -57,6 +59,7 @@ export function AnalyticsProvider({ children }: AnalyticsProviderProps) {
                     src={`${plausibleHost}/js/script.pageview-props.tagged-events.js`}
                     data-domain={plausibleDomain}
                     strategy="afterInteractive"
+                    nonce={nonce}
                 />
             )}
         </>

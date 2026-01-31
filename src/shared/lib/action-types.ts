@@ -18,21 +18,31 @@ export type ActionResponse<T = unknown> =
     | { success: false; error: string; code?: string; message?: string; meta?: { requestId: string } }
 
 /**
- * Paginated response type for list queries.
- * 
- * @example
- * return {
- *   data: companies,
- *   total: 100,
- *   pages: 10,
- *   currentPage: 1
- * }
+ * Alias for ActionResponse for backward compatibility.
+ * @deprecated Use ActionResponse instead.
+ */
+export type ActionResult<T = unknown> = ActionResponse<T>
+
+/**
+ * Paginated response type for list queries (Offset-based).
+ * @deprecated Use CursorPaginatedResponse for new implementations.
  */
 export type PaginatedResponse<T> = {
     data: T[]
     total: number
     pages: number
     currentPage: number
+}
+
+/**
+ * Cursor-based paginated response type.
+ */
+export type CursorPaginatedResponse<T> = {
+    data: T[]
+    meta: {
+        nextCursor: string | null
+        limit: number
+    }
 }
 
 /**
@@ -85,83 +95,32 @@ export function getZodErrorMessage(error: unknown): string {
 }
 
 // ==========================================
-// CURSOR-BASED PAGINATION
+// PAGINATION VALIDATION
 // ==========================================
 
-/** Cursor-based pagination configuration constants */
-export const CURSOR_PAGINATION = {
-    DEFAULT_LIMIT: 10,
-    MIN_LIMIT: 1,
-    MAX_LIMIT: 100,
-} as const
-
-/**
- * Cursor-based pagination parameters
- * @deprecated Offset-based pagination is deprecated. Use cursor-based pagination instead.
- */
+/** Pagination configuration constants */
 export const PAGINATION = {
-    DEFAULT_PAGE: 1,
-    DEFAULT_LIMIT: 10,
-    MIN_LIMIT: 1,
+    DEFAULT_LIMIT: 20,
     MAX_LIMIT: 100,
 } as const
 
 /**
- * Validates and normalizes cursor-based pagination parameters.
- * Prevents DoS attacks via excessive limit values.
- *
- * @param cursor - Cursor string (ID or timestamp) for pagination
+ * Validates and normalizes pagination parameters for cursor-based pagination.
+ * 
+ * @param cursor - The cursor string (usually an ID or timestamp)
  * @param limit - Items per page
  * @returns Validated pagination parameters
- *
- * @example
- * const { cursor, limit } = validateCursorPagination(rawCursor, rawLimit)
- * // Query: where: { id: { gt: cursor } }, take: limit
- */
-export function validateCursorPagination(
-    cursor?: string | null,
-    limit?: number | string | null
-): { cursor: string | null; limit: number } {
-    // Parse and validate limit
-    let validLimit = typeof limit === 'string' ? parseInt(limit, 10) : (limit ?? CURSOR_PAGINATION.DEFAULT_LIMIT)
-    if (isNaN(validLimit) || validLimit < CURSOR_PAGINATION.MIN_LIMIT) {
-        validLimit = CURSOR_PAGINATION.DEFAULT_LIMIT
-    }
-    if (validLimit > CURSOR_PAGINATION.MAX_LIMIT) {
-        validLimit = CURSOR_PAGINATION.MAX_LIMIT
-    }
-
-    return {
-        cursor: cursor || null,
-        limit: validLimit,
-    }
-}
-
-/**
- * Validates and normalizes pagination parameters.
- * Prevents DoS attacks via excessive limit values.
- * @deprecated Use validateCursorPagination instead for better performance
- *
- * @param page - Page number (1-indexed)
- * @param limit - Items per page
- * @returns Validated pagination parameters with skip value
- *
- * @example
- * const { page, limit, skip } = validatePagination(rawPage, rawLimit)
  */
 export function validatePagination(
-    page?: number | string | null,
+    cursor?: string | null,
     limit?: number | string | null
-): { page: number; limit: number; skip: number } {
-    // Parse and validate page
-    let validPage = typeof page === 'string' ? parseInt(page, 10) : (page ?? PAGINATION.DEFAULT_PAGE)
-    if (isNaN(validPage) || validPage < 1) {
-        validPage = PAGINATION.DEFAULT_PAGE
-    }
+): { cursor: string | undefined; limit: number } {
+    // Validate cursor
+    const validCursor = typeof cursor === 'string' && cursor.length > 0 ? cursor : undefined
 
     // Parse and validate limit
     let validLimit = typeof limit === 'string' ? parseInt(limit, 10) : (limit ?? PAGINATION.DEFAULT_LIMIT)
-    if (isNaN(validLimit) || validLimit < PAGINATION.MIN_LIMIT) {
+    if (isNaN(validLimit) || validLimit < 1) {
         validLimit = PAGINATION.DEFAULT_LIMIT
     }
     if (validLimit > PAGINATION.MAX_LIMIT) {
@@ -169,8 +128,7 @@ export function validatePagination(
     }
 
     return {
-        page: validPage,
+        cursor: validCursor,
         limit: validLimit,
-        skip: (validPage - 1) * validLimit,
     }
 }

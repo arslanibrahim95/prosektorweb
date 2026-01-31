@@ -6,6 +6,7 @@ import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { AnalyticsProvider } from "@/features/analytics/components/AnalyticsProvider";
 import { ResourceHints, CriticalCSS } from "@/features/performance/components/WebVitalsTracker";
+import { headers } from 'next/headers';
 
 const inter = Inter({
   subsets: ["latin"],
@@ -74,18 +75,19 @@ export default async function RootLayout({
 }>) {
   const { locale } = await params;
   const messages = await getMessages();
+  const nonce = headers().get('x-nonce') || undefined;
 
   return (
     <html lang={locale} className={`${inter.variable} ${playfair.variable}`} suppressHydrationWarning>
       <head>
         <ResourceHints />
-        <CriticalCSS />
+        <CriticalCSS nonce={nonce} />
       </head>
       <body className="font-sans antialiased">
         <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:z-[100] focus:top-4 focus:left-4 bg-brand-600 text-white px-4 py-2 rounded-lg font-bold shadow-lg">
           Skip to content
         </a>
-        <JsonLd data={{
+        <JsonLd nonce={nonce} data={{
           "@context": "https://schema.org",
           "@type": "Organization",
           "name": "ProSektorWeb",
@@ -99,7 +101,7 @@ export default async function RootLayout({
         }} />
         <NextIntlClientProvider messages={messages}>
           <AuthProvider>
-            <AnalyticsProvider>
+            <AnalyticsProvider nonce={nonce}>
               <ThemeProvider
                 attribute="class"
                 defaultTheme="system"

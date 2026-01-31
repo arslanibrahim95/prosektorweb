@@ -82,7 +82,7 @@ export function ResourceHints() {
 /**
  * Critical CSS inline component
  */
-export function CriticalCSS() {
+export function CriticalCSS({ nonce }: { nonce?: string }) {
     const criticalStyles = `
     /* Critical above-fold styles */
     *,*::before,*::after{box-sizing:border-box}
@@ -97,6 +97,7 @@ export function CriticalCSS() {
         <style
             dangerouslySetInnerHTML={{ __html: criticalStyles }}
             data-critical="true"
+            nonce={nonce}
         />
     );
 }
