@@ -222,19 +222,19 @@ function StatsCard({ href, icon: Icon, label, value, color, badge }: any) {
 
     return (
         <Link href={href} className="group">
-            <div className="bg-white p-6 rounded-3xl border border-neutral-200 group-hover:border-transparent group-hover:shadow-xl group-hover:shadow-neutral-200/50 transition-all h-full relative overflow-hidden">
-                <div className="flex items-center justify-between mb-4">
-                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-colors ${colors[color]} group-hover:text-white`}>
-                        <Icon className="w-6 h-6" />
+            <div className="bg-white p-5 rounded-xl border border-neutral-200 hover:border-neutral-300 hover:shadow-md transition-all h-full">
+                <div className="flex items-center justify-between mb-3">
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${colors[color]} group-hover:text-white`}>
+                        <Icon className="w-5 h-5" />
                     </div>
                     {badge && (
-                        <span className="text-[10px] font-black uppercase tracking-wider bg-neutral-100 text-neutral-500 px-2 py-1 rounded-lg">
+                        <span className="text-[10px] font-medium uppercase tracking-wide bg-neutral-100 text-neutral-500 px-2 py-1 rounded-md">
                             {badge}
                         </span>
                     )}
                 </div>
-                <div className="text-3xl font-bold text-neutral-900 tracking-tight">{value}</div>
-                <p className="text-sm font-bold text-neutral-400 uppercase tracking-widest mt-1 group-hover:text-neutral-500 transition-colors">{label}</p>
+                <div className="text-2xl font-semibold text-neutral-900 tracking-tight">{value}</div>
+                <p className="text-xs font-medium text-neutral-500 uppercase tracking-wide mt-1">{label}</p>
             </div>
         </Link>
     )
