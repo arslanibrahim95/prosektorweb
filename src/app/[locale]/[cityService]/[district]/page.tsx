@@ -66,7 +66,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       canonical: canonicalUrl,
       languages: {
         "tr": page.canonicalUrl,
-        "en": page.canonicalUrl.replace("https://prosektorweb.com", "https://prosektorweb.com/en"),
       },
     },
     robots: {
@@ -91,11 +90,6 @@ export async function generateStaticParams() {
           cityService: `${province.slug}-${service.slug}`,
           district: district.slug,
           locale: "tr",
-        });
-        params.push({
-          cityService: `${province.slug}-${service.slug}`,
-          district: district.slug,
-          locale: "en",
         });
       }
     }

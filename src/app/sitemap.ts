@@ -7,7 +7,7 @@ const SITEMAP_URL_LIMIT = 45000
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const baseUrl = 'https://prosektorweb.com'
-    const locales = ['tr', 'en']
+    const locales = ['tr']
 
     const routes = [
         '',
@@ -21,7 +21,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // Static pages with locales
     const staticPages = routes.flatMap((route) =>
         locales.map((locale) => {
-            const localePrefix = locale === 'tr' ? '' : `/${locale}`
+            const localePrefix = '' // tr prefix is empty
             return {
                 url: `${baseUrl}${localePrefix}${route}`,
                 lastModified: new Date(),
@@ -39,7 +39,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     const dynamicPages = blogPosts.flatMap((post) =>
         locales.map((locale) => {
-            const localePrefix = locale === 'tr' ? '' : `/${locale}`
+            const localePrefix = '' // tr prefix is empty
             return {
                 url: `${baseUrl}${localePrefix}/blog/${post.slug}`,
                 lastModified: post.updatedAt || post.createdAt,
