@@ -43,9 +43,7 @@ export function LoginForm() {
         })
 
         if (result?.error) {
-            if (result.error.includes('INACTIVE_ACCOUNT')) {
-                setError(t('error_inactive'))
-            } else if (result.error === 'CredentialsSignin') {
+            if (result.error === 'CredentialsSignin') {
                 setError(t('error_invalid'))
             } else {
                 setError(t('error_system'))

@@ -3,7 +3,7 @@ import { checkRateLimit } from '@/shared/lib/rate-limit'
 import { Ratelimit } from '@upstash/ratelimit'
 
 // Mock dependencies
-vi.mock('@/lib/redis', () => ({
+vi.mock('@/shared/lib/redis', () => ({
     redis: {}
 }))
 

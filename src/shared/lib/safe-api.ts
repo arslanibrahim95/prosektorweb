@@ -133,8 +133,12 @@ export function safeApi<TResult, TParams = any>(
             const result = await handler(req, { requestId, params: resolvedParams })
 
             // Handle both raw results and { data, pagination } objects
-            const responseData = (result && typeof result === 'object' && 'data' in result) ? (result as any).data : result
-            const pagination = (result && typeof result === 'object' && 'pagination' in result) ? (result as any).pagination : undefined
+            const isComplexResult = result && typeof result === 'object' && 'data' in result
+
+            const responseData = isComplexResult ? (result as { data: TResult }).data : result
+            const pagination = (result && typeof result === 'object' && 'pagination' in result)
+                ? (result as { pagination: ApiResponse['pagination'] }).pagination
+                : undefined
 
             const finalResponse = {
                 success: true,

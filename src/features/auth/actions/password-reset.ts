@@ -4,7 +4,7 @@ import { prisma } from '@/server/db'
 import { z } from 'zod'
 import bcrypt from 'bcryptjs'
 import { generateResetToken, hashToken } from '@/features/auth/lib/password-reset'
-import { sendPasswordResetEmail, ActionResponse } from '@/shared/lib'
+import { sendPasswordResetEmail, ActionResponse, getZodErrorMessage } from '@/shared/lib'
 
 const ResetSchema = z.object({
     email: z.string().email('Geçerli bir e-posta adresi girin.'),
@@ -53,7 +53,7 @@ export async function requestPasswordReset(prevState: ActionResponse<void>, form
         return { success: true, data: undefined, message: 'Şifre sıfırlama linki e-posta adresinize gönderildi.' }
     } catch (e) {
         if (e instanceof z.ZodError) {
-            return { success: false, error: (e as any).errors[0].message }
+            return { success: false, error: getZodErrorMessage(e) }
         }
         return { success: false, error: 'Bir hata oluştu. Lütfen daha sonra tekrar deneyin.' }
     }
@@ -111,7 +111,7 @@ export async function resetPassword(prevState: ActionResponse<void>, formData: F
         return { success: true, data: undefined, message: 'Şifreniz başarıyla güncellendi.' }
     } catch (e) {
         if (e instanceof z.ZodError) {
-            return { success: false, error: (e as any).errors[0].message }
+            return { success: false, error: getZodErrorMessage(e) }
         }
         return { success: false, error: 'Bir hata oluştu.' }
     }

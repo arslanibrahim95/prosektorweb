@@ -3,7 +3,7 @@ import { prisma } from '@/server/db'
 import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, Settings } from 'lucide-react'
-import { SiteSettingsForm } from '@/features/crm/components/portal/SiteSettingsForm'
+import { SiteSettingsForm } from '@/features/projects/components/portal/settings/SiteSettingsForm'
 
 interface SettingsPageProps {
     params: Promise<{ id: string }>

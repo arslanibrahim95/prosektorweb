@@ -110,19 +110,20 @@ async function logActivity(action: AuditAction, entity: string, entityId: string
     }
 }
 
-export async function getDomains(page: number = 1, limit: number = 20, search?: string) {
+import { CursorPaginatedResponse } from '@/shared/lib/action-types'
+
+export async function getDomains(cursor?: string, limit: number = 20, search?: string): Promise<CursorPaginatedResponse<any>> {
     try {
         const session = await auth()
-        if (!session?.user) return { data: [], meta: { total: 0, page: 1, limit: 20, totalPages: 0 } }
+        if (!session?.user) return { data: [], meta: { nextCursor: null, limit } }
 
-        const skip = (page - 1) * limit
         const where: any = {
             deletedAt: null
         }
 
         // AuthZ: Non-admins can only see their own company's domains
         if (session.user.role !== 'ADMIN') {
-            if (!session.user.companyId) return { data: [], meta: { total: 0, page: 1, limit: 20, totalPages: 0 } }
+            if (!session.user.companyId) return { data: [], meta: { nextCursor: null, limit } }
             where.companyId = session.user.companyId
         }
 
@@ -133,32 +134,33 @@ export async function getDomains(page: number = 1, limit: number = 20, search?: 
             ]
         }
 
-        const [data, total] = await Promise.all([
-            prisma.domain.findMany({
-                where,
-                skip,
-                take: limit,
-                orderBy: { expiresAt: 'asc' }, // Prioritize expiration
-                include: {
-                    company: { select: { id: true, name: true } },
-                    _count: { select: { dnsRecords: true } }
-                }
-            }),
-            prisma.domain.count({ where })
-        ])
+        const data = await prisma.domain.findMany({
+            where,
+            take: limit + 1,
+            cursor: cursor ? { id: cursor } : undefined,
+            orderBy: { expiresAt: 'asc' }, // Prioritize expiration
+            include: {
+                company: { select: { id: true, name: true } },
+                _count: { select: { dnsRecords: true } }
+            }
+        })
+
+        let nextCursor: string | null = null
+        if (data.length > limit) {
+            const nextItem = data.pop()
+            nextCursor = nextItem?.id || null
+        }
 
         return {
             data,
             meta: {
-                total,
-                page,
-                limit,
-                totalPages: Math.ceil(total / limit)
+                nextCursor,
+                limit
             }
         }
     } catch (e) {
         console.error('getDomains Error:', e)
-        return { data: [], meta: { total: 0, page: 1, limit: 20, totalPages: 0 } }
+        return { data: [], meta: { nextCursor: null, limit } }
     }
 }
 

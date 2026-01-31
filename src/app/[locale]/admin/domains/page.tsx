@@ -1,6 +1,6 @@
 import { getDomains, getDomainStats } from '@/features/projects/actions/domains'
 import Link from 'next/link'
-import { Pagination } from '@/components/ui/Pagination'
+import { CursorPagination } from '@/components/ui/CursorPagination'
 import {
     Globe,
     Plus,
@@ -17,7 +17,7 @@ import {
 } from 'lucide-react'
 
 interface DomainsPageProps {
-    searchParams: Promise<{ q?: string, search?: string, page?: string }>
+    searchParams: Promise<{ q?: string, search?: string, cursor?: string }>
 }
 
 const statusConfig: Record<string, { label: string, color: string }> = {
@@ -30,10 +30,10 @@ const statusConfig: Record<string, { label: string, color: string }> = {
 export default async function DomainsPage({ searchParams }: DomainsPageProps) {
     const params = await searchParams
     const searchQuery = params.q || params.search || ''
-    const page = parseInt(params.page || '1')
+    const cursor = params.cursor
 
     const [domainsData, stats] = await Promise.all([
-        getDomains(page, 20, searchQuery),
+        getDomains(cursor, 20, searchQuery),
         getDomainStats(),
     ])
 
@@ -222,9 +222,8 @@ export default async function DomainsPage({ searchParams }: DomainsPageProps) {
                 </div>
             )}
 
-            <Pagination
-                currentPage={meta.page}
-                totalPages={meta.totalPages}
+            <CursorPagination
+                nextCursor={meta.nextCursor}
                 baseUrl="/admin/domains"
             />
         </div>

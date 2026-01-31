@@ -1,12 +1,11 @@
 import Link from 'next/link'
-import { ChevronLeft, Search, Calendar, Clock, ChevronRight, User, Image as ImageIcon } from 'lucide-react'
+import { ChevronRight, Search, Calendar, Clock, User } from 'lucide-react'
 import { Navbar } from '@/components/layout/Navbar'
 import { Footer } from '@/components/layout/Footer'
 import { prisma } from '@/server/db'
 import { Prisma } from '@prisma/client'
-import Particles from '@/components/ui/Particles'
 import SpotlightCard from '@/components/ui/SpotlightCard'
-import { Pagination } from '@/features/content/components/Pagination'
+import { CursorPagination } from '@/components/ui/CursorPagination'
 import { BlogCardImage } from '@/features/content/components/BlogCardImage'
 
 // Helper to format date
@@ -21,10 +20,10 @@ const formatDate = (date: Date) => {
 export default async function BlogPage({
     searchParams
 }: {
-    searchParams: Promise<{ page?: string; category?: string; search?: string }>
+    searchParams: Promise<{ cursor?: string; category?: string; search?: string }>
 }) {
     const params = await searchParams
-    const page = Number(params.page) || 1
+    const cursor = params.cursor
     const categorySlug = params.category
     const search = params.search
     const LIMIT = 9
@@ -42,19 +41,24 @@ export default async function BlogPage({
     }
 
     // Fetch data in parallel
-    const [categories, posts, totalPosts] = await Promise.all([
+    const [categories, posts] = await Promise.all([
         prisma.blogCategory.findMany({ orderBy: { name: 'asc' } }),
         prisma.blogPost.findMany({
             where,
             include: { category: true },
             orderBy: { publishedAt: 'desc' },
-            skip: (page - 1) * LIMIT,
-            take: LIMIT
+            take: LIMIT + 1,
+            cursor: cursor ? { id: cursor } : undefined,
         }),
-        prisma.blogPost.count({ where })
     ])
 
-    const totalPages = Math.ceil(totalPosts / LIMIT)
+    let nextCursor: string | null = null
+    const displayPosts = [...posts]
+
+    if (displayPosts.length > LIMIT) {
+        const nextItem = displayPosts.pop()
+        nextCursor = nextItem?.id || null
+    }
 
     return (
         <div className="min-h-screen bg-transparent text-neutral-900 font-sans selection:bg-brand-100 selection:text-brand-900 relative overflow-hidden">
@@ -121,8 +125,8 @@ export default async function BlogPage({
             <section className="px-6 pb-24">
                 <div className="max-w-6xl mx-auto">
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {posts.length > 0 ? (
-                            posts.map((post) => (
+                        {displayPosts.length > 0 ? (
+                            displayPosts.map((post) => (
                                 <Link
                                     key={post.slug}
                                     href={`/blog/${post.slug}`}
@@ -203,10 +207,7 @@ export default async function BlogPage({
 
                     {/* Pagination */}
                     <div className="mt-12">
-                        <Pagination currentPage={page} totalPages={totalPages} baseUrl="/blog" />
-                    </div>
-                    <div className="text-center text-sm text-gray-400 mt-4 font-medium">
-                        Toplam {totalPosts} makale • Sayfa {page}/{totalPages || 1}
+                        <CursorPagination nextCursor={nextCursor} baseUrl="/blog" />
                     </div>
                 </div>
             </section>

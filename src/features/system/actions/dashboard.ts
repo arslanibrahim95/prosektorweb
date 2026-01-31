@@ -45,6 +45,9 @@ export interface RecentActivity {
 
 // Cache wrapper with explicit redis control
 export async function getAdminDashboardStats(): Promise<DashboardStats> {
+    const { requireAuth } = await import('@/features/auth/lib/auth-guard')
+    await requireAuth(['ADMIN'])
+
     return getOrSet(
         'dashboard:admin:stats',
         async () => {
@@ -171,6 +174,9 @@ export async function getAdminDashboardStats(): Promise<DashboardStats> {
 
 export async function getRecentActivities(limit: number = 5): Promise<RecentActivity[]> {
     try {
+        const { requireAuth } = await import('@/features/auth/lib/auth-guard')
+        await requireAuth(['ADMIN'])
+
         const logs = await prisma.auditLog.findMany({
             take: limit,
             orderBy: { createdAt: 'desc' },

@@ -5,7 +5,7 @@ import { requireAuth } from '@/features/auth/lib/auth-guard'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 import bcrypt from 'bcryptjs'
-import { UserRole, AuditAction } from '@prisma/client'
+import { UserRole, AuditAction, Prisma } from '@prisma/client'
 import { auth } from '@/auth'
 import { getErrorMessage, getZodErrorMessage, validatePagination, logger } from '@/shared/lib'
 
@@ -169,7 +169,7 @@ export async function createSystemUser(formData: FormData): Promise<ActionResult
         return { success: true, data: user }
     } catch (error) {
         if (error instanceof z.ZodError) {
-            return { success: false, error: error.issues[0].message }
+            return { success: false, error: getZodErrorMessage(error) }
         }
         return { success: false, error: 'Kullanıcı oluşturulamadı.' }
     }
@@ -196,11 +196,11 @@ export async function updateSystemUser(id: string, formData: FormData): Promise<
         // Partial validation handled manually or by lenient schema if needed
         // Here we re-use schema but handle password specially
 
-        const updateData: any = {
-            email: rawData.email,
-            name: rawData.name,
-            firstName: rawData.firstName,
-            lastName: rawData.lastName,
+        const updateData: Prisma.SystemUserUpdateInput = {
+            email: rawData.email ? String(rawData.email) : undefined,
+            name: rawData.name ? String(rawData.name) : undefined,
+            firstName: rawData.firstName ? String(rawData.firstName) : undefined,
+            lastName: rawData.lastName ? String(rawData.lastName) : undefined,
             role: rawData.role as UserRole,
             isActive: rawData.isActive
         }

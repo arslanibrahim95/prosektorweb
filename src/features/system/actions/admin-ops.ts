@@ -2,9 +2,10 @@
 
 import { auth } from '@/auth'
 import { redirect } from 'next/navigation'
-import { getErrorMessage, getZodErrorMessage, logger } from '@/shared/lib'
+import { logAudit } from '@/shared/lib'
 import { setCookie, deleteCookie } from '@/shared/lib/headers'
-import { createAuditLog } from '@/shared/lib/audit'
+import { getClientIp } from '@/shared/lib/rate-limit'
+import { headers } from 'next/headers'
 
 export async function impersonateCompany(companyId: string) {
     const session = await auth()
@@ -13,15 +14,18 @@ export async function impersonateCompany(companyId: string) {
         throw new Error('Unauthorized')
     }
 
+    const ipAddress = await getClientIp()
+    const userAgent = headers().get('user-agent') || undefined
+
     // Audit Log: Start Impersonation (DB-backed)
-    await createAuditLog({
-        action: 'IMPERSONATE_START',
+    await logAudit({
+        action: 'UPDATE',
         entity: 'AdminOps',
         entityId: companyId,
         userId: session.user.id,
         details: { operation: 'IMPERSONATE_START', targetCompanyId: companyId },
-        ipAddress: session.user.ipAddress,
-        userAgent: session.user.userAgent
+        ipAddress,
+        userAgent
     })
 
     // Set a cookie to indicate which company the admin acts as
@@ -45,15 +49,18 @@ export async function exitImpersonation() {
         redirect('/login')
     }
 
+    const ipAddress = await getClientIp()
+    const userAgent = headers().get('user-agent') || undefined
+
     // Audit Log: End Impersonation (DB-backed)
-    await createAuditLog({
-        action: 'IMPERSONATE_END',
+    await logAudit({
+        action: 'UPDATE',
         entity: 'AdminOps',
         entityId: session.user.companyId || 'system',
         userId: session.user.id,
         details: { operation: 'IMPERSONATE_END' },
-        ipAddress: session.user.ipAddress,
-        userAgent: session.user.userAgent
+        ipAddress,
+        userAgent
     })
 
     await deleteCookie('admin_view_company_id')

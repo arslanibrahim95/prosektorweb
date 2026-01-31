@@ -4,7 +4,7 @@ import { vi, beforeEach } from 'vitest'
 import { prisma } from '@/server/db'
 
 // 1. Mock the prisma module
-vi.mock('@/lib/prisma', () => ({
+vi.mock('@/server/db', () => ({
     prisma: mockDeep<PrismaClient>(),
 }))
 

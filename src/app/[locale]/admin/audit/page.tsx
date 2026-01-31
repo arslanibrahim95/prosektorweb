@@ -4,7 +4,7 @@ import { formatDistanceToNow } from 'date-fns'
 import { tr } from 'date-fns/locale'
 import { FileText, Plus, Trash2, Edit, LogIn, LogOut } from 'lucide-react'
 import { AuditFilters } from '@/features/system/components/AuditFilters'
-import { AuditPagination } from '@/features/system/components/AuditPagination'
+import { CursorPagination } from '@/components/ui/CursorPagination'
 import { Suspense } from 'react'
 
 const ACTION_ICONS: Record<AuditAction, React.ComponentType<{ className?: string }>> = {
@@ -40,22 +40,21 @@ function isValidAuditAction(value: string | undefined): value is AuditAction {
 export default async function AuditPage({
     searchParams,
 }: {
-    searchParams: Promise<{ page?: string; entity?: string; action?: string; startDate?: string; endDate?: string }>
+    searchParams: Promise<{ cursor?: string; entity?: string; action?: string; startDate?: string; endDate?: string }>
 }) {
     const params = await searchParams
-    const page = parseInt(params.page || '1')
+    const cursor = params.cursor || undefined
     const entity = params.entity || undefined
     const action = isValidAuditAction(params.action) ? params.action : undefined
     const startDate = params.startDate || undefined
     const endDate = params.endDate || undefined
 
-    const { data: logs, meta } = await getAuditLogs(page, 25, {
+    const { data: logs, meta } = await getAuditLogs(cursor, 25, {
         startDate,
         endDate,
         entity,
         action,
     })
-    const { total, totalPages: pages, page: currentPage } = meta
 
     return (
         <div className="space-y-6">
@@ -64,7 +63,7 @@ export default async function AuditPage({
                 <div>
                     <h1 className="text-2xl font-bold text-gray-900">İşlem Geçmişi</h1>
                     <p className="text-gray-500 mt-1">
-                        Sistemdeki tüm kritik işlemlerin kaydı ({total} kayıt)
+                        Sistemdeki tüm kritik işlemlerin kaydı
                     </p>
                 </div>
             </div>
@@ -164,7 +163,7 @@ export default async function AuditPage({
 
             {/* Pagination - Client Component */}
             <Suspense fallback={null}>
-                <AuditPagination currentPage={currentPage} totalPages={pages} />
+                <CursorPagination nextCursor={meta.nextCursor} baseUrl="/admin/audit" />
             </Suspense>
         </div>
     )

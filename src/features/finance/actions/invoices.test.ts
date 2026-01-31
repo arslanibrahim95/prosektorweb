@@ -6,7 +6,7 @@ import { redis } from '@/shared/lib'
 import { auth } from '@/auth'
 import { Decimal } from 'decimal.js'
 
-vi.mock('@/lib/prisma', () => ({
+vi.mock('@/server/db', () => ({
     prisma: {
         invoice: {
             create: vi.fn(),
@@ -20,7 +20,7 @@ vi.mock('@/lib/prisma', () => ({
     },
 }))
 
-vi.mock('@/lib/redis', () => ({
+vi.mock('@/shared/lib/redis', () => ({
     redis: {
         get: vi.fn(),
         set: vi.fn(),
@@ -31,11 +31,11 @@ vi.mock('@/auth', () => ({
     auth: vi.fn(),
 }))
 
-vi.mock('@/lib/cache', () => ({
+vi.mock('@/shared/lib/cache', () => ({
     invalidateCache: vi.fn(),
 }))
 
-vi.mock('@/lib/rate-limit', () => ({
+vi.mock('@/shared/lib/rate-limit', () => ({
     checkRateLimit: vi.fn().mockResolvedValue({ success: true }),
     getClientIp: vi.fn().mockResolvedValue('127.0.0.1')
 }))

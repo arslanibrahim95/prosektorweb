@@ -6,7 +6,7 @@ import { auth } from '@/auth'
 import { getErrorMessage, getZodErrorMessage, validatePagination, logger, slugify } from '@/shared/lib'
 import { z } from 'zod'
 import { getUserCompanyId, requireCompanyAccess, requireTenantAccess } from '@/features/system/lib/guards/tenant-guard'
-import { AuditAction, ProjectStatus, ProjectPriority } from '@prisma/client'
+import { AuditAction, ProjectStatus, ProjectPriority, Prisma } from '@prisma/client'
 
 export interface ProjectInput {
     companyId: string
@@ -163,18 +163,22 @@ export async function createProject(input: ProjectInput | FormData): Promise<Act
         // Tenant isolation
         await requireCompanyAccess(validated.companyId)
 
+        // Construct STRICT strictly typed create input
+        const createData: Prisma.WebProjectUncheckedCreateInput = {
+            name: validated.name,
+            slug: slugify(validated.name) + '-' + Math.random().toString(36).substring(2, 7),
+            companyId: validated.companyId,
+            domainId: validated.domainId || null,
+            price: validated.price ? Number(validated.price) : null,
+            notes: validated.notes || null,
+            status: validated.status || 'DRAFT',
+            priority: validated.priority || 'MEDIUM',
+            progress: 0,
+            // Initialize required fields if any (based on schema)
+        }
+
         const project = await prisma.webProject.create({
-            data: {
-                name: validated.name,
-                slug: slugify(validated.name) + '-' + Math.random().toString(36).substring(2, 7),
-                companyId: validated.companyId,
-                domainId: validated.domainId || null,
-                price: validated.price || null,
-                notes: validated.notes || null,
-                status: validated.status || 'DRAFT',
-                priority: validated.priority || 'MEDIUM',
-                progress: 0,
-            } as any
+            data: createData
         })
 
         await logActivity('CREATE', 'WebProject', project.id, { name: project.name })
@@ -214,40 +218,57 @@ export async function updateProject(id: string, input: Partial<ProjectInput> | F
         // Tenant isolation
         await requireTenantAccess('project', id)
 
-        const data = input instanceof FormData ? {
+        const rawData = input instanceof FormData ? {
             name: input.get('name') as string,
             status: input.get('status') as ProjectStatus,
-            siteUrl: input.get('siteUrl') as string,
-            previewUrl: input.get('previewUrl') as string,
-            repoUrl: input.get('repoUrl') as string,
             price: input.get('price') ? parseFloat(input.get('price') as string) : undefined,
             isPaid: input.get('isPaid') === 'true' || input.get('isPaid') === 'on',
             notes: input.get('notes') as string,
         } : input
 
-        // Auto-set dates based on status
-        if (data.status === 'DESIGNING' || data.status === 'DEVELOPMENT') {
-            const existing = await prisma.webProject.findUnique({ where: { id } })
-            if (!existing?.startedAt) (data as any).startedAt = new Date()
-        }
-        if (data.status === 'LIVE') (data as any).completedAt = new Date()
-        if (data.isPaid === true) {
-            const existing = await prisma.webProject.findUnique({ where: { id } })
-            if (!existing?.paidAt) (data as any).paidAt = new Date()
+        // 1. Fetch existing project FOR DATE LOGIC ONLY
+        const existing = await prisma.webProject.findUnique({ where: { id } })
+        if (!existing) return { success: false, error: 'Proje bulunamadı' }
+
+        // 2. Prepare STRICT update object
+        const updateData: Prisma.WebProjectUpdateInput = {
+            ...(rawData.name && { name: rawData.name }),
+            ...(rawData.status && { status: rawData.status }),
+            ...(rawData.price !== undefined && { price: rawData.price }),
+            ...(rawData.isPaid !== undefined && { isPaid: rawData.isPaid }),
+            ...(rawData.notes !== undefined && { notes: rawData.notes }),
         }
 
-        const where: any = { id }
+        // 3. Conditional Date Logic (Strictly Typed)
+        if (rawData.status === 'DESIGNING' || rawData.status === 'DEVELOPMENT') {
+            if (!existing.startedAt) {
+                updateData.startedAt = new Date()
+            }
+        }
+        if (rawData.status === 'LIVE') {
+            updateData.completedAt = new Date()
+        }
+        if (rawData.isPaid === true && !existing.paidAt) {
+            updateData.paidAt = new Date()
+        }
+
+        // 4. Handle Versioning
+        const where: Prisma.WebProjectWhereUniqueInput = { id }
+
+        // Optimistic Concurrency Control
+        // If version is provided, we MUST check it. If not, we just update by ID.
+        // Prisma doesn't support "increment AND check" in one go easily without exact match on where.
         if (typeof version === 'number') {
             where.version = version
-                ; (data as any).version = { increment: 1 }
+            updateData.version = { increment: 1 }
         }
 
         const project = await prisma.webProject.update({
             where,
-            data: data as any
+            data: updateData
         })
 
-        await logActivity('UPDATE', 'WebProject', id, data)
+        await logActivity('UPDATE', 'WebProject', id, rawData)
         revalidatePath('/admin/projects')
         revalidatePath(`/admin/projects/${id}`)
         return { success: true, data: project }
